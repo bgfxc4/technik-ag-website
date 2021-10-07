@@ -1,0 +1,8 @@
+{
+	"main_server_port": 5560,
+	"mongo_url": "mongodb://localhost:27017",
+	"users": [
+		add here your login hashes of the users in the format
+		sha512(sha512("technikag[username]:[password]")), Eg sha512(sha512("technikagTestUserName:TestPassword"))
+	]
+}

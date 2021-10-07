@@ -1,0 +1,28 @@
+{
+  "name": "technik-ag-website",
+  "version": "1.0.0",
+  "description": "A website to manage technical equipment and to book appointments",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bgfxc4/technik-ag-website.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bgfxc4/technik-ag-website/issues"
+  },
+  "homepage": "https://github.com/bgfxc4/technik-ag-website#readme",
+  "dependencies": {
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.10.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "js-sha512": "^0.8.0",
+    "mongodb": "^4.1.3"
+  }
+}
