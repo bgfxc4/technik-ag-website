@@ -6,6 +6,7 @@ import {sha512} from "js-sha512"
 import {Db, MongoClient} from "mongodb"
 
 const config = JSON.parse(fs.readFileSync("./configs/config.json", "utf-8"))
+const item_image_placeholder = fs.readFileSync("./imgs/item-placeholder-img.png").toString('base64')
 
 const app = express()
 var db:Db;
@@ -16,6 +17,9 @@ app.use(cors())
 interface Equipment {
 	id: number;
 	name: string;
+	description: string;
+	storage_place:string;
+	image: string;
 }
 
 interface EquipmentCategory {
@@ -23,7 +27,39 @@ interface EquipmentCategory {
 	equipment: Equipment[];
 }
 
-var equipment_list: EquipmentCategory[] = []
+var equipment_list: EquipmentCategory[] = [
+	{
+		name: "testCategory",
+		equipment: [
+			{
+				id: 0,
+				name: "testItem",
+				description: "just a test item",
+				storage_place: "room1",
+				image: item_image_placeholder
+			},
+			{
+				id: 0,
+				name: "testItem",
+				description: "just a test item",
+				storage_place: "room1",
+				image: item_image_placeholder
+			}
+		]
+	},
+	{
+		name: "testCategory2",
+		equipment: [
+			{
+				id: 1,
+				name: "testItem2",
+				description: "just the second test item",
+				storage_place: "room2",
+				image: item_image_placeholder
+			}
+		]
+	}
+]
 
 app.post("/authorize", (req, res) => {
 	if (!authorized(req.body))
