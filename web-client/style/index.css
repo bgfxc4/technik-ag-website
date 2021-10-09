@@ -72,6 +72,7 @@ body {
 	margin-top: 11px;
 	height: 60%;
 	width: 25%;
+	font-size: 1.5vh;
 }
 
 #top-bar button {
@@ -82,6 +83,7 @@ body {
 	margin-right: 16px;
 	height: 60%;
 	width: 6%;
+	max-width: 6vh
 }
 
 #top-bar button.x {
@@ -89,6 +91,27 @@ body {
 	background-color: white;
 	display: none;
 	width: 2%;
+}
+
+#top-bar .login-status {
+	background-color: #0000;
+	display: none;
+}
+
+button#not-logged-in.login-status {
+	width: 7%;
+	max-width: 7vh;
+	display: inline-block;
+}
+
+#logged-in .dropdown {
+	position: absolute;
+	background-color: #fff;
+	right: 0;
+	top: 6%;
+	padding: 10px; 
+	padding-right: 18px;
+	border: 2px solid black;
 }
 
 .item-entry {

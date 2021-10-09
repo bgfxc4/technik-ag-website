@@ -11,6 +11,10 @@
 		<div id="top-bar">
 			<a href="./" class="active">Inventory</a>
 			<a>Appointments</a>
+			<button class="login-status" id="logged-in" onclick="$('.login-status .dropdown').toggle()"><i class="fa fa-circle-user fa-2xl"></i>
+				<div class="dropdown" style="display:none;">You are logged in. <p onclick="logout()" style="color:red;">Log out</p></div>
+			</button>
+			<button class="login-status" id="not-logged-in" onclick="window.location = window.location.href + 'login.html'">Sign in</button>
 			<button onclick="search()"><i class="fa fa-search"></i></button>
 			<button class="x" onclick="window.location='./'"><i class="fa fa-x"></i></button>
 			<input type="text" onchange="search()" placeholder="search...">

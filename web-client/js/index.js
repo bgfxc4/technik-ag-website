@@ -1,5 +1,7 @@
 window.onload = function () {
 	
+	check_if_logged_in()
+
 	var search_keyword = new URL(window.location).searchParams.get("search")
 	
 	if (search_keyword != null) {
@@ -36,6 +38,28 @@ function render_equipment(equipment, search_keyword) {
 function search() {
 	var keyword = $("#top-bar input").val()
 	window.location = window.origin + window.location.pathname + ((keyword == "") ? "" : "?search=" + encodeURIComponent(keyword))
+}
+
+function logout() {
+	set_cookie("login_hash", "", 1)
+	window.location.reload()
+}
+
+function check_if_logged_in() {
+	var login_hash = get_cookie("login_hash")
+	if (login_hash != "") {
+		var xhr = new XMLHttpRequest()
+		var url = server_url + "authorize"
+		xhr.onload = function() {
+			if (xhr.status == 200) {
+				$("#logged-in").css("display", "inline")
+				$("#not-logged-in").css("display", "none")
+			}
+		}
+		xhr.open("POST", url)
+		xhr.setRequestHeader("content-type", "application/json")
+		xhr.send(JSON.stringify({login_hash: login_hash}))
+	}
 }
 
 function setup_item_dropdown() {
