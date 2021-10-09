@@ -5,6 +5,7 @@ window.onload = function () {
 	if (search_keyword != null) {
 		$("#search-message").text(`Search results for "${search_keyword}"`)
 		$("#top-bar input").val(search_keyword)
+		$("#top-bar button.x").css("display", "block")
 	}
 
 	var equipment = request_equipment()
@@ -17,8 +18,10 @@ function render_equipment(equipment, search_keyword) {
 	for (var category of equipment) {
 		var inner = ""
 		for (var item of category.equipment) {
-			if (!item.name.includes(decodeURIComponent(search_keyword)) && search_keyword !== null)
+			if (!item.name.toLowerCase().includes(decodeURIComponent(search_keyword).toLowerCase()) && search_keyword !== null)
 				continue
+			if (inner != "")
+				inner += "<hr>"
 			inner += `<div class="item-entry"><img src="data:image/jpeg;base64,${item.image}"/>` + 
 						`<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>` +
 						`<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id}</div></div>`
@@ -42,7 +45,8 @@ function setup_item_dropdown() {
 		if (content.style.maxHeight){
 			content.style.maxHeight = null;
 		} else {
-			content.style.maxHeight = content.scrollHeight + "px";
+			//content.style.maxHeight = content.scrollHeight + "px";
+			content.style.maxHeight = "unset";
 		}
 	})
 }

@@ -1,5 +1,6 @@
 body {
 	margin: 0;
+	font-size: 2vh;
 }
 
 /* Style the button that is used to open and close the collapsible content */
@@ -8,15 +9,14 @@ body {
 	color: #444;
 	cursor: pointer;
 	padding: 18px;
-	margin-bottom: 3px;
 	margin-left: 7px;
 	margin-right: 7px;
-	width: 100%;
+	width: calc(100% - 14px);
 	height: 8%;
 	border: none;
 	text-align: left;
 	outline: none;
-	font-size: 15px;
+	font-size: 2vh;
 }
 
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
@@ -28,6 +28,7 @@ body {
 .collapsible-content {
 	margin-left: 7px;
 	margin-right: 7px;
+	margin-bottom: 5px;
 	padding: 0 18px;
 	background-color: #f1f1f1;
 	max-height: 0;
@@ -41,6 +42,7 @@ body {
 	margin: 0;
 	margin-bottom: 15px;
 	overflow: hidden;
+	width: 100%;
 }
 
 #top-bar a {
@@ -69,6 +71,7 @@ body {
 	border: none;
 	margin-top: 11px;
 	height: 60%;
+	width: 25%;
 }
 
 #top-bar button {
@@ -78,17 +81,25 @@ body {
 	margin-top: 11px;
 	margin-right: 16px;
 	height: 60%;
+	width: 6%;
+}
+
+#top-bar button.x {
+	margin-right: 0;
+	background-color: white;
+	display: none;
+	width: 2%;
 }
 
 .item-entry {
-	max-height: 20%;
 	display: grid;
 	grid-template-columns: 3fr 7fr;
 	margin-bottom: 15px;
 }
 
 .item-entry img {
-	width: 100%;
+	max-width: 30vw;
+	max-height: 30vh;
 }
 
 .item-entry .description {
