@@ -31,10 +31,10 @@ function render_equipment(equipment, search_keyword) {
 			var actions = `<div class="actions admin-only" style="visibility: hidden;">
 							<button><i class="fa-solid fa-barcode fa-2xl"></i></button>
 							<button><i class="fa-solid fa-pen fa-2xl"></i></button>
-							<button><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
+							<button onclick="delete_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
 						</div>`
 
-			inner += `<div class="item-entry"><img src="data:image/jpeg;base64,${item.image}"/>
+			inner += `<div class="item-entry" item_id="${item.id}"><img src="data:image/jpeg;base64,${item.image}"/>
 						<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
 						<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id}</div>${actions}</div>`
 		}
@@ -94,6 +94,20 @@ function create_item_clicked() {
 	send_create_item(item, () => {
 		window.location.reload()
 	})
+}
+
+var delete_id = ""
+function delete_clicked(item) {
+	var id = item.parentNode.parentNode.getAttribute("item_id")
+	delete_id = id
+	show_dialog("delete-item-dialog")
+}
+
+function delete_item_clicked() {
+	send_delete_item(delete_id, () => {
+		window.location.reload()
+	})
+	delete_id = ""
 }
 
 function setup_item_dropdown() {

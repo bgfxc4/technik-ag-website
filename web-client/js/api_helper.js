@@ -13,6 +13,15 @@ function send_create_item(item, callback) {
 	callback()
 }
 
+function send_delete_item(id, callback) {
+	var body = {
+		login_hash: get_cookie("login_hash"),
+		id: id,
+	}
+	make_post_request(server_url + "delete-equipment", body)
+	callback()
+}
+
 function make_post_request(url, content) {
 	var xhr = new XMLHttpRequest()
     xhr.open("POST", url, false)

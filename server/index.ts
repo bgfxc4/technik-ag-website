@@ -74,6 +74,16 @@ app.post("/new-equipment", (req, res) => {
 	})
 })
 
+app.post("/delete-equipment", (req, res) => {
+	if (!authorized(req.body))
+		return res.status(401).send("Login credentials are wrong or not existent!")	
+	if (!req.body.id)
+		return res.status(400).send("You have to set an id!")
+	delete_equipment_from_db(req.body, () => {
+		res.status(200).send("ok")
+	})
+})
+
 app.get("/get-equipment", (req, res) => {
 	get_equipment_from_db(list => {
 		var result: any[] = []
@@ -106,6 +116,15 @@ function add_equipment_to_db(body: any, callback: () => void) {
 		image: item_image_placeholder
 	}
 	db.collection("equipment").insertOne(equ, err => {
+		if (err)
+			throw err
+		callback()
+	})
+}
+
+function delete_equipment_from_db(body: any, callback: () => void) {
+	var query = {id: body.id}
+	db.collection("equipment").deleteOne(query, err => {
 		if (err)
 			throw err
 		callback()
