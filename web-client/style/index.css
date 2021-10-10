@@ -40,7 +40,7 @@ body {
 	height: 6%;
 	background-color: #cdcdcd;
 	margin: 0;
-	margin-bottom: 15px;
+	margin-bottom: 10px;
 	overflow: hidden;
 	width: 100%;
 }
@@ -114,10 +114,29 @@ button#not-logged-in.login-status {
 	border: 2px solid black;
 }
 
+#top-actions {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#top-actions button {
+	margin-bottom: 5px;
+	float: right;
+	margin-right: 7px;
+	font-size: 2vh;
+}
+
+#top-actions .scan-code {
+	background-color: #0000;
+	border: none;
+	height: 3vh;
+}
+
 .item-entry {
+	position: relative;
 	display: grid;
-	grid-template-columns: 3fr 7fr;
-	margin-bottom: 15px;
+	grid-template-columns: 1fr 9fr;
 }
 
 .item-entry img {
@@ -128,4 +147,45 @@ button#not-logged-in.login-status {
 .item-entry .description {
 	display: inline-block;
 	padding-left: 10px;
+}
+
+.item-entry .actions {
+	position: absolute;
+	bottom: 7px;
+	right: 0;
+}
+
+.item-entry .actions button {
+	margin-right: 10px;
+	background-color: #fff0;
+	border: none;
+}
+
+#dialog-container {
+	visibility: hidden;
+	position: fixed;
+	background-color: #ddd8;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+}
+
+#dialog-container .dialog {
+	visibility: hidden;
+	text-align: center;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 40%;
+	background-color: white;
+}
+
+#dialog-container .dialog input {
+	margin-bottom: 15px;
+}
+
+#dialog-container .dialog button {
+	margin-bottom: 15px;
 }

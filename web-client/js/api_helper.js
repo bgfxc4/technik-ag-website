@@ -7,6 +7,12 @@ function request_equipment() {
 	return JSON.parse(res.responseText)
 }
 
+function send_create_item(item, callback) {
+	item.login_hash = get_cookie("login_hash")
+	make_post_request(server_url + "new-equipment", item)
+	callback()
+}
+
 function make_post_request(url, content) {
 	var xhr = new XMLHttpRequest()
     xhr.open("POST", url, false)
