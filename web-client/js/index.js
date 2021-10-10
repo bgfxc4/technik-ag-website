@@ -1,6 +1,9 @@
 var logged_in = false
+var qrcode
 
 window.onload = function () {
+	qrcode = new QRCode("qrcode-container")
+
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
 
@@ -29,7 +32,7 @@ function render_equipment(equipment, search_keyword) {
 				inner += "<hr>"
 			
 			var actions = `<div class="actions admin-only" style="visibility: hidden;">
-							<button><i class="fa-solid fa-barcode fa-2xl"></i></button>
+							<button onclick="gencode_clicked(this)"><i class="fa-solid fa-barcode fa-2xl"></i></button>
 							<button><i class="fa-solid fa-pen fa-2xl"></i></button>
 							<button onclick="delete_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
 						</div>`
@@ -84,6 +87,18 @@ function check_if_logged_in() {
 	}
 }
 
+var code_id = ""
+function gencode_clicked(e) {	
+	var id = e.parentNode.parentNode.getAttribute("item_id")
+	code_id = id
+	qrcode.makeCode(id)
+	JsBarcode("#barcode-container", id, {
+		width: 1,
+		height: 50
+	})
+	show_dialog("qrcode-dialog")
+}
+
 function create_item_clicked() {
 	var item = {
 		name: $('#create-item-name').val(),
@@ -108,6 +123,23 @@ function delete_item_clicked() {
 		window.location.reload()
 	})
 	delete_id = ""
+}
+
+function print_barcode() {
+	var inner = $('#barcode-container')[0].outerHTML
+	popupWinindow = window.open('', '_blank', 'width=1000,height=1000,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no')
+	popupWinindow.document.open()
+	popupWinindow.document.write('<html><head><style></style></head><body onload="window.print()">' + inner + '</html>')
+	popupWinindow.document.close()
+}
+
+function print_qrcode() {
+	var inner = $('#qrcode-container')[0].outerHTML
+	popupWinindow = window.open('', '_blank', 'width=1000,height=1000,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no')
+	popupWinindow.document.open()
+	popupWinindow.document.write('<html><head><style></style></head><body onload="window.print()">' + inner + '</html>')
+	popupWinindow.document.close()
+
 }
 
 function setup_item_dropdown() {
