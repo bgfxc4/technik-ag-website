@@ -106,6 +106,30 @@ app.get("/get-equipment", (req, res) => {
 	})
 })
 
+app.get("/get-equipment-by-id/:id", (req, res) => {
+	if (!req.params.id)
+		return res.status(401).send("The id you have given is not valid!")
+	get_equipment_by_id_from_db(req.params.id, list => {
+		var result: any[] = []
+		for (var equ of list) {
+			var category_exists = false
+			for (var cat of result) {
+				if (cat.name == equ.category) {
+					category_exists = true
+					cat.equipment.push(equ)
+				}
+			}
+			if (!category_exists) {
+				result.push({
+					name: equ.category,
+					equipment: [equ]
+				})
+			}
+		}
+		res.send(JSON.stringify(result))
+	})
+})
+
 function add_equipment_to_db(body: any, callback: () => void) {
 	var equ: Equipment = {
 		id: uuid.v4(),
@@ -136,6 +160,23 @@ function get_equipment_from_db(callback: (res: any) => void) {
 		if (err) 
 			throw err
 		callback(data)
+	})
+}
+
+function get_equipment_by_id_from_db(id: string, callback: (res: any) => void) {
+	db.collection("equipment").find().toArray((err, data) => {
+		if (err) 
+			throw err
+		if (!data) {
+			callback([])
+			return
+		}
+		var ret = []
+		for (var d of data) {
+			if (d.id.startsWith(id))
+				ret.push(d)
+		}
+		callback(ret)
 	})
 }
 
