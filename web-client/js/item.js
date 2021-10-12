@@ -7,29 +7,21 @@ window.onload = function () {
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
 
-	var search_keyword = new URL(window.location).searchParams.get("search")
+	var item_id = new URL(window.location).searchParams.get("id")
 	
-	if (search_keyword != null) {
-		$("#search-message").text(`Search results for "${search_keyword}"`)
-		$("#top-bar input").val(search_keyword)
-		$("#top-bar button.x").css("display", "block")
+	if (item_id == null || item_id == "") {
+		window.location = "./"
 	}
 
-	var equipment = request_equipment()
-	render_equipment(equipment, search_keyword)
+	var equipment = request_equipment_by_id(item_id)
+	render_equipment(equipment)
 }
 
-function render_equipment(equipment, search_keyword) {
+function render_equipment(equipment) {
 	$("#equipment-container").html("")
-	var outer = ""
+	var inner = ""
 	for (var category of equipment) {
-		$("#create-item-category-list").append(`<option value="${category.name}">`)
-		var inner = ""
 		for (var item of category.equipment) {
-			if (!item.name.toLowerCase().includes(decodeURIComponent(search_keyword).toLowerCase()) && search_keyword !== null)
-				continue
-			if (inner != "")
-				inner += "<hr>"
 			
 			var actions = `<div class="actions admin-only" style="visibility: hidden;">
 							<button onclick="gencode_clicked(this)"><i class="fa-solid fa-barcode fa-2xl"></i></button>
@@ -37,20 +29,12 @@ function render_equipment(equipment, search_keyword) {
 							<button onclick="delete_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
 						</div>`
 
-			inner += `<div class="item-entry" item_id="${item.id}"><img onclick="window.location = './item.html?id=${item.id}'" src="data:image/jpeg;base64,${item.image}"/>
+			inner += `<div class="item-entry" item_id="${item.id}"><img src="data:image/jpeg;base64,${item.image}"/>
 						<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
 						<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id}</div>${actions}</div>`
 		}
-		if (inner != "")
-			outer += `<button type="button" class="collapsible">${category.name}</button>  <div class="collapsible-content">${inner}</div>`
 	}
-	$("#equipment-container").append(outer)
-	setup_item_dropdown()
-}
-
-function search() {
-	var keyword = $("#top-bar input").val()
-	window.location = window.origin + window.location.pathname + ((keyword == "") ? "" : "?search=" + encodeURIComponent(keyword))
+	$("#equipment-container").append(inner)
 }
 
 function logout() {
@@ -140,17 +124,4 @@ function print_qrcode() {
 	popupWinindow.document.write('<html><head><style></style></head><body onload="window.print()">' + inner + '</html>')
 	popupWinindow.document.close()
 
-}
-
-function setup_item_dropdown() {
-	$(".collapsible").on("click", (e) => {
-		e.target.classList.toggle("active")
-		var content = e.target.nextElementSibling
-		if (content.style.maxHeight){
-			content.style.maxHeight = null;
-		} else {
-			//content.style.maxHeight = content.scrollHeight + "px";
-			content.style.maxHeight = "unset";
-		}
-	})
 }

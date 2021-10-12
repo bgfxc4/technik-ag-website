@@ -1,0 +1,44 @@
+<html>
+	<head>
+		<title>Technik AG</title>
+		<meta charset="UTF-8">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="js/qrcode.min.js"></script>
+		<script src="js/JsBarcode.all.min.js"></script>
+		<script src="js/api_helper.js"></script>
+		<script src="js/item.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
+		<link rel="stylesheet" href="style/item.css">
+	</head>
+	<body>
+		<div id="top-bar">
+			<a href="./index.html" >Inventory</a>
+			<a>Appointments</a>
+			<button class="login-status" id="logged-in" onclick="$('.login-status .dropdown').toggle()"><i class="fa fa-circle-user fa-2xl"></i>
+				<div class="dropdown" style="display:none;">You are logged in. <p onclick="logout()" style="color:red;">Log out</p></div>
+			</button>
+			<button class="login-status" id="not-logged-in" onclick="window.location = './login.html'">Sign in</button>
+		</div>
+		<div id="top-actions">
+			<button class="scan-code"><i class="fa-solid fa-barcode fa-xl"></i></button>
+		</div>
+		<p id="search-message"></p>
+		<div id="equipment-container"></div>
+		<div id="dialog-container">
+			<div class="dialog" id="qrcode-dialog">
+				<h3>QR code</h3>
+				<div id="qrcode-container"></div>
+				<button onclick="hide_all_dialogs();show_dialog('barcode-dialog')">Barcode</button>
+				<button onclick="print_qrcode()">Print</button>
+				<button onclick="hide_all_dialogs()">Close</button>
+			</div>
+			<div class="dialog" id="barcode-dialog">
+				<h3>Bar code</h3>
+				<svg id="barcode-container"></svg><br>
+				<button onclick="hide_all_dialogs();show_dialog('qrcode-dialog')">QR code</button>
+				<button onclick="print_barcode()">Print</button>
+				<button onclick="hide_all_dialogs()">Close</button>
+			</div>
+		</div>
+	</body>
+</html>

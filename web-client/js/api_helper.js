@@ -7,6 +7,11 @@ function request_equipment() {
 	return JSON.parse(res.responseText)
 }
 
+function request_equipment_by_id(id) {
+	var res = make_get_request(`${server_url}get-equipment-by-id/${id}`)
+	return JSON.parse(res.responseText)
+}
+
 function send_create_item(item, callback) {
 	item.login_hash = get_cookie("login_hash")
 	make_post_request(server_url + "new-equipment", item)
