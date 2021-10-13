@@ -92,7 +92,7 @@ function gencode_clicked(e) {
 	var id = e.parentNode.parentNode.getAttribute("item_id")
 	code_id = id
 	qrcode.makeCode(id)
-	JsBarcode("#barcode-container", id.substring(0, 23), {
+	JsBarcode("#barcode-container", id.substring(0, 15), {
 		width: 1,
 		height: 50
 	})
