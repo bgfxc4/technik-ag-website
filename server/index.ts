@@ -12,7 +12,7 @@ const item_image_placeholder = fs.readFileSync("./imgs/item-placeholder-img.png"
 const app = express()
 var db:Db;
 
-app.use(body_parser.json())
+app.use(body_parser.json({limit: "50mb"}))
 app.use(cors())
 
 interface Equipment {
@@ -137,7 +137,7 @@ function add_equipment_to_db(body: any, callback: () => void) {
 		description: body.description,
 		storage_place: body.storage_place,
 		category: body.category,
-		image: item_image_placeholder
+		image: (body.image) ? body.image : item_image_placeholder
 	}
 	db.collection("equipment").insertOne(equ, err => {
 		if (err)
