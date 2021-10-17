@@ -43,6 +43,10 @@
 				<label for="create-item-category">Select an existing or enter a new category:</label><br>
 				<input type="text" id="create-item-category" list="create-item-category-list" placeholder="Enter a category..."><br>
 				<datalist id="create-item-category-list"></datalist>
+				
+				<label for="create-item-image">Select an image of the item:</label><br>
+				<input type="file" accept="image/png, image/jpeg" id="create-item-image"><br>
+
 				<button onclick="hide_all_dialogs()">Cancel</button>
 				<button onclick="create_item_clicked()">Create</button>
 			</div>

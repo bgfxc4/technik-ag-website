@@ -100,15 +100,33 @@ function gencode_clicked(e) {
 }
 
 function create_item_clicked() {
-	var item = {
-		name: $('#create-item-name').val(),
-		description: $('#create-item-description').val(),
-		storage_place: $('#create-item-storage').val(),
-		category: $('#create-item-category').val()
-	}
-	send_create_item(item, () => {
-		window.location.reload()
+	load_image_base64(img => {
+		var item = {
+			name: $('#create-item-name').val(),
+			description: $('#create-item-description').val(),
+			storage_place: $('#create-item-storage').val(),
+			category: $('#create-item-category').val(),
+			image: img
+		}
+		send_create_item(item, () => {
+			window.location.reload()
+		})
 	})
+}
+
+function load_image_base64(callback) {
+	if ($('#create-item-image')[0].files.length == 0) {
+		callback(undefined)
+		return
+	}
+	var file = $('#create-item-image')[0].files[0]
+	var reader = new FileReader()
+	reader.onloadend = function() {
+		//console.log(reader.result)
+		//console.log(reader.result.split('base64,')[1])
+		callback(reader.result.split('base64,')[1])
+	}
+	reader.readAsDataURL(file)
 }
 
 var delete_id = ""
