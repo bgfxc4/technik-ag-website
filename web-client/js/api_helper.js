@@ -1,21 +1,24 @@
 var server_url = "https://bgfxc4.de/technikag-api/" 
 
-function request_equipment() {
-	var res = make_get_request(`${server_url}get-equipment`)
-	if (res.status == 401)
-		window.location = window.location.href + "login.html"
-	return JSON.parse(res.responseText)
+function request_equipment(callback) {
+	make_get_request(`${server_url}get-equipment`, res => {
+		if (res.status == 401)
+			window.location = window.location.href + "login.html"
+		callback(JSON.parse(res.responseText))
+	})
 }
 
-function request_equipment_by_id(id) {
-	var res = make_get_request(`${server_url}get-equipment-by-id/${id}`)
-	return JSON.parse(res.responseText)
+function request_equipment_by_id(id, callback) {
+	make_get_request(`${server_url}get-equipment-by-id/${id}`, res => {
+		callback(JSON.parse(res.responseText))
+	})
 }
 
 function send_create_item(item, callback) {
 	item.login_hash = get_cookie("login_hash")
-	make_post_request(server_url + "new-equipment", item)
-	callback()
+	make_post_request(server_url + "new-equipment", item, res => {
+		callback(res)
+	})
 }
 
 function send_delete_item(id, callback) {
@@ -23,23 +26,32 @@ function send_delete_item(id, callback) {
 		login_hash: get_cookie("login_hash"),
 		id: id,
 	}
-	make_post_request(server_url + "delete-equipment", body)
-	callback()
+	make_post_request(server_url + "delete-equipment", body, res => {
+		callback(res)
+	})
 }
 
-function make_post_request(url, content) {
+function make_post_request(url, content, callback) {
 	var xhr = new XMLHttpRequest()
-    xhr.open("POST", url, false)
+	xhr.onreadystatechange = function() {
+		if (this.readyState != 4)
+			return
+		callback({responseText: xhr.responseText, status: xhr.status})
+	}
+    xhr.open("POST", url, true)
     xhr.setRequestHeader('Content-Type', 'application/json')
     xhr.send(JSON.stringify(content))
-    return {responseText: xhr.responseText, status: xhr.status}
 }
 
-function make_get_request(url) {
-	var xhr = new XMLHttpRequest()
-    xhr.open("GET", url, false)
+function make_get_request(url, callback) {
+	var xhr = new XMLHttpRequest()	
+	xhr.onreadystatechange = function() {
+		if (this.readyState != 4)
+			return
+		callback({responseText: xhr.responseText, status: xhr.status})
+	}
+    xhr.open("GET", url, true)
 	xhr.send()
-    return {responseText: xhr.responseText, status: xhr.status}
 }
 
 function set_cookie(cname, cvalue, exdays) {
@@ -63,4 +75,23 @@ function get_cookie(cname) {
 		}
 	}
 	return "";
+}
+
+function check_if_logged_in() {
+	var login_hash = get_cookie("login_hash")
+	if (login_hash != "") {
+		var xhr = new XMLHttpRequest()
+		var url = server_url + "authorize"
+		xhr.onload = function() {
+			if (xhr.status == 200) {
+				logged_in = true
+				$("#logged-in").css("display", "inline")
+				$("#not-logged-in").css("display", "none")
+				$(".admin-only").css("visibility", "visible")
+			}
+		}
+		xhr.open("POST", url)
+		xhr.setRequestHeader("content-type", "application/json")
+		xhr.send(JSON.stringify({login_hash: login_hash}))
+	}
 }

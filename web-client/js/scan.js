@@ -58,22 +58,3 @@ function show_dialog(id) {
 	$('#' + id).css("visibility", "visible")
 	$("#dialog-container").css("visibility", "visible")
 }
-
-function check_if_logged_in() {
-	var login_hash = get_cookie("login_hash")
-	if (login_hash != "") {
-		var xhr = new XMLHttpRequest()
-		var url = server_url + "authorize"
-		xhr.onload = function() {
-			if (xhr.status == 200) {
-				logged_in = true
-				$("#logged-in").css("display", "inline")
-				$("#not-logged-in").css("display", "none")
-				$(".admin-only").css("visibility", "visible")
-			}
-		}
-		xhr.open("POST", url)
-		xhr.setRequestHeader("content-type", "application/json")
-		xhr.send(JSON.stringify({login_hash: login_hash}))
-	}
-}
