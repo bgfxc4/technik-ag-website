@@ -194,3 +194,7 @@ button#not-logged-in.login-status {
 	margin-left: 10%;
 	margin-bottom: 20px;
 }
+
+#error-msg {
+	color: red;
+}

@@ -14,6 +14,9 @@ window.onload = function () {
 	}
 
 	request_equipment_by_id(item_id, equipment => {
+		if (equipment === undefined) {
+			return show_error_message("Not able to connect to the server. Please contact the system administrator.")
+		}
 		render_equipment(equipment)
 	})
 }
@@ -89,6 +92,11 @@ function delete_item_clicked() {
 		window.location.reload()
 	})
 	delete_id = ""
+}
+
+function show_error_message(msg) {
+	$('#error-msg').text(msg)
+	$('#error-msg').css("visibility", "visible")
 }
 
 function print_barcode() {

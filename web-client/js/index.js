@@ -16,6 +16,9 @@ window.onload = function () {
 	}
 
 	request_equipment(equipment => {
+		if (equipment === undefined) {
+			return show_error_message("Not able to connect to the server. Please contact the system administrator.")
+		}
 		render_equipment(equipment, search_keyword)
 	})
 }
@@ -140,6 +143,11 @@ function print_qrcode() {
 	popupWinindow.document.write('<html><head><style></style></head><body onload="window.print()">' + inner + '</html>')
 	popupWinindow.document.close()
 
+}
+
+function show_error_message(msg) {
+	$('#error-msg').text(msg)
+	$('#error-msg').css("visibility", "visible")
 }
 
 function setup_item_dropdown() {

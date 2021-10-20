@@ -2,15 +2,22 @@ var server_url = "https://bgfxc4.de/technikag-api/"
 
 function request_equipment(callback) {
 	make_get_request(`${server_url}get-equipment`, res => {
-		if (res.status == 401)
-			window.location = window.location.href + "login.html"
-		callback(JSON.parse(res.responseText))
+		if (res.responseText == undefined || res.status != 200)
+			callback(undefined)
+		else {
+			if (res.status == 401)
+				window.location = window.location.href + "login.html"
+			callback(JSON.parse(res.responseText))
+		}
 	})
 }
 
 function request_equipment_by_id(id, callback) {
 	make_get_request(`${server_url}get-equipment-by-id/${id}`, res => {
-		callback(JSON.parse(res.responseText))
+		if (res.responseText == undefined || res.status != 200)
+			callback(undefined)
+		else
+			callback(JSON.parse(res.responseText))
 	})
 }
 
@@ -38,6 +45,9 @@ function make_post_request(url, content, callback) {
 			return
 		callback({responseText: xhr.responseText, status: xhr.status})
 	}
+	xhr.onerror = function() {
+		callback({responseText: undefined, status: xhr.status})
+	}
     xhr.open("POST", url, true)
     xhr.setRequestHeader('Content-Type', 'application/json')
     xhr.send(JSON.stringify(content))
@@ -49,6 +59,9 @@ function make_get_request(url, callback) {
 		if (this.readyState != 4)
 			return
 		callback({responseText: xhr.responseText, status: xhr.status})
+	}
+	xhr.onerror = function() {
+		callback({responseText: undefined, status: xhr.status})
 	}
     xhr.open("GET", url, true)
 	xhr.send()
