@@ -28,6 +28,13 @@ function send_create_item(item, callback) {
 	})
 }
 
+function send_edit_item(item, callback) {
+	item.login_hash = get_cookie("login_hash")
+	make_post_request(server_url + "edit-equipment", item, res => {
+		callback(res)
+	})
+}
+
 function send_delete_item(id, callback) {
 	var body = {
 		login_hash: get_cookie("login_hash"),

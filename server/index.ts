@@ -74,6 +74,24 @@ app.post("/new-equipment", (req, res) => {
 	})
 })
 
+app.post("/edit-equipment", (req, res) => {
+	if (!authorized(req.body))
+		return res.status(401).send("Login credentials are wrong or not existent!")	
+	if (!req.body.id)
+		return res.status(400).send("You have to specify an id of the item to edit!")
+	if (!req.body.name)
+		return res.status(400).send("You have to set a name!")
+	if (!req.body.description)
+		return res.status(400).send("You have to set a description!")
+	if (!req.body.storage_place)
+		return res.status(400).send("You have to set a storage place!")
+	if (!req.body.category)
+		return res.status(400).send("You have to set a category!")
+	edit_equipment_in_db(req.body, () => {
+		res.status(200).send("ok")
+	})
+})
+
 app.post("/delete-equipment", (req, res) => {
 	if (!authorized(req.body))
 		return res.status(401).send("Login credentials are wrong or not existent!")	
@@ -140,6 +158,24 @@ function add_equipment_to_db(body: any, callback: () => void) {
 		image: (body.image) ? body.image : item_image_placeholder
 	}
 	db.collection("equipment").insertOne(equ, err => {
+		if (err)
+			throw err
+		callback()
+	})
+}
+
+function edit_equipment_in_db(body: any, callback: () => void) {
+	var query = { id: body.id}
+	var update = {
+		$set: {
+			name: body.name, 
+			description: body.description,
+			storage_place: body.storage_place,
+			category: body.category,
+			image: (body.image) ? body.image : item_image_placeholder
+		}
+	}
+	db.collection("equipment").updateOne(query, update, err => {
 		if (err)
 			throw err
 		callback()

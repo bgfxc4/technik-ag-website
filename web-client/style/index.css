@@ -190,6 +190,11 @@ button#not-logged-in.login-status {
 	margin-bottom: 15px;
 }
 
+#dialog-container .dialog img {
+	max-width: 20vw;
+	max-height: 20vh;
+}
+
 #qrcode-container {
 	margin-left: 10%;
 	margin-bottom: 20px;

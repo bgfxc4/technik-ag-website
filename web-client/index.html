@@ -52,6 +52,27 @@
 				<button onclick="hide_all_dialogs()">Cancel</button>
 				<button onclick="create_item_clicked()">Create</button>
 			</div>
+			<div class="dialog" id="edit-item-dialog">
+				<h3>Edit item</h3>
+				<label for="edit-item-name">Name:</label><br>
+				<input type="text" id="edit-item-name" placeholder="Enter a name..."><br>
+
+				<label for="edit-item-description">Description:</label><br>
+				<input type="text" id="edit-item-description" placeholder="Enter a short description..."><br>
+
+				<label for="edit-item-storage">Storage place:</label><br>
+				<input type="text" id="edit-item-storage" placeholder="Enter a storage place..."><br>
+
+				<label for="edit-item-category">Select an existing or enter a new category:</label><br>
+				<input type="text" id="edit-item-category" list="create-item-category-list" placeholder="Enter a category..."><br>
+				<datalist id="edit-item-category-list"></datalist>
+				
+				<label for="edit-item-image">Select an image of the item:</label><br>
+				<input type="file" onchange="load_image_preview('#edit-item-image', '#edit-image-preview')" accept="image/png, image/jpeg" id="edit-item-image"><img id="edit-image-preview"><br>
+
+				<button onclick="hide_all_dialogs()">Cancel</button>
+				<button onclick="edit_item_clicked()">Edit</button>
+			</div>
 			<div class="dialog" id="delete-item-dialog">
 				<h3>Delete Item</h3>
 				Do you really want to delete the item permanently?
