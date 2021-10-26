@@ -37,11 +37,11 @@ function render_equipment(equipment, search_keyword) {
 			
 			var actions = `<div class="actions admin-only" ${logged_in ? '' : 'style="visibility: hidden;'}">
 							<button onclick="gencode_clicked(this)"><i class="fa-solid fa-barcode fa-2xl"></i></button>
-							<button onclick="edit_clicked(this)"><i class="fa-solid fa-pen fa-2xl"></i></button>
+							<button onclick="window.location = './edit-item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
 							<button onclick="delete_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
 						</div>`
 
-			inner += `<div class="item-entry" item_id="${item.id}"><img onclick="window.location = './item.html?id=${item.id}'" src="data:image/jpeg;base64,${item.image}"/>
+			inner += `<div class="item-entry" item_id="${item.id}"><img onclick="window.location = './item?id=${item.id}'" src="data:image/jpeg;base64,${item.image}"/>
 						<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
 						<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id}</div>${actions}</div>`
 		}
@@ -84,40 +84,6 @@ function gencode_clicked(e) {
 	show_dialog("qrcode-dialog")
 }
 
-function create_item_clicked() {
-	load_image_base64("#create-item-image", img => {
-		var item = {
-			name: $('#create-item-name').val(),
-			description: $('#create-item-description').val(),
-			storage_place: $('#create-item-storage').val(),
-			category: $('#create-item-category').val(),
-			image: img
-		}
-		send_create_item(item, () => {
-			window.location.reload()
-		})
-	})
-}
-
-function load_image_preview(input_query, img_query) {
-	load_image_base64(input_query, img => {
-		$(img_query)[0].src = `data:image/jpeg;base64,${img}`
-	})
-}
-
-function load_image_base64(query, callback) {
-	if ($(query)[0].files.length == 0) {
-		callback(undefined)
-		return
-	}
-	var file = $(query)[0].files[0]
-	var reader = new FileReader()
-	reader.onloadend = function() {
-		callback(reader.result.split('base64,')[1])
-	}
-	reader.readAsDataURL(file)
-}
-
 var delete_id = ""
 function delete_clicked(item) {
 	var id = item.parentNode.parentNode.getAttribute("item_id")
@@ -130,35 +96,6 @@ function delete_item_clicked() {
 		window.location.reload()
 	})
 	delete_id = ""
-}
-
-var edit_id = ""
-function edit_clicked(item) {
-	var id = item.parentNode.parentNode.getAttribute("item_id")
-	edit_id = id
-	request_equipment_by_id(id, equ => {
-		$('#edit-item-name').val(equ[0].equipment[0].name)
-		$('#edit-item-description').val(equ[0].equipment[0].description)
-		$('#edit-item-storage').val(equ[0].equipment[0].storage_place)
-		$('#edit-item-category').val(equ[0].equipment[0].category)
-		$('#edit-image-preview')[0].src = `data:image/jpeg;base64,${equ[0].equipment[0].image}`
-		show_dialog("edit-item-dialog")
-	})
-}
-
-function edit_item_clicked()  {
-	var item = {
-		id: edit_id,
-		name: $('#edit-item-name').val(),
-		description: $('#edit-item-description').val(),
-		storage_place: $('#edit-item-storage').val(),
-		category: $('#edit-item-category').val(),
-		image: $('#edit-image-preview')[0].src.split("base64,")[1]
-	}
-	edit_id = ""
-	send_edit_item(item, () => {
-		window.location.reload()
-	})
 }
 
 function print_barcode() {

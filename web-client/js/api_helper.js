@@ -6,7 +6,7 @@ function request_equipment(callback) {
 			callback(undefined)
 		else {
 			if (res.status == 401)
-				window.location = window.location.href + "login.html"
+				window.location = window.location.href + "login"
 			callback(JSON.parse(res.responseText))
 		}
 	})

@@ -17,62 +17,20 @@
 			<button class="login-status" id="logged-in" onclick="$('.login-status .dropdown').toggle()"><i class="fa fa-circle-user fa-2xl"></i>
 				<div class="dropdown" style="display:none;">You are logged in. <p onclick="logout()" style="color:red;">Log out</p></div>
 			</button>
-			<button class="login-status" id="not-logged-in" onclick="window.location = window.location.href + 'login.html'">Sign in</button>
+			<button class="login-status" id="not-logged-in" onclick="window.location = './login'">Sign in</button>
 			<button onclick="search()"><i class="fa fa-search"></i></button>
 			<button class="x" onclick="window.location='./'"><i class="fa fa-x"></i></button>
 			<input type="text" onchange="search()" placeholder="search...">
 		</div>
 		<div id="top-actions">
-			<button onclick="window.location = './scan.html'" class="scan-code"><i class="fa-solid fa-barcode fa-xl"></i></button>
-			<button class="new-item admin-only" onclick="show_dialog('create-item-dialog')">New item</button>
+			<button onclick="window.location = './scan'" class="scan-code"><i class="fa-solid fa-barcode fa-xl"></i></button>
+			<button class="new-item admin-only" onclick="window.location = './create-item'">New item</button>
 		</div>
 		<p id="search-message"></p>
 		<div id="equipment-container">
 			<p id="error-msg" style="visibility=hidden;"></p>
 		</div>
 		<div id="dialog-container">
-			<div class="dialog" id="create-item-dialog">
-				<h3>Create item</h3>
-				<label for="create-item-name">Name:</label><br>
-				<input type="text" id="create-item-name" placeholder="Enter a name..."><br>
-
-				<label for="create-item-description">Description:</label><br>
-				<input type="text" id="create-item-description" placeholder="Enter a short description..."><br>
-
-				<label for="create-item-storage">Storage place:</label><br>
-				<input type="text" id="create-item-storage" placeholder="Enter a storage place..."><br>
-
-				<label for="create-item-category">Select an existing or enter a new category:</label><br>
-				<input type="text" id="create-item-category" list="create-item-category-list" placeholder="Enter a category..."><br>
-				<datalist id="create-item-category-list"></datalist>
-				
-				<label for="create-item-image">Select an image of the item:</label><br>
-				<input type="file" accept="image/png, image/jpeg" id="create-item-image"><br>
-
-				<button onclick="hide_all_dialogs()">Cancel</button>
-				<button onclick="create_item_clicked()">Create</button>
-			</div>
-			<div class="dialog" id="edit-item-dialog">
-				<h3>Edit item</h3>
-				<label for="edit-item-name">Name:</label><br>
-				<input type="text" id="edit-item-name" placeholder="Enter a name..."><br>
-
-				<label for="edit-item-description">Description:</label><br>
-				<input type="text" id="edit-item-description" placeholder="Enter a short description..."><br>
-
-				<label for="edit-item-storage">Storage place:</label><br>
-				<input type="text" id="edit-item-storage" placeholder="Enter a storage place..."><br>
-
-				<label for="edit-item-category">Select an existing or enter a new category:</label><br>
-				<input type="text" id="edit-item-category" list="create-item-category-list" placeholder="Enter a category..."><br>
-				<datalist id="edit-item-category-list"></datalist>
-				
-				<label for="edit-item-image">Select an image of the item:</label><br>
-				<input type="file" onchange="load_image_preview('#edit-item-image', '#edit-image-preview')" accept="image/png, image/jpeg" id="edit-item-image"><img id="edit-image-preview"><br>
-
-				<button onclick="hide_all_dialogs()">Cancel</button>
-				<button onclick="edit_item_clicked()">Edit</button>
-			</div>
 			<div class="dialog" id="delete-item-dialog">
 				<h3>Delete Item</h3>
 				Do you really want to delete the item permanently?

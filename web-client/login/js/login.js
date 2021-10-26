@@ -8,7 +8,7 @@ function try_login() {
 	xhr.onload = function() {
 		if (xhr.status == 200) {
 			set_cookie("login_hash", login_hash, 14)
-			window.location = window.location.href.replace("login.html", "")
+			window.location = "../" 
 		} else {
 			document.getElementById("errorText").hidden = false
 		}
