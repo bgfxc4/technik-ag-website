@@ -56,7 +56,15 @@ function edit_item_clicked()  {
 		category: $('#edit-item-category').val(),
 		image: $('#edit-image-preview')[0].src.split("base64,")[1]
 	}
-	send_edit_item(item, () => {
-		window.location = '../'
+	send_edit_item(item, res => {
+		if (res.status != 200) {
+				display_error(`${res.status}: ${res.responseText}`)
+			} else {
+				window.location = '../'
+			}
 	})
+}
+
+function display_error(msg) {
+	$('#error-text').text(msg)
 }

@@ -12,10 +12,18 @@ function create_item_clicked() {
 			category: $('#create-item-category').val(),
 			image: img
 		}
-		send_create_item(item, () => {
-			window.location = '../'
+		send_create_item(item, res => {
+			if (res.status != 200) {
+				display_error(`${res.status}: ${res.responseText}`)
+			} else {
+				window.location = '../'
+			}
 		})
 	})
+}
+
+function display_error(msg) {
+	$('#error-text').text(msg)
 }
 
 function load_image_preview(input_query, img_query) {

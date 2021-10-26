@@ -34,9 +34,11 @@
 			
 			<label for="create-item-image">Select an image of the item:</label><br>
 			<input type="file" onchange="load_image_preview('#create-item-image', '#create-image-preview')" accept="image/png, image/jpeg" id="create-item-image"><img id="create-image-preview"><br>
-
+			
 			<button onclick="window.location = '../'">Cancel</button>
 			<button onclick="create_item_clicked()">Create</button>
+			
+			<p id="error-text" style="color:red"></p>
 		</div>
 	</body>
 </html>
