@@ -1,6 +1,12 @@
 window.onload = function () {
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
+
+	request_categories(res => {
+		for (var cat of res) {
+			$('#create-item-category').append(`<option value="${cat.name}">${cat.name}</option>`)
+		}
+	})
 }
 
 function create_item_clicked() {

@@ -27,7 +27,6 @@ function render_equipment(equipment, search_keyword) {
 	$("#equipment-container").html("")
 	var outer = ""
 	for (var category of equipment) {
-		$("#create-item-category-list").append(`<option value="${category.name}">`)
 		var inner = ""
 		for (var item of category.equipment) {
 			if (!item.name.toLowerCase().includes(decodeURIComponent(search_keyword).toLowerCase()) && search_keyword !== null)
@@ -45,7 +44,7 @@ function render_equipment(equipment, search_keyword) {
 						<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
 						<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id}</div>${actions}</div>`
 		}
-		if (inner != "")
+		//if (inner != "")
 			outer += `<button type="button" class="collapsible">${category.name}</button>  <div class="collapsible-content">${inner}</div>`
 	}
 	$("#equipment-container").append(outer)

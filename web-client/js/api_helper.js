@@ -12,6 +12,18 @@ function request_equipment(callback) {
 	})
 }
 
+function request_categories(callback) {
+	make_get_request(`${server_url}get-categories`, res => {
+		if (res.responseText == undefined || res.status != 200)
+			callback(undefined)
+		else {
+			if (res.status == 401)
+				window.location = window.location.href + "login"
+			callback(JSON.parse(res.responseText))
+		}
+	})
+}
+
 function request_equipment_by_id(id, callback) {
 	make_get_request(`${server_url}get-equipment-by-id/${id}`, res => {
 		if (res.responseText == undefined || res.status != 200)
@@ -24,6 +36,13 @@ function request_equipment_by_id(id, callback) {
 function send_create_item(item, callback) {
 	item.login_hash = get_cookie("login_hash")
 	make_post_request(server_url + "new-equipment", item, res => {
+		callback(res)
+	})
+}
+
+function send_create_category(category, callback) {
+	category.login_hash = get_cookie("login_hash")
+	make_post_request(server_url + "new-category", category, res => {
 		callback(res)
 	})
 }

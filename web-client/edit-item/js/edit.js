@@ -14,7 +14,13 @@ window.onload = function () {
 		if (equipment === undefined) {
 			return show_error_message("Not able to connect to the server. Please contact the system administrator.")
 		}
+		console.log(equipment)
 		fill_in_item(equipment[0].equipment[0])
+	})	
+	request_categories(res => {
+		for (var cat of res) {
+			$('#edit-item-category').append(`<option value="${cat.name}">${cat.name}</option>`)
+		}
 	})
 }
 

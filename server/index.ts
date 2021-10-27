@@ -24,6 +24,9 @@ interface Equipment {
 	image: string;
 }
 
+interface Category {
+	name: string;
+}
 
 var equipment_list: Equipment[] = [
 	{
@@ -69,8 +72,25 @@ app.post("/new-equipment", (req, res) => {
 		return res.status(400).send("You have to set a storage place!")
 	if (!req.body.category)
 		return res.status(400).send("You have to set a category!")
-	add_equipment_to_db(req.body, () => {
-		res.status(200).send("ok")
+	check_if_category_exists(req.body.category, exists => {
+		if (!exists)
+			return res.status(400).send("The category you specified does not exist!")
+		add_equipment_to_db(req.body, () => {
+			res.status(200).send("ok")
+		})
+	})
+})
+
+app.post("/new-category", (req, res) => {
+	if (!authorized(req.body))
+		return res.status(401).send("Login credentials are wrong or not existent!")	
+	if (!req.body.name)
+		return res.status(400).send("You have to set a name!")
+	add_category_to_db(req.body, exists => {
+		 if (!exists)
+			 res.status(200).send("ok")
+		 else
+			 res.status(400).send("A category with this name exists already!")
 	})
 })
 
@@ -87,8 +107,12 @@ app.post("/edit-equipment", (req, res) => {
 		return res.status(400).send("You have to set a storage place!")
 	if (!req.body.category)
 		return res.status(400).send("You have to set a category!")
-	edit_equipment_in_db(req.body, () => {
-		res.status(200).send("ok")
+	check_if_category_exists(req.body.category, exists => {
+		if (!exists)
+			return res.status(400).send("The category you specified does not exist!")
+		edit_equipment_in_db(req.body, () => {
+			res.status(200).send("ok")
+		})
 	})
 })
 
@@ -103,25 +127,29 @@ app.post("/delete-equipment", (req, res) => {
 })
 
 app.get("/get-equipment", (req, res) => {
-	get_equipment_from_db(list => {
-		var result: any[] = []
-		for (var equ of list) {
-			var category_exists = false
-			for (var cat of result) {
-				if (cat.name == equ.category) {
-					category_exists = true
-					cat.equipment.push(equ)
+   get_equipment_from_db(list => {
+		get_categories_from_db(cats => {
+			var result: any[] = []
+
+			for (var cat of cats) {
+				result.push({name: cat.name, equipment: []})
+			}
+
+			for (var equ of list) {
+				for (var i = 0; i < result.length; i++) {
+					if (result[i].name == equ.category)
+						result[i].equipment.push(equ)
 				}
 			}
-			if (!category_exists) {
-				result.push({
-					name: equ.category,
-					equipment: [equ]
-				})
-			}
-		}
-		res.send(JSON.stringify(result))
-	})
+			res.send(JSON.stringify(result))
+		})
+   })
+})
+
+app.get("/get-categories", (req, res) => {
+   get_categories_from_db(list => {
+		res.send(JSON.stringify(list))
+   })
 })
 
 app.get("/get-equipment-by-id/:id", (req, res) => {
@@ -164,6 +192,26 @@ function add_equipment_to_db(body: any, callback: () => void) {
 	})
 }
 
+function add_category_to_db(body: any, callback: (exists: boolean) => void) {
+	var cat: Category = {
+		name: body.name,
+	}
+	var query = { name: cat.name}
+	db.collection("categories").find(query).toArray((err, data) => {
+		if (err)
+			throw err
+
+		if (data == undefined || data.length != 0)
+			return callback(true)
+		
+		db.collection("categories").insertOne(cat, err => {
+			if (err)
+				throw err
+			callback(false)
+		})
+	})
+}
+
 function edit_equipment_in_db(body: any, callback: () => void) {
 	var query = { id: body.id}
 	var update = {
@@ -193,7 +241,15 @@ function delete_equipment_from_db(body: any, callback: () => void) {
 
 function get_equipment_from_db(callback: (res: any) => void) {
 	db.collection("equipment").find().toArray((err, data) => {
-		if (err) 
+		if (err)
+			throw err
+		callback(data)
+	})
+}
+
+function get_categories_from_db(callback: (res: any) => void) {
+	db.collection("categories").find().toArray((err, data) => {
+		if (err)
 			throw err
 		callback(data)
 	})
@@ -213,6 +269,18 @@ function get_equipment_by_id_from_db(id: string, callback: (res: any) => void) {
 				ret.push(d)
 		}
 		callback(ret)
+	})
+}
+
+function check_if_category_exists(name: string, callback: (exists: boolean) => void) {
+	db.collection("categories").find({name: name}).toArray((err, data) => {
+		if (err)
+			throw err
+		if (data == undefined)
+			return callback(false)
+		if (data.length == 0)
+			return callback(false)
+		callback(true)
 	})
 }
 
