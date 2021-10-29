@@ -26,6 +26,7 @@ interface Equipment {
 
 interface Category {
 	name: string;
+	types: string[];
 }
 
 app.post("/authorize", (req, res) => {
@@ -56,7 +57,7 @@ app.post("/new-equipment", (req, res) => {
 
 app.post("/new-category", (req, res) => {
 	if (!authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
+		return res.status(401).send("Login credentials are wrong or not existent!")
 	if (!req.body.name)
 		return res.status(400).send("You have to set a name!")
 	add_category_to_db(req.body, exists => {
@@ -64,6 +65,23 @@ app.post("/new-category", (req, res) => {
 			 res.status(200).send("ok")
 		 else
 			 res.status(400).send("A category with this name exists already!")
+	})
+})
+
+app.post("/new-type", (req, res) => {
+	if (!authorized(req.body))
+		return res.status(401).send("Login credentials are wrong or not existent!")
+	if (!req.body.name)
+		return res.status(400).send("You have to set a name!")
+	if (!req.body.category)
+		return res.status(400).send("You have to set a category!")
+	add_type_to_db(req.body, code => {
+		 if (code == 0)
+			 res.status(200).send("ok")
+		 else if (code == 1)
+			 res.status(400).send("The category you specified does not exist!")
+		 else
+			 res.status(400).send("A type with this name exists already in this category!")
 	})
 })
 
@@ -182,6 +200,7 @@ function add_equipment_to_db(body: any, callback: () => void) {
 function add_category_to_db(body: any, callback: (exists: boolean) => void) {
 	var cat: Category = {
 		name: body.name,
+		types: []
 	}
 	var query = { name: cat.name}
 	db.collection("categories").find(query).toArray((err, data) => {
@@ -195,6 +214,31 @@ function add_category_to_db(body: any, callback: (exists: boolean) => void) {
 			if (err)
 				throw err
 			callback(false)
+		})
+	})
+}
+
+function add_type_to_db(body: any, callback: (code: number) => void) {
+
+	var query = { name: body.category}
+	db.collection("categories").find(query).toArray((err, data) => {
+		if (err)
+			throw err
+
+		if (data == undefined || data.length == 0)
+			return callback(1)
+		
+		for (var t of data[0].types) {
+			if (t == body.name) {
+				callback(2)
+				return
+			}
+		}
+		data[0].types.push(body.name)
+		db.collection("categories").updateOne({name: body.category}, {$set: {types: data[0].types}}, err => {
+			if (err)
+				throw err
+			callback(0)
 		})
 	})
 }

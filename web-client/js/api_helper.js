@@ -47,6 +47,13 @@ function send_create_category(category, callback) {
 	})
 }
 
+function send_create_type(type, callback) {
+	type.login_hash = get_cookie("login_hash")
+	make_post_request(server_url + "new-type", type, res => {
+		callback(res)
+	})
+}
+
 function send_edit_item(item, callback) {
 	item.login_hash = get_cookie("login_hash")
 	make_post_request(server_url + "edit-equipment", item, res => {
