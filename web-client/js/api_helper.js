@@ -64,6 +64,16 @@ function send_delete_item(id, callback) {
 	})
 }
 
+function send_delete_category(name, callback) {
+	var body = {
+		login_hash: get_cookie("login_hash"),
+		name: name,
+	}
+	make_post_request(server_url + "delete-category", body, res => {
+		callback(res)
+	})
+}
+
 function make_post_request(url, content, callback) {
 	var xhr = new XMLHttpRequest()
 	xhr.onreadystatechange = function() {

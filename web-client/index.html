@@ -36,7 +36,13 @@
 				<h3>Delete Item</h3>
 				Do you really want to delete the item permanently?
 				<button onclick="hide_all_dialogs()">Cancel</button>
-				<button onclick="delete_item_clicked()">Delete</button>
+				<button onclick="delete_item_confirmed()">Delete</button>
+			</div>
+			<div class="dialog" id="delete-category-dialog">
+				<h3>Delete Category</h3>
+				Do you really want to delete the category with all of its content?
+				<button onclick="hide_all_dialogs()">Cancel</button>
+				<button onclick="delete_category_confirmed()">Delete</button>
 			</div>
 			<div class="dialog" id="qrcode-dialog">
 				<h3>QR code</h3>

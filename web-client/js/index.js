@@ -37,15 +37,17 @@ function render_equipment(equipment, search_keyword) {
 			var actions = `<div class="actions admin-only" ${logged_in ? '' : 'style="visibility: hidden;'}">
 							<button onclick="gencode_clicked(this)"><i class="fa-solid fa-barcode fa-2xl"></i></button>
 							<button onclick="window.location = './edit-item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
-							<button onclick="delete_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
+							<button onclick="delete_item_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
 						</div>`
 
 			inner += `<div class="item-entry" item_id="${item.id}"><img onclick="window.location = './item?id=${item.id}'" src="data:image/jpeg;base64,${item.image}"/>
 						<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
 						<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id}</div>${actions}</div>`
 		}
-		//if (inner != "")
-			outer += `<button type="button" class="collapsible">${category.name}</button>  <div class="collapsible-content">${inner}</div>`
+		outer += `<button type="button" class="collapsible" category_name="${category.name}">${category.name} <div class="actions admin-only">
+				<i onclick="delete_category_clicked(this)" class="fa-solid fa-trash-can fa-xl" style="color:red;"></i>
+			</div></button>
+		<div class="collapsible-content">${inner}</div>`
 	}
 	$("#equipment-container").append(outer)
 	setup_item_dropdown()
@@ -83,18 +85,32 @@ function gencode_clicked(e) {
 	show_dialog("qrcode-dialog")
 }
 
-var delete_id = ""
-function delete_clicked(item) {
+var delete_item_id = ""
+function delete_item_clicked(item) {
 	var id = item.parentNode.parentNode.getAttribute("item_id")
-	delete_id = id
+	delete_item_id = id
 	show_dialog("delete-item-dialog")
 }
 
-function delete_item_clicked() {
-	send_delete_item(delete_id, () => {
+function delete_item_confirmed() {
+	send_delete_item(delete_item_id, () => {
 		window.location.reload()
 	})
-	delete_id = ""
+	delete_item_id = ""
+}
+
+var delete_category_name = ""
+function delete_category_clicked(item) {
+	var name = item.parentNode.parentNode.getAttribute("category_name")
+	delete_category_name = name
+	show_dialog("delete-category-dialog")
+}
+
+function delete_category_confirmed() {
+	send_delete_category(delete_category_name, () => {
+		window.location.reload()
+	})
+	delete_category_name = ""
 }
 
 function print_barcode() {
@@ -120,7 +136,9 @@ function show_error_message(msg) {
 }
 
 function setup_item_dropdown() {
-	$(".collapsible").on("click", (e) => {
+	$("button.collapsible").on("click", (e) => {
+		if (e.target.tagName != "BUTTON")
+			return
 		e.target.classList.toggle("active")
 		var content = e.target.nextElementSibling
 		if (content.style.maxHeight){

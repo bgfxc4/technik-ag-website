@@ -28,33 +28,6 @@ interface Category {
 	name: string;
 }
 
-var equipment_list: Equipment[] = [
-	{
-		id: "0",
-		name: "testItem",
-		description: "just a test item",
-		storage_place: "room1",
-		category: "testCategory1",
-		image: item_image_placeholder
-	},
-	{
-		id: "0",
-		name: "testItem",
-		description: "just a test test item",
-		storage_place: "room1",
-		category: "testCategory1",
-		image: item_image_placeholder
-	},
-	{
-		id: "1",
-		name: "testItem2",
-		description: "just the second test item",
-		storage_place: "room2",
-		category: "testCategory2",
-		image: item_image_placeholder
-	}
-]
-
 app.post("/authorize", (req, res) => {
 	if (!authorized(req.body))
 		return res.status(401).send("Login credentials are wrong or not existent!")	
@@ -123,6 +96,20 @@ app.post("/delete-equipment", (req, res) => {
 		return res.status(400).send("You have to set an id!")
 	delete_equipment_from_db(req.body, () => {
 		res.status(200).send("ok")
+	})
+})
+
+app.post("/delete-category", (req, res) => {
+	if (!authorized(req.body))
+		return res.status(401).send("Login credentials are wrong or not existent!")	
+	if (!req.body.name)
+		return res.status(400).send("You have to set a name!")
+	check_if_category_exists(req.body.name, exists => {
+		if (!exists)
+			return res.status(400).send("The category you specified does not exist!")
+		delete_category_from_db(req.body, () => {
+			res.status(200).send("ok")
+		})
 	})
 })
 
@@ -236,6 +223,18 @@ function delete_equipment_from_db(body: any, callback: () => void) {
 		if (err)
 			throw err
 		callback()
+	})
+}
+
+function delete_category_from_db(body: any, callback: () => void) {
+	db.collection("categories").deleteOne({name: body.name}, err => {
+		if (err)
+			throw err
+		db.collection("equipment").deleteMany({category: body.name}, err2 => {
+			if (err2)
+				throw err2
+			callback()
+		})
 	})
 }
 
