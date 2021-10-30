@@ -45,8 +45,9 @@ function fill_in_item(item) {
 	$('#edit-item-name').val(item.name)
 	$('#edit-item-description').val(item.description)
 	$('#edit-item-storage').val(item.storage_place)
-	$('#edit-item-category').val(item.category)
-	$('#edit-item-type').val(item.type)
+	$('#edit-item-category').val(item.category).change()
+	render_types(item.category)
+	$('#edit-item-type').val(item.type).change()
 	$('#edit-image-preview')[0].src = `data:image/jpeg;base64,${item.image}`
 }
 
