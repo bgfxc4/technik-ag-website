@@ -21,6 +21,7 @@ interface Equipment {
 	description: string;
 	storage_place:string;
 	category: string;
+	type: string;
 	image: string;
 }
 
@@ -46,9 +47,13 @@ app.post("/new-equipment", (req, res) => {
 		return res.status(400).send("You have to set a storage place!")
 	if (!req.body.category)
 		return res.status(400).send("You have to set a category!")
-	check_if_category_exists(req.body.category, exists => {
-		if (!exists)
+	if (!req.body.type)
+		return res.status(400).send("You have to set a type!")
+	check_if_type_exists(req.body.category, req.body.type, code => {
+		if (code == 1)
 			return res.status(400).send("The category you specified does not exist!")
+		if (code == 2)
+			return res.status(400).send("The type you specified does not exist in the category you specified!")
 		add_equipment_to_db(req.body, () => {
 			res.status(200).send("ok")
 		})
@@ -98,9 +103,13 @@ app.post("/edit-equipment", (req, res) => {
 		return res.status(400).send("You have to set a storage place!")
 	if (!req.body.category)
 		return res.status(400).send("You have to set a category!")
-	check_if_category_exists(req.body.category, exists => {
-		if (!exists)
+	if (!req.body.type)
+		return res.status(400).send("You have to set a type!")
+	check_if_type_exists(req.body.category, req.body.type, code => {
+		if (code == 1)
 			return res.status(400).send("The category you specified does not exist!")
+		if (code == 2)
+			return res.status(400).send("The type you specified does not exist in the category you specified!")
 		edit_equipment_in_db(req.body, () => {
 			res.status(200).send("ok")
 		})
@@ -137,13 +146,25 @@ app.get("/get-equipment", (req, res) => {
 			var result: any[] = []
 
 			for (var cat of cats) {
-				result.push({name: cat.name, equipment: []})
+				var types = []
+				
+				for (var t of cat.types)
+					types.push({name: t, equipment: []})
+
+				result.push({name: cat.name, types: types})
 			}
 
 			for (var equ of list) {
 				for (var i = 0; i < result.length; i++) {
-					if (result[i].name == equ.category)
-						result[i].equipment.push(equ)
+					if (result[i].name == equ.category) {
+						for (var j = 0; j < result[i].types.length; j++) {
+							if (result[i].types[j].name == equ.type) {
+								result[i].types[j].equipment.push(equ)
+								continue
+							}
+						}
+						continue
+					}
 				}
 			}
 			res.send(JSON.stringify(result))
@@ -188,6 +209,7 @@ function add_equipment_to_db(body: any, callback: () => void) {
 		description: body.description,
 		storage_place: body.storage_place,
 		category: body.category,
+		type: body.type,
 		image: (body.image) ? body.image : item_image_placeholder
 	}
 	db.collection("equipment").insertOne(equ, err => {
@@ -251,6 +273,7 @@ function edit_equipment_in_db(body: any, callback: () => void) {
 			description: body.description,
 			storage_place: body.storage_place,
 			category: body.category,
+			type: body.type,
 			image: (body.image) ? body.image : item_image_placeholder
 		}
 	}
@@ -324,6 +347,24 @@ function check_if_category_exists(name: string, callback: (exists: boolean) => v
 		if (data.length == 0)
 			return callback(false)
 		callback(true)
+	})
+}
+
+function check_if_type_exists(category: string, name: string, callback: (code: number) => void) {
+	db.collection("categories").find({name: category}).toArray((err, data) => {
+		if (err)
+			throw err
+		if (data == undefined)
+			return callback(1)
+		if (data.length == 0)
+			return callback(1)
+		for (var t of data[0].types) {
+			if (t == name) {
+				callback(0)
+				return
+			}
+		}
+		callback(2)
 	})
 }
 

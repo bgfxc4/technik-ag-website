@@ -1,4 +1,5 @@
 var logged_in = false
+var categories = []
 
 window.onload = function () {
 	$(".admin-only").css("visibility", "hidden")
@@ -14,14 +15,28 @@ window.onload = function () {
 		if (equipment === undefined) {
 			return show_error_message("Not able to connect to the server. Please contact the system administrator.")
 		}
-		console.log(equipment)
 		fill_in_item(equipment[0].equipment[0])
 	})	
 	request_categories(res => {
+		categories = res
 		for (var cat of res) {
 			$('#edit-item-category').append(`<option value="${cat.name}">${cat.name}</option>`)
 		}
+		if (res[0] != undefined)
+			render_types(res[0].name)
 	})
+}
+
+function render_types(cat_name) {
+	console.log("Rendering: ", cat_name)
+	$('#edit-item-type').html("")
+	for (var cat of categories) {
+		if (cat_name == cat.name) {
+			for (var t of cat.types)
+				$('#edit-item-type').append(`<option value="${t}">${t}</option>`)
+			return
+		}
+	}
 }
 
 var edit_id = ""
@@ -31,6 +46,7 @@ function fill_in_item(item) {
 	$('#edit-item-description').val(item.description)
 	$('#edit-item-storage').val(item.storage_place)
 	$('#edit-item-category').val(item.category)
+	$('#edit-item-type').val(item.type)
 	$('#edit-image-preview')[0].src = `data:image/jpeg;base64,${item.image}`
 }
 
@@ -60,6 +76,7 @@ function edit_item_clicked()  {
 		description: $('#edit-item-description').val(),
 		storage_place: $('#edit-item-storage').val(),
 		category: $('#edit-item-category').val(),
+		type: $('#edit-item-type').val(),
 		image: $('#edit-image-preview')[0].src.split("base64,")[1]
 	}
 	send_edit_item(item, res => {

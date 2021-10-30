@@ -27,30 +27,42 @@ function render_equipment(equipment, search_keyword) {
 	$("#equipment-container").html("")
 	var outer = ""
 	for (var category of equipment) {
-		var inner = ""
-		for (var item of category.equipment) {
-			if (!item.name.toLowerCase().includes(decodeURIComponent(search_keyword).toLowerCase()) && search_keyword !== null)
-				continue
-			if (inner != "")
-				inner += "<hr>"
-			
-			var actions = `<div class="actions admin-only" ${logged_in ? '' : 'style="visibility: hidden;'}">
-							<button onclick="gencode_clicked(this)"><i class="fa-solid fa-barcode fa-2xl"></i></button>
-							<button onclick="window.location = './edit-item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
-							<button onclick="delete_item_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
-						</div>`
-
-			inner += `<div class="item-entry" item_id="${item.id}"><img onclick="window.location = './item?id=${item.id}'" src="data:image/jpeg;base64,${item.image}"/>
-						<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
-						<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id}</div>${actions}</div>`
+		var types = ""
+		for (var type of category.types) {
+			var inner = ""
+			for (var item of type.equipment) {
+				if (!item.name.toLowerCase().includes(decodeURIComponent(search_keyword).toLowerCase()) && search_keyword !== null)
+					continue
+				if (inner != "")
+					inner += "<hr>"
+				inner += generate_html_for_item(item)
+			}
+			types += `<button type="button" class="collapsible type" type_name="${type.name}">${type.name} <div class="actions admin-only">
+					<i onclick="delete_type_clicked(this)" class="fa-solid fa-trash-can fa-xl" style="color:red;"></i>
+				</div></button>
+			<div class="collapsible-content type">${inner}</div>`
+	
 		}
-		outer += `<button type="button" class="collapsible" category_name="${category.name}">${category.name} <div class="actions admin-only">
+		outer += `<button type="button" class="collapsible category" category_name="${category.name}">${category.name} <div class="actions admin-only">
 				<i onclick="delete_category_clicked(this)" class="fa-solid fa-trash-can fa-xl" style="color:red;"></i>
 			</div></button>
-		<div class="collapsible-content">${inner}</div>`
+		<div class="collapsible-content category">${types}</div>`
 	}
 	$("#equipment-container").append(outer)
 	setup_item_dropdown()
+}
+
+function generate_html_for_item(item) {
+	var actions = `<div class="actions admin-only" ${logged_in ? '' : 'style="visibility: hidden;'}">
+			<button onclick="gencode_clicked(this)"><i class="fa-solid fa-barcode fa-2xl"></i></button>
+			<button onclick="window.location = './edit-item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
+			<button onclick="delete_item_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
+		</div>`
+
+	return `<div class="item-entry" item_id="${item.id}"><img onclick="window.location = './item?id=${item.id}'" src="data:image/jpeg;base64,${item.image}"/>
+			<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
+			<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id}</div>${actions}</div>`
+
 }
 
 function search() {
@@ -139,12 +151,21 @@ function setup_item_dropdown() {
 	$("button.collapsible").on("click", (e) => {
 		if (e.target.tagName != "BUTTON")
 			return
-		e.target.classList.toggle("active")
+
 		var content = e.target.nextElementSibling
-		if (content.style.maxHeight){
+		var already_open = !!content.style.maxHeight
+		$('.active').removeClass('active')
+
+		if (e.target.classList.contains("type"))
+			$(".collapsible-content.type").css("maxHeight", "")
+		else
+			$(".collapsible-content").css("maxHeight", "")
+
+		if (already_open){
 			content.style.maxHeight = null;
 		} else {
 			//content.style.maxHeight = content.scrollHeight + "px";
+			e.target.classList.toggle("active")
 			content.style.maxHeight = "unset";
 		}
 	})

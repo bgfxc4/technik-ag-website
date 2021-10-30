@@ -1,12 +1,29 @@
+var categories = []
+
 window.onload = function () {
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
 
 	request_categories(res => {
+		categories = res
 		for (var cat of res) {
-			$('#create-item-category').append(`<option value="${cat.name}">${cat.name}</option>`)
+			$('#create-item-category').append(`<option onclick="render_types(${cat.name})" value="${cat.name}">${cat.name}</option>`)
 		}
+		if (res[0] != undefined)
+			render_types(res[0].name)
 	})
+}
+
+function render_types(cat_name) {
+	console.log("Rendering: ", cat_name)
+	$('#create-item-type').html("")
+	for (var cat of categories) {
+		if (cat_name == cat.name) {
+			for (var t of cat.types)
+				$('#create-item-type').append(`<option value="${t}">${t}</option>`)
+			return
+		}
+	}
 }
 
 function create_item_clicked() {
@@ -16,6 +33,7 @@ function create_item_clicked() {
 			description: $('#create-item-description').val(),
 			storage_place: $('#create-item-storage').val(),
 			category: $('#create-item-category').val(),
+			type: $('#create-item-type').val(),
 			image: img
 		}
 		send_create_item(item, res => {

@@ -29,7 +29,10 @@
 			<input type="text" id="create-item-storage" placeholder="Enter a storage place..."><br>
 
 			<label for="create-item-category">Select a category:</label><br>
-			<select id="create-item-category" placeholder="Select a category..."></select><br>
+			<select id="create-item-category" onchange="render_types(this.value)"></select><br>
+
+			<label for="create-item-type">Select a type:</label><br>
+			<select id="create-item-type"></select><br>
 			
 			<label for="create-item-image">Select an image of the item:</label><br>
 			<input type="file" onchange="load_image_preview('#create-item-image', '#create-image-preview')" accept="image/png, image/jpeg" id="create-item-image"><img id="create-image-preview"><br>
