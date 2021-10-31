@@ -81,23 +81,13 @@ button#not-logged-in.login-status {
 	border: 2px solid black;
 }
 
-#dialog-container {
-	visibility: hidden;
-	position: fixed;
-	background-color: #ddd8;
-	top: 0;
-	right: 0;
-	left: 0;
-	bottom: 0;
-}
-
-.dialog {
+#main-content {
+	display: flex;
 	text-align: center;
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	width: 40%;
 	background-color: white;
 }
 
@@ -112,4 +102,46 @@ button#not-logged-in.login-status {
 .dialog img {
 	max-width: 20vw;
 	max-height: 20vh;
+}
+
+ul.tree li {
+	list-style-type: none;
+	position: relative;
+}
+
+ul.tree li ul {
+	display: none;
+}
+
+ul.tree li.open > ul {
+	display: block;
+}
+
+ul.tree li a {
+	color: black;
+	text-decoration: none;
+}
+
+ul.tree li a.item-template {
+	color: blue;
+	text-decoration: blue;
+	text-decoration-line: underline;
+}
+
+ul.tree li a:before {
+	height: 1em;
+	padding:0 .1em;
+	font-size: .8em;
+	display: block;
+	position: absolute;
+	left: -1.3em;
+	top: .2em;
+}
+
+ul.tree li > a:not(:last-child):before {
+	content: '‣';
+}
+
+ul.tree li.open > a:not(:last-child):before {
+	content: '-';
 }
