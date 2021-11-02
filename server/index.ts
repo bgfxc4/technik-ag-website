@@ -66,10 +66,10 @@ app.post("/new-category", (req, res) => {
 	if (!req.body.name)
 		return res.status(400).send("You have to set a name!")
 	add_category_to_db(req.body, exists => {
-		 if (!exists)
-			 res.status(200).send("ok")
-		 else
-			 res.status(400).send("A category with this name exists already!")
+		if (!exists)
+			res.status(200).send("ok")
+		else
+			res.status(400).send("A category with this name exists already!")
 	})
 })
 
@@ -81,12 +81,12 @@ app.post("/new-type", (req, res) => {
 	if (!req.body.category)
 		return res.status(400).send("You have to set a category!")
 	add_type_to_db(req.body, code => {
-		 if (code == 0)
-			 res.status(200).send("ok")
-		 else if (code == 1)
-			 res.status(400).send("The category you specified does not exist!")
-		 else
-			 res.status(400).send("A type with this name exists already in this category!")
+		if (code == 0)
+			res.status(200).send("ok")
+		else if (code == 1)
+			res.status(400).send("The category you specified does not exist!")
+		else
+			res.status(400).send("A type with this name exists already in this category!")
 	})
 })
 
@@ -118,7 +118,7 @@ app.post("/edit-equipment", (req, res) => {
 
 app.post("/delete-equipment", (req, res) => {
 	if (!authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
+		return res.status(401).send("Login credentials are wrong or not existent!")
 	if (!req.body.id)
 		return res.status(400).send("You have to set an id!")
 	delete_equipment_from_db(req.body, () => {
@@ -128,7 +128,7 @@ app.post("/delete-equipment", (req, res) => {
 
 app.post("/delete-category", (req, res) => {
 	if (!authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
+		return res.status(401).send("Login credentials are wrong or not existent!")
 	if (!req.body.name)
 		return res.status(400).send("You have to set a name!")
 	check_if_category_exists(req.body.name, exists => {
@@ -140,8 +140,24 @@ app.post("/delete-category", (req, res) => {
 	})
 })
 
+app.post("/delete-type", (req, res) => {
+	if (!authorized(req.body))
+		return res.status(401).send("Login credentials are wrong or not existent!")
+	if (!req.body.name)
+		return res.status(400).send("You have to set a name!")
+	if (!req.body.category)
+		return res.status(400).send("You have to set a category!")
+	check_if_type_exists(req.body.category, req.body.name, code => {
+		if (code != 0)
+			return res.status(400).send("The type or category you specified do not exist!")
+		delete_type_from_db(req.body, () => {
+			res.status(200).send("ok")
+		})
+	})
+})
+
 app.get("/get-equipment", (req, res) => {
-   get_equipment_from_db(list => {
+	get_equipment_from_db(list => {
 		get_categories_from_db(cats => {
 			var result: any[] = []
 
@@ -169,13 +185,13 @@ app.get("/get-equipment", (req, res) => {
 			}
 			res.send(JSON.stringify(result))
 		})
-   })
+	})
 })
 
 app.get("/get-categories", (req, res) => {
-   get_categories_from_db(list => {
+	get_categories_from_db(list => {
 		res.send(JSON.stringify(list))
-   })
+	})
 })
 
 app.get("/get-equipment-by-id/:id", (req, res) => {
@@ -301,6 +317,25 @@ function delete_category_from_db(body: any, callback: () => void) {
 			if (err2)
 				throw err2
 			callback()
+		})
+	})
+}
+
+function delete_type_from_db(body: any, callback: () => void) {
+	db.collection("categories").findOne({name: body.category}, (err, data) => {
+		if (err)
+			throw err
+		if (!data)
+			return
+		data.types.splice(data.types.indexOf(body.name), 1)
+		db.collection("categories").updateOne({name: body.category}, {$set: {types: data.types}}, err2 => {
+			if (err2)
+				throw err2
+			db.collection("equipment").deleteMany({category: body.category, type: body.name}, err3 => {
+				if (err3)
+					throw err3
+				callback()
+			})
 		})
 	})
 }

@@ -37,16 +37,19 @@ function render_equipment(equipment, search_keyword) {
 					inner += "<hr>"
 				inner += generate_html_for_item(item)
 			}
-			types += `<button type="button" class="collapsible type" type_name="${type.name}">${type.name} <div class="actions admin-only">
+			if (search_keyword === null || inner != "") {
+				types += `<button type="button" class="collapsible type" type_name="${type.name}">${type.name} <div class="actions admin-only">
 					<i onclick="delete_type_clicked(this)" class="fa-solid fa-trash-can fa-xl" style="color:red;"></i>
-				</div></button>
-			<div class="collapsible-content type">${inner}</div>`
-	
+					</div></button>
+				<div class="collapsible-content type">${inner}</div>`
+			}
 		}
-		outer += `<button type="button" class="collapsible category" category_name="${category.name}">${category.name} <div class="actions admin-only">
-				<i onclick="delete_category_clicked(this)" class="fa-solid fa-trash-can fa-xl" style="color:red;"></i>
-			</div></button>
-		<div class="collapsible-content category">${types}</div>`
+		if (search_keyword === null || types != "") {
+			outer += `<button type="button" class="collapsible category" category_name="${category.name}">${category.name} <div class="actions admin-only">
+					<i onclick="delete_category_clicked(this)" class="fa-solid fa-trash-can fa-xl" style="color:red;"></i>
+				</div></button>
+			<div class="collapsible-content category">${types}</div>`
+		}
 	}
 	$("#equipment-container").append(outer)
 	setup_item_dropdown()
@@ -123,6 +126,25 @@ function delete_category_confirmed() {
 		window.location.reload()
 	})
 	delete_category_name = ""
+}
+
+var delete_type_name = ""
+var delete_type_category = ""
+function delete_type_clicked(item) {
+	var name = item.parentNode.parentNode.getAttribute("type_name")
+	console.log(item.parentNode.parentNode.parentNode.previousElementSibling)
+	var category = item.parentNode.parentNode.parentNode.previousElementSibling.getAttribute("category_name")
+	delete_type_name = name
+	delete_type_category = category
+	show_dialog("delete-type-dialog")
+}
+
+function delete_type_confirmed() {
+	send_delete_type(delete_type_name, delete_type_category, () => {
+		window.location.reload()
+	})
+	delete_type_name = ""
+	delete_type_category = ""
 }
 
 function print_barcode() {
