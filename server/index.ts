@@ -23,11 +23,13 @@ interface Equipment {
 	category: string;
 	type: string;
 	image: string;
+	custom_fields: any;
 }
 
 interface Category {
 	name: string;
 	types: string[];
+	custom_fields: string[];
 }
 
 app.post("/authorize", (req, res) => {
@@ -167,7 +169,7 @@ app.get("/get-equipment", (req, res) => {
 				for (var t of cat.types)
 					types.push({name: t, equipment: []})
 
-				result.push({name: cat.name, types: types})
+				result.push({name: cat.name, types: types, custom_fields: cat.custom_fields})
 			}
 
 			for (var equ of list) {
@@ -219,26 +221,40 @@ app.get("/get-equipment-by-id/:id", (req, res) => {
 })
 
 function add_equipment_to_db(body: any, callback: () => void) {
-	var equ: Equipment = {
-		id: uuid.v4(),
-		name: body.name,
-		description: body.description,
-		storage_place: body.storage_place,
-		category: body.category,
-		type: body.type,
-		image: (body.image) ? body.image : item_image_placeholder
-	}
-	db.collection("equipment").insertOne(equ, err => {
+	db.collection("categories").findOne({name: body.category}, (err, data) => {
 		if (err)
 			throw err
-		callback()
+		
+		var custom_fields: {
+			[key: string]: string;
+		} = {}
+		if (data)
+			for (var f in body.custom_fields) {
+				custom_fields[f] = body.custom_fields[f]
+			}
+		var equ: Equipment = {
+			id: uuid.v4(),
+			name: body.name,
+			description: body.description,
+			storage_place: body.storage_place,
+			category: body.category,
+			type: body.type,
+			image: (body.image) ? body.image : item_image_placeholder,
+			custom_fields: custom_fields
+		}
+		db.collection("equipment").insertOne(equ, err2 => {
+			if (err2)
+				throw err
+			callback()
+		})
 	})
 }
 
 function add_category_to_db(body: any, callback: (exists: boolean) => void) {
 	var cat: Category = {
 		name: body.name,
-		types: []
+		types: [],
+		custom_fields: body.custom_fields,
 	}
 	var query = { name: cat.name}
 	db.collection("categories").find(query).toArray((err, data) => {
@@ -282,21 +298,34 @@ function add_type_to_db(body: any, callback: (code: number) => void) {
 }
 
 function edit_equipment_in_db(body: any, callback: () => void) {
-	var query = { id: body.id}
-	var update = {
-		$set: {
-			name: body.name, 
-			description: body.description,
-			storage_place: body.storage_place,
-			category: body.category,
-			type: body.type,
-			image: (body.image) ? body.image : item_image_placeholder
-		}
-	}
-	db.collection("equipment").updateOne(query, update, err => {
+	db.collection("categories").findOne({name: body.category}, (err, data) => {
 		if (err)
 			throw err
-		callback()
+		
+		var custom_fields: {
+			[key: string]: string;
+		} = {}
+		if (data)
+			for (var f in body.custom_fields) {
+				custom_fields[f] = body.custom_fields[f]
+			}
+		var query = { id: body.id}
+		var update = {
+			$set: {
+				name: body.name, 
+				description: body.description,
+				storage_place: body.storage_place,
+				category: body.category,
+				type: body.type,
+				custom_fields: custom_fields,
+				image: (body.image) ? body.image : item_image_placeholder
+			}
+		}
+		db.collection("equipment").updateOne(query, update, err => {
+			if (err)
+				throw err
+			callback()
+		})
 	})
 }
 

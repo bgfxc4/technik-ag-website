@@ -22,10 +22,13 @@ window.onload = function () {
 
 function render_types(cat_name) {
 	$('#create-item-type').html("")
+	$('#custom-field-container').html("")
 	for (var cat of categories) {
 		if (cat_name == cat.name) {
 			for (var t of cat.types)
 				$('#create-item-type').append(`<option value="${t}">${t}</option>`)
+			for (var f of cat.custom_fields)
+				$('#custom-field-container').append(`<label for="custom-field-${f}">${f}:</label><br><input type="text" field-name="${f}" placeholder="Enter a value for ${f}..." id="custom-field-${f}"><br>`)
 			return
 		}
 	}
@@ -77,6 +80,11 @@ function render_template_list(equipment) {
 }
 
 function create_item_clicked() {
+	var custom_fields = {}
+	$("#custom-field-container input").each((i, el) => {
+		custom_fields[$(el).attr('field-name')] = $(el).val()
+	})
+
 	load_image_base64("#create-item-image", img => {
 		var item = {
 			name: $('#create-item-name').val(),
@@ -84,6 +92,7 @@ function create_item_clicked() {
 			storage_place: $('#create-item-storage').val(),
 			category: $('#create-item-category').val(),
 			type: $('#create-item-type').val(),
+			custom_fields: custom_fields,
 			image: img
 		}
 		send_create_item(item, res => {

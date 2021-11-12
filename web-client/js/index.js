@@ -61,10 +61,14 @@ function generate_html_for_item(item) {
 			<button onclick="window.location = './edit-item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
 			<button onclick="delete_item_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
 		</div>`
-
+	
+	var cf = ""
+	for (var f in item.custom_fields) {
+		cf += `<br><b>${f}:</b> ${item.custom_fields[f]}`
+	}
 	return `<div class="item-entry" item_id="${item.id}"><img onclick="window.location = './item?id=${item.id}'" src="data:image/jpeg;base64,${item.image}"/>
 			<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
-			<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id}</div>${actions}</div>`
+			<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id} ${cf}</div>${actions}</div>`
 
 }
 
@@ -176,7 +180,7 @@ function setup_item_dropdown() {
 
 		var content = e.target.nextElementSibling
 		var already_open = !!content.style.maxHeight
-		$('.active').removeClass('active')
+		$('.collapsible.active').removeClass('active')
 
 		if (e.target.classList.contains("type"))
 			$(".collapsible-content.type").css("maxHeight", "")

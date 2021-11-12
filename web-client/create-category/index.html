@@ -22,10 +22,21 @@
 			<label for="create-category-name">Name:</label><br>
 			<input type="text" id="create-category-name" placeholder="Enter a name..."><br>
 
+			<p style="display:inline">Custom fields:   </p><button onclick="show_dialog('create-field')">Create custom field</button>
+			<div id="field-container"></div><br>
 			<button onclick="window.location = '../'">Cancel</button>
 			<button onclick="create_category_clicked()">Create</button>
 			
 			<p id="error-text" style="color:red"></p>
+		</div>
+		<div id="dialog-container">
+			<div class="dialog" id="create-field">
+				<h3>Create custom field</h3>
+				<label for="create-field-name">Name:</label><br>
+				<input type="text" id="create-field-name" placeholder="Enter a name..."><br>
+				<button onclick="hide_all_dialogs()">Cancel</button>
+				<button onclick="create_field_confirmed()">Create</button>
+			</div>
 		</div>
 	</body>
 </html>
