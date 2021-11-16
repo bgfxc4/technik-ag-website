@@ -25,7 +25,7 @@ window.onload = function () {
 			$('#edit-item-category').append(`<option value="${cat.name}">${cat.name}</option>`)
 		}
 		if (res[0] != undefined)
-			render_types(res[0].name)
+			render_types(res[0].name, item_to_edit)
 	})
 }
 

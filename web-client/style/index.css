@@ -148,6 +148,13 @@ button#not-logged-in.login-status {
 	height: 3vh;
 }
 
+#top-actions .delete-button {
+	background-color: red;
+	color: white;
+	border: 2px solid red;
+	border-radius: 3px;
+}
+
 .item-entry {
 	position: relative;
 	display: grid;
@@ -174,6 +181,10 @@ button#not-logged-in.login-status {
 	margin-right: 10px;
 	background-color: #fff0;
 	border: none;
+}
+
+.fa-trash-can {
+	display: none;
 }
 
 #dialog-container {

@@ -27,6 +27,8 @@
 			<button class="new-item admin-only" onclick="window.location = './create-item'">New item</button>
 			<button class="new-category admin-only" onclick="window.location = './create-category'">New category</button>
 			<button class="new-type admin-only" onclick="window.location = './create-type'">New type</button>
+			<button class="admin-only" id="enter-delete-mode-btn" onclick="enter_delete_mode()">Delete category/type/item</button>
+			<button class="delete-button" id="exit-delete-mode-btn" onclick="exit_delete_mode()" style='display:none;'>Exit delete mode</button>
 		</div>
 		<p id="search-message"></p>
 		<div id="equipment-container">

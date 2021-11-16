@@ -151,6 +151,18 @@ function delete_type_confirmed() {
 	delete_type_category = ""
 }
 
+function enter_delete_mode() {
+	$(".fa-trash-can").css("display", "inline-block")
+	$('#enter-delete-mode-btn').css("display", "none")
+	$('#exit-delete-mode-btn').css("display", "inline-block")
+}
+
+function exit_delete_mode() {
+	$(".fa-trash-can").css("display", "none")
+	$('#enter-delete-mode-btn').css("display", "inline-block")
+	$('#exit-delete-mode-btn').css("display", "none")
+}
+
 function print_barcode() {
 	var inner = $('#barcode-container')[0].outerHTML
 	popupWinindow = window.open('', '_blank', 'width=1000,height=1000,scrollbars=no,menubar=no,toolbar=no,location=no,status=no,titlebar=no')
