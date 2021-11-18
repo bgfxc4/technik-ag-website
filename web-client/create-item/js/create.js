@@ -40,6 +40,9 @@ function fill_in_item(item) {
 	$('#create-item-storage').val(item.storage_place)
 	$('#create-item-category').val(item.category).change()
 	render_types(item.category)
+	for (var i in item.custom_fields) {
+		$(`#custom-field-${i}`).val(item.custom_fields[i])
+	}
 	$('#create-item-type').val(item.type).change()
 	$('#create-image-preview')[0].src = `data:image/jpeg;base64,${item.image}`
 }
@@ -85,23 +88,21 @@ function create_item_clicked() {
 		custom_fields[$(el).attr('field-name')] = $(el).val()
 	})
 
-	load_image_base64("#create-item-image", img => {
-		var item = {
-			name: $('#create-item-name').val(),
-			description: $('#create-item-description').val(),
-			storage_place: $('#create-item-storage').val(),
-			category: $('#create-item-category').val(),
-			type: $('#create-item-type').val(),
-			custom_fields: custom_fields,
-			image: img
+	var item = {
+		name: $('#create-item-name').val(),
+		description: $('#create-item-description').val(),
+		storage_place: $('#create-item-storage').val(),
+		category: $('#create-item-category').val(),
+		type: $('#create-item-type').val(),
+		custom_fields: custom_fields,
+		image: (!!$('#create-image-preview')[0].src) ? $('#create-image-preview')[0].src.split('base64,')[1] : undefined
+	}
+	send_create_item(item, res => {
+		if (res.status != 200) {
+			display_error(`${res.status}: ${res.responseText}`)
+		} else {
+			window.location = '../'
 		}
-		send_create_item(item, res => {
-			if (res.status != 200) {
-				display_error(`${res.status}: ${res.responseText}`)
-			} else {
-				window.location = '../'
-			}
-		})
 	})
 }
 
