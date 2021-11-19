@@ -2,9 +2,9 @@
   "name": "technik-ag-website",
   "version": "1.0.0",
   "description": "A website to manage technical equipment and to book appointments",
-  "main": "index.ts",
+  "main": "main.ts",
   "scripts": {
-    "start": "ts-node index.ts"
+    "start": "ts-node main.ts"
   },
   "repository": {
     "type": "git",
