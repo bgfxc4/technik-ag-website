@@ -1,16 +1,30 @@
 var categories = []
 var complete_equipment = []
 
+var cat_name = ""
+var type_name = ""
+
 window.onload = function () {
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
+	
+	cat_name = new URL(window.location).searchParams.get("category")
+	type_name = new URL(window.location).searchParams.get("type")
 
 	request_categories(res => {
 		categories = res
 		for (var cat of res) {
 			$('#create-item-category').append(`<option onclick="render_types(${cat.name})" value="${cat.name}">${cat.name}</option>`)
 		}
-		if (res[0] != undefined)
+		if (cat_name != null) {
+				$('#create-item-category').val(decodeURIComponent(cat_name))
+				$('#create-item-category').select()
+				render_types(decodeURIComponent(cat_name))
+			if (type_name != null) {
+				$('#create-item-type').val(decodeURIComponent(type_name))
+				$('#create-item-type').select()
+			}
+		} else if (res[0] != undefined)
 			render_types(res[0].name)
 	})
 

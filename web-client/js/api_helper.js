@@ -33,6 +33,15 @@ function request_equipment_by_id(id, callback) {
 	})
 }
 
+function request_equipment_by_type(category, type, callback) {
+	make_get_request(`${server_url}get-equipment-by-type/${category}/${type}`, res => {
+		if (res.responseText == undefined || res.status != 200)
+			callback(undefined)
+		else
+			callback(JSON.parse(res.responseText))
+	})
+}
+
 function send_create_item(item, callback) {
 	item.login_hash = get_cookie("login_hash")
 	make_post_request(server_url + "new-equipment", item, res => {

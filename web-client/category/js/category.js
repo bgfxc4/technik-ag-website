@@ -1,24 +1,35 @@
 var logged_in = false
+var cat_name = ""
 
 window.onload = function () {
 
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
+	
+	cat_name = new URL(window.location).searchParams.get("category")
+	
+	if (cat_name == null) {
+		window.location = "../"
+	}
 
 	request_categories(cats => {
 		if (cats === undefined) {
 			return show_error_message("Not able to connect to the server. Please contact the system administrator.")
 		}
-		render_categories(cats)
+		render_types(cats, cat_name)
 	})
 }
 
-function render_categories(cats) {
+function render_types(cats, cat_name) {
 
 	var s = ""
 	for (var category of cats) {
-		var loc = './category/?category=' + encodeURIComponent(category.name)
-		s += `<button class="category-btn" category_name="${category.name}" onclick="window.location = '${loc}'">${category.name}</button>`
+		if (category.name == cat_name) {
+			for (var t of category.types) {
+				var loc = '../type/?category=' + encodeURIComponent(cat_name) + '&type=' + encodeURIComponent(t)
+				s += `<button class="type-btn" type_name="${t}" onclick="window.location = '${loc}'">${t}</button>`
+			}
+		}
 		
 	}
 	$("#equipment-container").prepend(s)
@@ -44,34 +55,33 @@ function show_dialog(id) {
 	$("#dialog-container").css("visibility", "visible")
 }
 
-var delete_category_name = ""
-function delete_category_clicked(item) {
-	var name = item.getAttribute("category_name")
-	delete_category_name = name
-	show_dialog("delete-category-dialog")
+var delete_type_name = ""
+function delete_type_clicked(item) {
+	var name = item.getAttribute("type_name")
+	delete_type_name = name
+	show_dialog("delete-type-dialog")
 }
 
-function delete_category_confirmed() {
-	send_delete_category(delete_category_name, () => {
+function delete_type_confirmed() {
+	send_delete_type(delete_type_name, cat_name, () => {
 		window.location.reload()
 	})
-	delete_category_name = ""
+	delete_type_name = ""
 }
 
 function enter_delete_mode() {
-	$('.category-btn').addClass('red-btn')
-	$('.category-btn').each((i, el) => {
+	$('.type-btn').addClass('red-btn')
+	$('.type-btn').each((i, el) => {
 		$(el).attr('onclick-tmp', $(el).attr('onclick'))
-		console.log(el)
-		$(el).attr('onclick', 'delete_category_clicked(this)')
+		$(el).attr('onclick', 'delete_type_clicked(this)')
 	})
 	$('#enter-delete-mode-btn').css("display", "none")
 	$('#exit-delete-mode-btn').css("display", "inline-block")
 }
 
 function exit_delete_mode() {
-	$('.category-btn').removeClass('red-btn')
-	$('.category-btn').each(el => {
+	$('.type-btn').removeClass('red-btn')
+	$('.type-btn').each(el => {
 		$(el).attr('onclick', $(el).attr('onclick-tmp'))
 	})
 	$('#enter-delete-mode-btn').css("display", "inline-block")

@@ -1,10 +1,18 @@
+var cat_name = ""
+
 window.onload = function () {
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()	
 
+	cat_name = new URL(window.location).searchParams.get("category")
+
 	request_categories(res => {
 		for (var cat of res) {
 			$('#create-type-category').append(`<option value="${cat.name}">${cat.name}</option>`)
+		}
+		if (cat_name != null) {
+			$('#create-type-category').val(decodeURIComponent(cat_name))
+			$('#create-type-category').select()
 		}
 	})
 }
