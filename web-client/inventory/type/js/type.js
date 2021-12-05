@@ -39,7 +39,7 @@ function render_items(items) {
 function generate_html_for_item(item) {
 	var actions = `<div class="actions admin-only" ${logged_in ? '' : 'style="visibility: hidden;'}">
 			<button onclick="gencode_clicked(this)"><i class="fa-solid fa-barcode fa-2xl"></i></button>
-			<button onclick="window.location = '../edit-item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
+			<button onclick="window.location = '../../edit/item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
 			<button onclick="delete_item_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
 		</div>`
 	

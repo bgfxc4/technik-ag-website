@@ -4,7 +4,10 @@ var item_to_edit
 
 window.onload = function () {
 	$(".admin-only").css("visibility", "hidden")
-	check_if_logged_in()
+	check_if_logged_in(() => {
+		if (!logged_in)
+			window.location = "../../inventory"
+	})
 
 	var item_id = new URL(window.location).searchParams.get("id")
 	
@@ -104,6 +107,11 @@ function edit_item_clicked()  {
 				window.location = '../../inventory'
 			}
 	})
+}
+
+function logout() {
+	set_cookie("login_hash", "", 1)
+	window.location.reload()
 }
 
 function display_error(msg) {

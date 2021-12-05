@@ -153,7 +153,7 @@ function get_cookie(cname) {
 	return "";
 }
 
-function check_if_logged_in() {
+function check_if_logged_in(callback) {
 	var login_hash = get_cookie("login_hash")
 	if (login_hash != "") {
 		var xhr = new XMLHttpRequest()
@@ -165,9 +165,14 @@ function check_if_logged_in() {
 				$("#not-logged-in").css("display", "none")
 				$(".admin-only").css("visibility", "visible")
 			}
+			if (callback)
+				callback()
 		}
 		xhr.open("POST", url)
 		xhr.setRequestHeader("content-type", "application/json")
 		xhr.send(JSON.stringify({login_hash: login_hash}))
+	} else {
+		if (callback)
+			callback()
 	}
 }
