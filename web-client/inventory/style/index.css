@@ -123,20 +123,34 @@ button#not-logged-in.login-status {
 	margin-top : 8%;
 	margin-left: 12%;
 	margin-right: 12%;
+	margin-bottom: 5%;
 }
 
 .category-btn {
+	position: relative;
 	width: 100%;
 	height: 0;
 	padding-bottom: 100%;
 }
 
 .category-btn img {
+	position: absolute;
 	max-width: 100%;
-	width: auto;
-	height: auto;
+	max-height: 89%;
 	border-radius: 5px;
 	margin-top: 2px;
+	margin-left: auto;
+	margin-right: auto;
+	left: 0;
+	right: 0;
+	text-align: center;
+}
+
+.category-btn p {
+	position: absolute;
+	bottom: -1em;
+	width: 100%;
+	text-align: center;
 }
 
 .new-category {

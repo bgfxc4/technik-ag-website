@@ -19,7 +19,7 @@ function render_categories(cats) {
 	for (var category of cats) {
 		var loc = './category/?category=' + encodeURIComponent(category.name)
 		var img = `<img src="data:image/jpeg;base64,${category.image}"/>`
-		s += `<button class="category-btn" category_name="${category.name}" onclick="window.location = '${loc}'">${img} ${category.name}</button>`
+		s += `<button class="category-btn" category_name="${category.name}" onclick="window.location = '${loc}'">${img} <p>${category.name}</p></button>`
 		
 	}
 	$("#equipment-container").prepend(s)
