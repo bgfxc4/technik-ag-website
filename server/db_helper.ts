@@ -47,6 +47,7 @@ export function add_equipment_to_db(body: any, callback: () => void) {
 export function add_category_to_db(body: any, callback: (exists: boolean) => void) {
 	var cat: main.Category = {
 		name: body.name,
+		image: (body.image) ? body.image : item_image_placeholder,
 		types: [],
 		custom_fields: body.custom_fields,
 	}

@@ -39,7 +39,8 @@
 				<div id="custom-field-container"></div>
 					
 				<label for="create-item-image">Select an image of the item:</label><br>
-				<input type="file" onchange="load_image_preview('#create-item-image', '#create-image-preview')" accept="image/png, image/jpeg" id="create-item-image"><img id="create-image-preview"><br>
+				<input type="file" onchange="load_image_preview('#create-item-image', '#create-image-preview')" accept="image/png, image/jpeg" id="create-item-image"><br>
+				<img id="create-image-preview"><br><br>
 				
 				<button onclick="window.location = '../../inventory'">Cancel</button>
 				<button onclick="create_item_clicked()">Create</button>

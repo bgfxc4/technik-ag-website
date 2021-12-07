@@ -26,6 +26,7 @@ export interface Equipment {
 
 export interface Category {
 	name: string;
+	image: string;
 	types: string[];
 	custom_fields: string[];
 }

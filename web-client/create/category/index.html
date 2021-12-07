@@ -24,6 +24,10 @@
 
 			<p style="display:inline">Custom fields:   </p><button onclick="show_dialog('create-field')">Create custom field</button>
 			<div id="field-container"></div><br>
+
+			<label for="create-category-image">Select an image for the category:</label><br>
+			<input type="file" onchange="load_image_preview('#create-category-image', '#create-category-preview')" accept="image/png, image/jpeg" id="create-category-image"><br>
+			<img id="create-category-preview"><br><br>
 			<button onclick="window.location = '../../inventory'">Cancel</button>
 			<button onclick="create_category_clicked()">Create</button>
 			

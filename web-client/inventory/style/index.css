@@ -131,6 +131,14 @@ button#not-logged-in.login-status {
 	padding-bottom: 100%;
 }
 
+.category-btn img {
+	max-width: 100%;
+	width: auto;
+	height: auto;
+	border-radius: 5px;
+	margin-top: 2px;
+}
+
 .new-category {
 	height: 15%;
 	margin-bottom: 75%;

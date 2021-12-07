@@ -9,6 +9,7 @@ function create_category_clicked() {
 	var category = {
 		name: $('#create-category-name').val(),
 		custom_fields: custom_fields,
+		image: (!!$('#create-category-preview')[0].src) ? $('#create-category-preview')[0].src.split('base64,')[1] : undefined
 	}
 	send_create_category(category, res => {
 		if (res.status != 200) {
@@ -48,6 +49,25 @@ function hide_all_dialogs() {
 function show_dialog(id) {
 	$('#' + id).css("visibility", "visible")
 	$("#dialog-container").css("visibility", "visible")
+}
+
+function load_image_preview(input_query, img_query) {
+	load_image_base64(input_query, img => {
+		$(img_query)[0].src = `data:image/jpeg;base64,${img}`
+	})
+}
+
+function load_image_base64(query, callback) {
+	if ($(query)[0].files.length == 0) {
+		callback(undefined)
+		return
+	}
+	var file = $(query)[0].files[0]
+	var reader = new FileReader()
+	reader.onloadend = function() {
+		callback(reader.result.split('base64,')[1])
+	}
+	reader.readAsDataURL(file)
 }
 
 function display_error(msg) {
