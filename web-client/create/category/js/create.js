@@ -36,9 +36,14 @@ function create_field_confirmed() {
 
 function render_field_names() {
 	$('#field-container').html("")
-	for (var s of custom_fields) {
-		$('#field-container').append(`-${s}<br>`)
+	for (var s in custom_fields) {
+		$('#field-container').append(`-${custom_fields[s]} <a style="color:red; text-decoration: underline red; cursor: pointer;" onclick="remove_field(${s})">remove</a><br>`)
 	}
+}
+
+function remove_field(index) {
+	custom_fields.splice(index, 1)
+	render_field_names()
 }
 
 function hide_all_dialogs() {
