@@ -42,6 +42,12 @@ function request_equipment_by_type(category, type, callback) {
 	})
 }
 
+function send_search_items(keywords, callback) {
+	make_post_request(server_url + "search-equipment", {keywords: keywords}, res => {
+		callback(res)
+	})
+}
+
 function send_create_item(item, callback) {
 	item.login_hash = get_cookie("login_hash")
 	make_post_request(server_url + "new-equipment", item, res => {

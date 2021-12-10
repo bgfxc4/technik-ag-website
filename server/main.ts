@@ -189,6 +189,28 @@ app.get("/get-equipment", (req, res) => {
 	})
 })
 
+function fits_search(name: string, keywords: any[]) {
+	for (var k of keywords) {
+		if (name.includes(k))
+			return true
+	}
+	return false
+}
+
+app.post("/search-equipment", (req, res) => {
+	if (!req.body.keywords || !req.body.keywords[0])
+		return res.status(400).send("You have to provide keywords to search for!")
+
+	db_helper.get_equipment_from_db(list => {
+		var ret:any[] = []
+		for (var item of list) {
+			if (fits_search(item.name, req.body.keywords))
+				ret.push(item)
+		}
+		res.send(JSON.stringify(ret))
+	})
+})
+
 app.get("/get-categories", (req, res) => {
 	db_helper.get_categories_from_db(list => {
 		res.send(JSON.stringify(list))
