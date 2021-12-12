@@ -3,6 +3,8 @@
 		<title>Technik AG</title>
 		<meta charset="UTF-8">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="../js/qrcode.min.js"></script>
+		<script src="../js/JsBarcode.all.min.js"></script>
 		<script src="../js/api_helper.js"></script>
 		<script src="js/search.js"></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
@@ -34,6 +36,20 @@
 				Do you really want to delete this item?<br>
 				<button onclick="hide_all_dialogs()">Cancel</button>
 				<button onclick="delete_item_confirmed()">Delete</button>
+			</div>
+			<div class="dialog" id="qrcode-dialog">
+				<h3>QR code</h3>
+				<div id="qrcode-container"></div>
+				<button onclick="hide_all_dialogs();show_dialog('barcode-dialog')">Barcode</button>
+				<button onclick="print_qrcode()">Print</button>
+				<button onclick="hide_all_dialogs()">Close</button>
+			</div>
+			<div class="dialog" id="barcode-dialog">
+				<h3>Bar code</h3>
+				<svg id="barcode-container"></svg><br>
+				<button onclick="hide_all_dialogs();show_dialog('qrcode-dialog')">QR code</button>
+				<button onclick="print_barcode()">Print</button>
+				<button onclick="hide_all_dialogs()">Close</button>
 			</div>
 		</div>
 	</body>

@@ -1,8 +1,10 @@
 var logged_in = false
 var search_tag = ""
+var qrcode
 
 window.onload = function () {
-
+	qrcode = new QRCode("qrcode-container")
+	
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
 	
@@ -39,7 +41,7 @@ function render_items(items) {
 function generate_html_for_item(item) {
 	var actions = `<div class="actions admin-only" ${logged_in ? '' : 'style="visibility: hidden;'}">
 			<button onclick="gencode_clicked(this)"><i class="fa-solid fa-barcode fa-2xl"></i></button>
-			<button onclick="window.location = '../../edit/item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
+			<button onclick="window.location = '../edit/item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
 			<button onclick="delete_item_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
 		</div>`
 	
@@ -72,6 +74,18 @@ function hide_all_dialogs() {
 function show_dialog(id) {
 	$('#' + id).css("visibility", "visible")
 	$("#dialog-container").css("visibility", "visible")
+}
+
+var code_id = ""
+function gencode_clicked(e) {	
+	var id = e.parentNode.parentNode.getAttribute("item_id")
+	code_id = id
+	qrcode.makeCode(id)
+	JsBarcode("#barcode-container", id.substring(0, 23), {
+		width: 1,
+		height: 50
+	})
+	show_dialog("qrcode-dialog")
 }
 
 var delete_item_id = ""

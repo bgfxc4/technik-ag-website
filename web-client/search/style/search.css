@@ -196,6 +196,11 @@ button#not-logged-in.login-status {
 	max-height: 20vh;
 }
 
+#qrcode-container {
+	margin-left: 10%;
+	margin-bottom: 20px;
+}
+
 #error-msg {
 	color: red;
 }
