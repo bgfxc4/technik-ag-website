@@ -183,6 +183,11 @@ button#not-logged-in.login-status {
 	background-color: white;
 }
 
+#qrcode-container {
+	margin-left: 10%;
+	margin-bottom: 20px;
+}
+
 #dialog-container .dialog input {
 	margin-bottom: 15px;
 }
