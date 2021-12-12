@@ -3,6 +3,9 @@ QrScanner.WORKER_PATH = 'js/qr-scanner-worker.min.js'
 var scanner
 
 window.onload = function () {
+	if (window.location.href.startsWith("http://"))
+		window.location = window.location.href.replace("http://", "https://")
+
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
 
