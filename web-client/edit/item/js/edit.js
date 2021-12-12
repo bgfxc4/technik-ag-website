@@ -21,7 +21,7 @@ window.onload = function () {
 		}
 		item_to_edit = equipment[0].equipment[0]
 		fill_in_item(equipment[0].equipment[0])
-	})	
+	})
 	request_categories(res => {
 		categories = res
 		for (var cat of res) {
@@ -29,6 +29,9 @@ window.onload = function () {
 		}
 		if (res[0] != undefined)
 			render_types(res[0].name, item_to_edit)
+	})
+	to_data_url(`${server_url}get-item-img/${item_id}`, base64 => {
+		$('#edit-image-preview')[0].src = base64
 	})
 }
 
@@ -62,7 +65,20 @@ function fill_in_item(item) {
 	$('#edit-item-category').val(item.category).change()
 	render_types(item.category, item)
 	$('#edit-item-type').val(item.type).change()
-	$('#edit-image-preview')[0].src = `data:image/jpeg;base64,${item.image}`
+}
+
+function to_data_url(url, callback) {
+	var xhr = new XMLHttpRequest()
+	xhr.onload = function() {
+		var reader = new FileReader()
+		reader.onloadend = function() {
+			callback(reader.result)
+		}
+		reader.readAsDataURL(xhr.response)
+	};
+	xhr.open('GET', url)
+	xhr.responseType = 'blob'
+	xhr.send()
 }
 
 function load_image_preview(input_query, img_query) {
@@ -84,12 +100,12 @@ function load_image_base64(query, callback) {
 	reader.readAsDataURL(file)
 }
 
-function edit_item_clicked()  {
+function edit_item_clicked() {
 	var custom_fields = {}
 	$("#custom-field-container input").each((i, el) => {
 		custom_fields[$(el).attr('field-name')] = $(el).val()
 	})
-	
+	var img = $('#edit-image-preview')[0].src.split("base64,")[1]
 	var item = {
 		id: edit_id,
 		name: $('#edit-item-name').val(),
@@ -97,7 +113,7 @@ function edit_item_clicked()  {
 		storage_place: $('#edit-item-storage').val(),
 		category: $('#edit-item-category').val(),
 		type: $('#edit-item-type').val(),
-		image: $('#edit-image-preview')[0].src.split("base64,")[1],
+		image: img,
 		custom_fields: custom_fields
 	}
 	send_edit_item(item, res => {

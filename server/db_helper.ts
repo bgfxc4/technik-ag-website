@@ -106,7 +106,7 @@ export function edit_equipment_in_db(body: any, callback: () => void) {
 		var query = { id: body.id}
 		var update = {
 			$set: {
-				name: body.name, 
+				name: body.name,
 				description: body.description,
 				storage_place: body.storage_place,
 				category: body.category,
