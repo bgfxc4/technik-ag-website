@@ -150,7 +150,7 @@ app.post("/delete-type", (req, res) => {
 		return res.status(400).send("You have to set a category!")
 	db_helper.check_if_type_exists(req.body.category, req.body.name, code => {
 		if (code != 0)
-			return res.status(400).send("The type or category you specified do not exist!")
+			return res.status(400).send("The type or category you specified does not exist!")
 		db_helper.delete_type_from_db(req.body, () => {
 			res.status(200).send("ok")
 		})
@@ -189,6 +189,43 @@ app.get("/get-equipment", (req, res) => {
 	})
 })
 
+app.get("/get-category-img/:name", (req, res) => {
+	if (!req.params.name)
+		return res.status(400).send("The name you have given is not valid!")
+
+	db_helper.get_category_by_name(req.params.name, cat => {
+		if (cat == undefined)
+			return res.status(400).send("A category with the name you provided does not exist!")
+		
+		var img = Buffer.from(cat.image, 'base64');
+
+		res.writeHead(200, {
+			'Content-Type': 'image/png',
+			'Content-Length': img.length
+		});
+
+		res.end(img)
+	})
+})
+
+app.get("/get-item-img/:id", (req, res) => {
+	if (!req.params.id)
+		return res.status(400).send("The id you have given is not valid!")
+
+	db_helper.get_equipment_by_id_from_db(req.params.id, equ => {
+		if (equ == undefined || equ.length == 0 || equ[0] == undefined)
+			return res.status(400).send("An item with the id you provided does not exist!")
+		var img = Buffer.from(equ[0].image, 'base64');
+
+		res.writeHead(200, {
+			'Content-Type': 'image/png',
+			'Content-Length': img.length
+		});
+
+		res.end(img)
+	}, {})
+})
+
 function fits_search(name: string, keywords: any[]) {
 	for (var k of keywords) {
 		if (name.includes(k))
@@ -219,7 +256,7 @@ app.get("/get-categories", (req, res) => {
 
 app.get("/get-equipment-by-id/:id", (req, res) => {
 	if (!req.params.id)
-		return res.status(401).send("The id you have given is not valid!")
+		return res.status(400).send("The id you have given is not valid!")
 	db_helper.get_equipment_by_id_from_db(req.params.id, list => {
 		var result: any[] = []
 		for (var equ of list) {
@@ -243,9 +280,9 @@ app.get("/get-equipment-by-id/:id", (req, res) => {
 
 app.get("/get-equipment-by-type/:category/:type", (req, res) => {
 	if (!req.params.category)
-		return res.status(401).send("You have to specify a category!")
+		return res.status(400).send("You have to specify a category!")
 	if (!req.params.type)
-		return res.status(401).send("You have to specify a type!")
+		return res.status(400).send("You have to specify a type!")
 	db_helper.get_equipment_by_type_from_db(req.params.category, req.params.type, equ => {
 		res.send(JSON.stringify(equ))
 	})

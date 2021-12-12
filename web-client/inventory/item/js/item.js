@@ -47,7 +47,8 @@ function render_equipment(equipment) {
 			for (var f in item.custom_fields) {
 				cf += `<br><b>${f}:</b> ${item.custom_fields[f]}`
 			}
-			inner += `<div class="item-entry" item_id="${item.id}"><img src="data:image/jpeg;base64,${item.image}"/>
+			var img = `<img src="${server_url}get-item-img/${item.id}"/>`
+			inner += `<div class="item-entry" item_id="${item.id}">${img}
 						<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
 						<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id} ${cf}</div>${actions}</div>`
 		}

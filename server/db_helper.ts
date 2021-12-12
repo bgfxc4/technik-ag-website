@@ -163,24 +163,24 @@ export function delete_type_from_db(body: any, callback: () => void) {
 	})
 }
 
-export function get_equipment_from_db(callback: (res: any) => void) {
-	db.collection("equipment").find().toArray((err, data) => {
+export function get_equipment_from_db(callback: (res: any) => void, project={image: 0}) {
+	db.collection("equipment").find().project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		callback(data)
 	})
 }
 
-export function get_categories_from_db(callback: (res: any) => void) {
-	db.collection("categories").find().toArray((err, data) => {
+export function get_categories_from_db(callback: (res: any) => void, project={image:0}) {
+	db.collection("categories").find().project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		callback(data)
 	})
 }
 
-export function get_equipment_by_id_from_db(id: string, callback: (res: any) => void) {
-	db.collection("equipment").find().toArray((err, data) => {
+export function get_equipment_by_id_from_db(id: string, callback: (res: any) => void, project:any={image:0}) {
+	db.collection("equipment").find().project(project).toArray((err, data) => {
 		if (err) 
 			throw err
 		if (!data) {
@@ -196,16 +196,26 @@ export function get_equipment_by_id_from_db(id: string, callback: (res: any) => 
 	})
 }
 
-export function get_equipment_by_type_from_db(category: string, type: string, callback: (res: any) => void) {
-	db.collection("equipment").find({category: category, type: type}).toArray((err, data) => {
+export function get_category_by_name(name: string, callback: (category: any) => void) {
+	db.collection("categories").findOne({name: name}, (err, data) => {
+		if (err)
+			throw err
+		if (data == undefined)
+			return callback(undefined)
+		callback(data)
+	})
+}
+
+export function get_equipment_by_type_from_db(category: string, type: string, callback: (res: any) => void, project={image:0}) {
+	db.collection("equipment").find({category: category, type: type}).project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		callback(data)
 	})
 }
 
-export function check_if_category_exists(name: string, callback: (exists: boolean) => void) {
-	db.collection("categories").find({name: name}).toArray((err, data) => {
+export function check_if_category_exists(name: string, callback: (exists: boolean) => void, project={image:0}) {
+	db.collection("categories").find({name: name}).project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		if (data == undefined)
@@ -216,8 +226,8 @@ export function check_if_category_exists(name: string, callback: (exists: boolea
 	})
 }
 
-export function check_if_type_exists(category: string, name: string, callback: (code: number) => void) {
-	db.collection("categories").find({name: category}).toArray((err, data) => {
+export function check_if_type_exists(category: string, name: string, callback: (code: number) => void, project={image:0}) {
+	db.collection("categories").find({name: category}).project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		if (data == undefined)

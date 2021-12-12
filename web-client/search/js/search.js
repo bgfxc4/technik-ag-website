@@ -47,7 +47,8 @@ function generate_html_for_item(item) {
 	for (var f in item.custom_fields) {
 		cf += `<br><b>${f}:</b> ${item.custom_fields[f]}`
 	}
-	return `<div class="item-entry" item_id="${item.id}"><img onclick="window.location = '../item?category=${item.category}&type=${item.type}&id=${item.id}'" src="data:image/jpeg;base64,${item.image}"/>
+	var img = `<img onclick="window.location = '../inventory/item?category=${item.category}&type=${item.type}&id=${item.id}'" src="${server_url}get-item-img/${item.id}"/>`
+	return `<div class="item-entry" item_id="${item.id}">${img}
 			<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
 			<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id} ${cf}</div>${actions}</div>`
 
