@@ -228,7 +228,7 @@ app.get("/get-item-img/:id", (req, res) => {
 
 function fits_search(name: string, keywords: any[]) {
 	for (var k of keywords) {
-		if (name.includes(k))
+		if (name.toLowerCase().includes(k.toLowerCase()))
 			return true
 	}
 	return false
