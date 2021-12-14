@@ -1,3 +1,20 @@
+:root {
+	--background-color: #121212;
+	--secondary-background-color: #000000;
+	--foreground-color: #1f1f1f;
+	--specular-color: #bb86fc;
+	--font-color: #e1e1e1;
+	--secondary-font-color: #9c9c9c;
+
+	--top-bar-color: var(--secondary-background-color);
+	--top-bar-active-color: var(--background-color);
+}
+
 html {
 	font-family: sans-serif;
+	color: var(--font-color);
+}
+
+a {
+	color: var(--specular-color);
 }

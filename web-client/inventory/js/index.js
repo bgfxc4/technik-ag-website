@@ -72,7 +72,7 @@ function enter_delete_mode() {
 
 function exit_delete_mode() {
 	$('.category-btn').removeClass('red-btn')
-	$('.category-btn').each(el => {
+	$('.category-btn').each((i, el) => {
 		$(el).attr('onclick', $(el).attr('onclick-tmp'))
 	})
 	$('#enter-delete-mode-btn').css("display", "inline-block")
