@@ -25,6 +25,7 @@ window.onload = function () {
 			return show_error_message(res.responseText)
 
 		render_items(JSON.parse(res.responseText))
+		exit_delete_mode()
 	})
 }
 
@@ -103,13 +104,13 @@ function delete_item_confirmed() {
 }
 
 function enter_delete_mode() {
-	$('.fa-trash-can').css("display", "inline-block")
+	$('button:has(.fa-trash-can)').css("display", "inline-block")
 	$('#enter-delete-mode-btn').css("display", "none")
 	$('#exit-delete-mode-btn').css("display", "inline-block")
 }
 
 function exit_delete_mode() {
-	$('.fa-trash-can').css("display", "none")
+	$('button:has(.fa-trash-can)').css("display", "none")
 	$('#enter-delete-mode-btn').css("display", "inline-block")
 	$('#exit-delete-mode-btn').css("display", "none")
 }

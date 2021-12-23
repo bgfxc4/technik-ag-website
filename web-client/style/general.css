@@ -1,4 +1,5 @@
-:root {
+/*Dark Color Scheme*/
+/*:root {
 	--background-color: #121212;
 	--secondary-background-color: #000000;
 	--foreground-color: #1f1f1f;
@@ -8,6 +9,21 @@
 
 	--top-bar-color: var(--secondary-background-color);
 	--top-bar-active-color: var(--background-color);
+	--icon-button-background: #0000;
+}*/
+
+/*Discord Color Scheme*/
+:root {
+	--foreground-color: #36393f;
+	--secondary-background-color: #2f3136;
+	--background-color: #23272a;
+	--specular-color: #56ccec;
+	--font-color: #e1e1e1;
+	--secondary-font-color: #9c9c9c;
+
+	--top-bar-color: var(--secondary-background-color);
+	--top-bar-active-color: var(--background-color);
+	--icon-button-background: #0000;
 }
 
 html {

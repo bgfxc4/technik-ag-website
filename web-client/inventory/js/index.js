@@ -14,13 +14,18 @@ window.onload = function () {
 }
 
 function render_categories(cats) {
-
+	console.log(cats)
 	var s = ""
 	for (var category of cats) {
 		var loc = './category/?category=' + encodeURIComponent(category.name)
-		//var img = `<img src="data:image/jpeg;base64,${category.image}"/>`
+		var types = ""
+		for (var t of category.types) {
+			types += `<a href='./type/?category=${encodeURIComponent(category.name)}&type=${encodeURIComponent(t)}'>${t}</a><br>`
+		}
 		var img = `<img src="${server_url}get-category-img/${category.name}"/>`
-		s += `<button class="category-btn" category_name="${category.name}" onclick="window.location = '${loc}'">${img} <p>${category.name}</p></button>`
+		s += `<button class="category-btn" category_name="${category.name}" onclick="window.location = '${loc}'">
+				<div><h2>${category.name}</h2> <br> ${types}</div> ${img}
+			</button>`
 		
 	}
 	$("#equipment-container").prepend(s)

@@ -121,10 +121,6 @@ button#not-logged-in.login-status {
 	border-radius: 3px;
 }
 
-.fa-trash-can {
-	display: none;
-}
-
 #path-text {
 	width: 80%;
 	margin: 0 auto;
@@ -163,7 +159,8 @@ button#not-logged-in.login-status {
 
 .item-entry .actions button {
 	margin-right: 10px;
-	background-color: var(--foreground-color);
+	background-color: var(--icon-button-background);
+	height: 2rem;
 	border: none;
 }
 

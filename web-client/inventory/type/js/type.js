@@ -25,6 +25,7 @@ window.onload = function () {
 			return show_error_message("Not able to connect to the server. Please contact the system administrator.")
 		}
 		render_items(items)
+		exit_delete_mode()
 	})
 }
 
@@ -108,13 +109,13 @@ function delete_item_confirmed() {
 }
 
 function enter_delete_mode() {
-	$('.fa-trash-can').css("display", "inline-block")
+	$('button:has(.fa-trash-can)').css("display", "inline-block")
 	$('#enter-delete-mode-btn').css("display", "none")
 	$('#exit-delete-mode-btn').css("display", "inline-block")
 }
 
 function exit_delete_mode() {
-	$('.fa-trash-can').css("display", "none")
+	$('button:has(.fa-trash-can)').css("display", "none")
 	$('#enter-delete-mode-btn').css("display", "inline-block")
 	$('#exit-delete-mode-btn').css("display", "none")
 }

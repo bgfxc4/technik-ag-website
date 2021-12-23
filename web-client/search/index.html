@@ -25,6 +25,8 @@
 		</div>
 		<div id="top-actions">
 			<button onclick="window.location = '../scan'" class="scan-code"><i class="fa-solid fa-barcode fa-xl"></i></button>
+			<button class="admin-only" id="enter-delete-mode-btn" onclick="enter_delete_mode()">Delete item</button>
+			<button class="delete-button" id="exit-delete-mode-btn" onclick="exit_delete_mode()" style='display:none;'>Exit delete mode</button>
 		</div>
 		<p id="search-message"></p>
 		<p id="path-text"></p>
