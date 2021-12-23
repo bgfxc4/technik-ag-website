@@ -123,13 +123,13 @@ button#not-logged-in.login-status {
 }
 
 #equipment-container {
-	width: 76%;
+	width: 88%;
 	display: grid;
 	grid-template-columns: 1fr  1fr 1fr;
 	gap: 4% 4%;
-	margin-top : 8%;
-	margin-left: 12%;
-	margin-right: 12%;
+	margin-top : 6%;
+	margin-left: 6%;
+	margin-right: 6%;
 	margin-bottom: 5%;
 }
 
@@ -200,4 +200,15 @@ button#not-logged-in.login-status {
 
 #error-msg {
 	color: red;
+}
+
+@media (orientation: portrait) {
+	#equipment-container {
+		grid-template-columns: 1fr;
+	}
+	
+	.category-btn {
+		padding-bottom: 40%;
+		font-size: 1.2vh;
+	}
 }

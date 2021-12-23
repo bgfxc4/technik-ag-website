@@ -28,9 +28,21 @@ function render_types(cats, cat_name) {
 		if (category.name == cat_name) {
 			for (var t of category.types) {
 				var loc = '../type/?category=' + encodeURIComponent(cat_name) + '&type=' + encodeURIComponent(t)
-				s += `<button class="type-btn" type_name="${t}" onclick="window.location = '${loc}'">${t}</button>`
+				s += `<button class="type-btn" id="${t}-btn" type_name="${t}" onclick="window.location = '${loc}'">
+						<div><h2>${t}</h2> <br> </div>
+					</button>`
+
+				request_equipment_by_type(cat_name, t, res => {
+					if (res.length == 0) 
+						return
+					var items = ""
+					for (var i of res) {
+						items += `<a href='../item/?id=${encodeURIComponent(i.id)}&category=${encodeURIComponent(category.name)}&type=${encodeURIComponent(t)}'>${i.name}</a><br>`
+					}
+					$(`#${res[0].type}-btn div`).append(items)
+				})
 			}
-		}	
+		}
 	}
 	$("#equipment-container").prepend(s)
 }
