@@ -123,6 +123,53 @@ export function edit_equipment_in_db(body: any, callback: () => void) {
 	})
 }
 
+export function edit_category_in_db(body: any, callback: () => void) {
+	var query = { name: body.old_name }
+	var update: any = {$set: {}}
+	if (body.new_name)
+		update.$set.name = body.new_name
+	if (body.custom_fields)
+		update.$set.custom_fields = body.custom_fields
+	if (body.image)
+		update.$set.image = body.image
+
+	db.collection("categories").updateOne(query, update, err => {
+		if (err)
+			throw err
+		if (!body.new_name && !body.custom_fields)
+			return callback()
+		
+		// edit all the equipment of the category
+		db.collection("equipment").find({category: body.old_name}).toArray(async (err, data) => {
+			if (err)
+				throw err
+			if (!data)
+				return callback()
+			
+			for (var item of data) {
+				var update: any = {$set: {}}
+
+				// if the users wants to set new custom field, loop through custom fields 
+				// and only add the ones, that are in the request body
+				if (body.custom_fields) {
+					update.$set.custom_fields = {}
+					for (var field in item.custom_fields) {
+						if (body.custom_fields.includes(field)) {
+							update.$set.custom_fields[field] = item.custom_fields[field]
+						}
+					}
+				}
+				
+				if (body.new_name) {
+					update.$set.category = body.new_name
+				}
+				await db.collection("equipment").updateMany({category: body.old_name}, update)
+			}
+			callback()
+		})
+	})
+}
+
 export function delete_equipment_from_db(body: any, callback: () => void) {
 	var query = {id: body.id}
 	db.collection("equipment").deleteOne(query, err => {

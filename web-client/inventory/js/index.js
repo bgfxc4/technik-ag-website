@@ -21,6 +21,7 @@ function render_categories(cats) {
 		var types = ""
 		for (var t of category.types) {
 			types += `<a href='./type/?category=${encodeURIComponent(category.name)}&type=${encodeURIComponent(t)}'>${t}</a><br>`
+			console.log(encodeURIComponent(t), t)
 		}
 		var img = `<img src="${server_url}get-category-img/${category.name}"/>`
 		s += `<button class="category-btn" category_name="${category.name}" onclick="window.location = '${loc}'">
@@ -65,7 +66,13 @@ function delete_category_confirmed() {
 	delete_category_name = ""
 }
 
+function edit_category_clicked(item) {
+	var name = item.getAttribute("category_name")
+	window.location = `../edit/category?name=${encodeURIComponent(name)}`
+}
+
 function enter_delete_mode() {
+	exit_edit_mode()
 	$('.category-btn').addClass('red-btn')
 	$('.category-btn').each((i, el) => {
 		$(el).attr('onclick-tmp', $(el).attr('onclick'))
@@ -82,6 +89,26 @@ function exit_delete_mode() {
 	})
 	$('#enter-delete-mode-btn').css("display", "inline-block")
 	$('#exit-delete-mode-btn').css("display", "none")
+}
+
+function enter_edit_mode() {
+	exit_delete_mode()
+	$('.category-btn').addClass('blue-btn')
+	$('.category-btn').each((i, el) => {
+		$(el).attr('onclick-tmp', $(el).attr('onclick'))
+		$(el).attr('onclick', 'edit_category_clicked(this)')
+	})
+	$('#enter-edit-mode-btn').css("display", "none")
+	$('#exit-edit-mode-btn').css("display", "inline-block")
+}
+
+function exit_edit_mode() {
+	$('.category-btn').removeClass('blue-btn')
+	$('.category-btn').each((i, el) => {
+		$(el).attr('onclick', $(el).attr('onclick-tmp'))
+	})
+	$('#enter-edit-mode-btn').css("display", "inline-block")
+	$('#exit-edit-mode-btn').css("display", "none")
 }
 
 function show_error_message(msg) {

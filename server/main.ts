@@ -117,6 +117,21 @@ app.post("/edit-equipment", (req, res) => {
 	})
 })
 
+app.post("/edit-category", (req, res) => {
+	if (!authorized(req.body))
+		return res.status(401).send("Login credentials are wrong or not existent!")	
+	if (!req.body.old_name)
+		return res.status(400).send("You have to specify the old name of the category you want to edit!")
+	
+	db_helper.check_if_category_exists(req.body.old_name, exists => {
+		if (!exists)
+			return res.status(400).send("A category with the old_name you specified does not exist!")
+		db_helper.edit_category_in_db(req.body, () => {
+			res.status(200).send("ok")
+		})
+	})
+})
+
 app.post("/delete-equipment", (req, res) => {
 	if (!authorized(req.body))
 		return res.status(401).send("Login credentials are wrong or not existent!")
