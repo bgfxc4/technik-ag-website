@@ -76,6 +76,13 @@ function send_edit_item(item, callback) {
 	})
 }
 
+function send_edit_type(type, callback) {
+	type.login_hash = get_cookie("login_hash")
+	make_post_request(server_url + "edit-type", type, res => {
+		callback(res)
+	})
+}
+
 function send_edit_category(category, callback) {
 	category.login_hash = get_cookie("login_hash")
 	make_post_request(server_url + "edit-category", category, res => {

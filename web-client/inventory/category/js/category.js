@@ -73,6 +73,11 @@ function show_dialog(id) {
 	$("#dialog-container").css("visibility", "visible")
 }
 
+function edit_type_clicked(item) {
+	var name = item.getAttribute("type_name")
+	window.location = `../../edit/type?name=${encodeURIComponent(name)}&cat=${cat_name}`
+}
+
 var delete_type_name = ""
 function delete_type_clicked(item) {
 	var name = item.getAttribute("type_name")
@@ -104,6 +109,26 @@ function exit_delete_mode() {
 	})
 	$('#enter-delete-mode-btn').css("display", "inline-block")
 	$('#exit-delete-mode-btn').css("display", "none")
+}
+
+function enter_edit_mode() {
+	exit_delete_mode()
+	$('.type-btn').addClass('blue-btn')
+	$('.type-btn').each((i, el) => {
+		$(el).attr('onclick-tmp', $(el).attr('onclick'))
+		$(el).attr('onclick', 'edit_type_clicked(this)')
+	})
+	$('#enter-edit-mode-btn').css("display", "none")
+	$('#exit-edit-mode-btn').css("display", "inline-block")
+}
+
+function exit_edit_mode() {
+	$('.type-btn').removeClass('blue-btn')
+	$('.type-btn').each((i, el) => {
+		$(el).attr('onclick', $(el).attr('onclick-tmp'))
+	})
+	$('#enter-edit-mode-btn').css("display", "inline-block")
+	$('#exit-edit-mode-btn').css("display", "none")
 }
 
 function show_error_message(msg) {

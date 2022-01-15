@@ -26,6 +26,7 @@ window.onload = function () {
 
 		render_items(JSON.parse(res.responseText))
 		exit_delete_mode()
+		exit_edit_mode()
 	})
 }
 
@@ -42,7 +43,7 @@ function render_items(items) {
 function generate_html_for_item(item) {
 	var actions = `<div class="actions admin-only" ${logged_in ? '' : 'style="visibility: hidden;'}">
 			<button onclick="gencode_clicked(this)"><i class="fa-solid fa-barcode fa-2xl"></i></button>
-			<button onclick="window.location = '../edit/item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl"></i></button>
+			<button onclick="window.location = '../edit/item?id=${item.id}'"><i class="fa-solid fa-pen fa-2xl" style="color:blue;"></i></button>
 			<button onclick="delete_item_clicked(this)"><i class="fa-solid fa-trash-can fa-2xl" style="color:red;"></i></button>
 		</div>`
 	
@@ -104,6 +105,7 @@ function delete_item_confirmed() {
 }
 
 function enter_delete_mode() {
+	exit_edit_mode()
 	$('button:has(.fa-trash-can)').css("display", "inline-block")
 	$('#enter-delete-mode-btn').css("display", "none")
 	$('#exit-delete-mode-btn').css("display", "inline-block")
@@ -113,6 +115,19 @@ function exit_delete_mode() {
 	$('button:has(.fa-trash-can)').css("display", "none")
 	$('#enter-delete-mode-btn').css("display", "inline-block")
 	$('#exit-delete-mode-btn').css("display", "none")
+}
+
+function enter_edit_mode() {
+	exit_delete_mode()
+	$('button:has(.fa-pen)').css("display", "inline-block")
+	$('#enter-edit-mode-btn').css("display", "none")
+	$('#exit-edit-mode-btn').css("display", "inline-block")
+}
+
+function exit_edit_mode() {
+	$('button:has(.fa-pen)').css("display", "none")
+	$('#enter-edit-mode-btn').css("display", "inline-block")
+	$('#exit-edit-mode-btn').css("display", "none")
 }
 
 function show_error_message(msg) {

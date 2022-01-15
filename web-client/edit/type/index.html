@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<title>Technik AG</title>
+		<meta charset="UTF-8">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="../../js/api_helper.js"></script>
+		<script src="js/edit.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
+		<link rel="stylesheet" href="../../style/general.css">
+		<link rel="stylesheet" href="style/edit.css">
+	</head>
+	<body>
+		<div id="top-bar">
+			<a href="../../inventory/" >Inventory</a>
+			<a>Appointments</a>
+			<button class="login-status" id="logged-in" onclick="$('.login-status .dropdown').toggle()"><i class="fa fa-circle-user fa-2xl"></i>
+				<div class="dropdown" style="display:none;">You are logged in. <p onclick="logout()" style="color:red;">Log out</p></div>
+			</button>
+			<button class="login-status" id="not-logged-in" onclick="window.location = '../../login'">Sign in</button>
+		</div>
+		<div class="dialog" id="edit-container">
+			<h3>Edit type</h3>
+			<label for="edit-type-name">Name:</label><br>
+			<input type="text" id="edit-type-name" placeholder="Enter a name..."><br>
+
+			<button onclick="window.location = '../../inventory'">Cancel</button>
+			<button onclick="edit_type_clicked()">Edit</button>
+			
+			<p id="error-text" style="color:red"></p>
+		</div>
+		<div id="dialog-container">
+		</div>
+	</body>
+</html>

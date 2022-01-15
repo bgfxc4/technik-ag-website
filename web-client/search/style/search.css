@@ -121,6 +121,13 @@ button#not-logged-in.login-status {
 	border-radius: 3px;
 }
 
+#top-actions .edit-button {
+	background-color: blue;
+	color: var(--font-color);
+	border: 2px solid blue;
+	border-radius: 3px;
+}
+
 #path-text {
 	width: 80%;
 	margin: 0 auto;

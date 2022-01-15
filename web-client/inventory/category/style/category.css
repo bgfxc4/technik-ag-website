@@ -16,6 +16,10 @@ button {
 	color: red;
 }
 
+.blue-btn {
+	color: blue;
+}
+
 #top-bar {
 	height: 6%;
 	background-color: var(--top-bar-color);
@@ -118,6 +122,13 @@ button#not-logged-in.login-status {
 	background-color: red;
 	color: var(--font-color);
 	border: 2px solid red;
+	border-radius: 3px;
+}
+
+#top-actions .edit-button {
+	background-color: blue;
+	color: var(--font-color);
+	border: 2px solid blue;
 	border-radius: 3px;
 }
 

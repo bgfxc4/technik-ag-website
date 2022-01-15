@@ -27,13 +27,15 @@
 			<button onclick="window.location = '../../scan'" class="scan-code"><i class="fa-solid fa-barcode fa-xl"></i></button>
 			<button class="admin-only" id="enter-delete-mode-btn" onclick="enter_delete_mode()">Delete item</button>
 			<button class="delete-button" id="exit-delete-mode-btn" onclick="exit_delete_mode()" style='display:none;'>Exit delete mode</button>
+			<button class="admin-only" id="enter-edit-mode-btn" onclick="enter_edit_mode()">Edit item</button>
+			<button class="edit-button" id="exit-edit-mode-btn" onclick="exit_edit_mode()" style='display:none;'>Exit edit mode</button>
 		</div>
 		<p id="search-message"></p>
 		<p id="path-text"></p>
 		<div id="equipment-container">
+			<button class="new-item admin-only" onclick="window.location = `../../create/item?category=${cat_name}&type=${type_name}`">New item</button>
 			<p id="error-msg" style="visibility:hidden;"></p>
 		</div>
-		<button class="new-item admin-only" onclick="window.location = `../../create/item?category=${cat_name}&type=${type_name}`">New item</button>
 		<div id="dialog-container">
 			<div class="dialog" id="delete-item-dialog">
 				<h3>Delete Item</h3>

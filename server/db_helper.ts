@@ -2,6 +2,7 @@ import {Db, MongoClient} from "mongodb"
 import * as fs from "fs"
 import * as uuid from "uuid"
 import * as main from "./main"
+import * as inventory from "./inventory-routes"
 
 const item_image_placeholder = fs.readFileSync("./imgs/item-placeholder-img.png").toString('base64')
 
@@ -26,7 +27,7 @@ export function add_equipment_to_db(body: any, callback: () => void) {
 			for (var f in body.custom_fields) {
 				custom_fields[f] = body.custom_fields[f]
 			}
-		var equ: main.Equipment = {
+		var equ: inventory.Equipment = {
 			id: uuid.v4(),
 			name: body.name,
 			description: body.description,
@@ -45,7 +46,7 @@ export function add_equipment_to_db(body: any, callback: () => void) {
 }
 
 export function add_category_to_db(body: any, callback: (exists: boolean) => void) {
-	var cat: main.Category = {
+	var cat: inventory.Category = {
 		name: body.name,
 		image: (body.image) ? body.image : item_image_placeholder,
 		types: [],
@@ -167,6 +168,31 @@ export function edit_category_in_db(body: any, callback: () => void) {
 			}
 			callback()
 		})
+	})
+}
+
+export function edit_type_in_db(body: any, callback: () => void) {
+	var query: any = { name: body.category }
+	
+	db.collection("categories").findOne(query, async (err, data) => {
+		if (err)
+			throw err
+		
+		if (!data)
+			return
+
+		data.types[data.types.indexOf(body.old_name)] = body.new_name
+		var update: any = {
+			$set: { types: data.types }
+		}
+		await db.collection("categories").updateOne(query, update)
+		
+		query = { category: body.category, type: body.old_name}
+		update = {
+			$set: { type: body.new_name }
+		}
+		await db.collection("equipment").updateMany(query, update)
+		callback()
 	})
 }
 
