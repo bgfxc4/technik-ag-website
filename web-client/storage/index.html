@@ -1,0 +1,81 @@
+<html>
+	<head>
+		<title>Technik AG</title>
+		<meta charset="UTF-8">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="../js/api_helper.js"></script>
+		<script src="js/index.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
+		<link rel="stylesheet" href="../style/general.css">
+		<link rel="stylesheet" href="style/index.css">
+	</head>
+	<body>
+		<div id="top-bar">
+			<a href="../inventory/">Inventory</a>
+			<a href="./" class="active">Storage</a>
+			<a>Appointments</a>
+			<button class="login-status" id="logged-in" onclick="$('.login-status .dropdown').toggle()"><i class="fa fa-circle-user fa-2xl"></i>
+				<div class="dropdown" style="display:none;">You are logged in. <p onclick="logout()" style="color:red;">Log out</p></div>
+			</button>
+			<button class="login-status" id="not-logged-in" onclick="window.location = '../login'">Sign in</button>
+			<button onclick="search()"><i class="fa fa-search"></i></button>
+			<button class="x" onclick="window.location='./'"><i class="fa fa-x"></i></button>
+			<input type="text" onchange="search()" placeholder="search...">
+		</div>
+		<div id="top-actions">
+			<button onclick="window.location = '../scan'" class="scan-code"><i class="fa-solid fa-barcode fa-xl"></i></button>
+			<button class="admin-only" id="enter-delete-mode-btn" onclick="enter_delete_mode()">Delete mode</button>
+			<button class="delete-button" id="exit-delete-mode-btn" onclick="exit_delete_mode()" style='display:none;'>Exit delete mode</button>
+			<button class="admin-only" id="enter-edit-mode-btn" onclick="enter_edit_mode()">Edit mode</button>
+			<button class="edit-button" id="exit-edit-mode-btn" onclick="exit_edit_mode()" style='display:none;'>Exit edit mode</button>
+		</div>
+		<div id="storage-container">
+
+			<ul id="room_list">
+				<li><button class="new-room admin-only" onclick="show_dialog('create-room-dialog')">New room</button></li>
+			</ul>
+			<p id="error-msg" style="visibility:hidden;"></p>
+		</div>
+		<div id="dialog-container">
+			<div class="dialog" id="create-room-dialog">
+				<h3>Create Room</h3>
+				<label for="create-room-name">Name:</label><br>
+				<input type="text" id="create-room-name" placeholder="Enter a name..."><br>
+				<button onclick="hide_all_dialogs()">Cancel</button>
+				<button onclick="create_room_confirmed()">Create</button>
+			</div>
+			<div class="dialog" id="create-shelf-dialog">
+				<h3>Create Shelf</h3>
+				<label for="create-shelf-name">Name:</label><br>
+				<input type="text" id="create-shelf-name" placeholder="Enter a name..."><br>
+				<button onclick="hide_all_dialogs()">Cancel</button>
+				<button onclick="create_shelf_confirmed()">Create</button>
+			</div>
+			<div class="dialog" id="create-compartment-dialog">
+				<h3>Create Compartment</h3>
+				<label for="create-compartment-name">Name:</label><br>
+				<input type="text" id="create-compartment-name" placeholder="Enter a name..."><br>
+				<button onclick="hide_all_dialogs()">Cancel</button>
+				<button onclick="create_compartment_confirmed()">Create</button>
+			</div>
+			<div class="dialog" id="delete-room-dialog">
+				<h3>Delete Room</h3>
+				Do you really want to delete the room with all of its content?<br>
+				<button onclick="hide_all_dialogs()">Cancel</button>
+				<button onclick="delete_room_confirmed()">Delete</button>
+			</div>
+			<div class="dialog" id="delete-shelf-dialog">
+				<h3>Delete Shelf</h3>
+				Do you really want to delete the shelf with all of its content?<br>
+				<button onclick="hide_all_dialogs()">Cancel</button>
+				<button onclick="delete_shelf_confirmed()">Delete</button>
+			</div>
+			<div class="dialog" id="delete-compartment-dialog">
+				<h3>Delete Compartment</h3>
+				Do you really want to delete the compartment?<br>
+				<button onclick="hide_all_dialogs()">Cancel</button>
+				<button onclick="delete_compartment_confirmed()">Delete</button>
+			</div>
+		</div>
+	</body>
+</html>

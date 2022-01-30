@@ -1,22 +1,13 @@
-import {Db, MongoClient} from "mongodb"
 import * as fs from "fs"
 import * as uuid from "uuid"
-import * as main from "./main"
-import * as inventory from "./inventory-routes"
+import * as main from "../main"
+import * as inventory from "./routes"
 
 const item_image_placeholder = fs.readFileSync("./imgs/item-placeholder-img.png").toString('base64')
 
-var db:Db;
-
-export function setup_mongodb() {
-	MongoClient.connect(main.config.mongo_url).then(client => {
-		db = client.db("technikag")
-		console.log("[Database] connected to database!")
-	})
-}
 
 export function add_equipment_to_db(body: any, callback: () => void) {
-	db.collection("categories").findOne({name: body.category}, (err, data) => {
+	main.db.collection("categories").findOne({name: body.category}, (err, data) => {
 		if (err)
 			throw err
 		
@@ -37,7 +28,7 @@ export function add_equipment_to_db(body: any, callback: () => void) {
 			image: (body.image) ? body.image : item_image_placeholder,
 			custom_fields: custom_fields
 		}
-		db.collection("equipment").insertOne(equ, err2 => {
+		main.db.collection("equipment").insertOne(equ, err2 => {
 			if (err2)
 				throw err
 			callback()
@@ -53,14 +44,14 @@ export function add_category_to_db(body: any, callback: (exists: boolean) => voi
 		custom_fields: body.custom_fields,
 	}
 	var query = { name: cat.name}
-	db.collection("categories").find(query).toArray((err, data) => {
+	main.db.collection("categories").find(query).toArray((err, data) => {
 		if (err)
 			throw err
 
 		if (data == undefined || data.length != 0)
 			return callback(true)
 		
-		db.collection("categories").insertOne(cat, err => {
+		main.db.collection("categories").insertOne(cat, err => {
 			if (err)
 				throw err
 			callback(false)
@@ -70,7 +61,7 @@ export function add_category_to_db(body: any, callback: (exists: boolean) => voi
 
 export function add_type_to_db(body: any, callback: (code: number) => void) {
 	var query = { name: body.category}
-	db.collection("categories").find(query).toArray((err, data) => {
+	main.db.collection("categories").find(query).toArray((err, data) => {
 		if (err)
 			throw err
 
@@ -84,7 +75,7 @@ export function add_type_to_db(body: any, callback: (code: number) => void) {
 			}
 		}
 		data[0].types.push(body.name)
-		db.collection("categories").updateOne({name: body.category}, {$set: {types: data[0].types}}, err => {
+		main.db.collection("categories").updateOne({name: body.category}, {$set: {types: data[0].types}}, err => {
 			if (err)
 				throw err
 			callback(0)
@@ -93,7 +84,7 @@ export function add_type_to_db(body: any, callback: (code: number) => void) {
 }
 
 export function edit_equipment_in_db(body: any, callback: () => void) {
-	db.collection("categories").findOne({name: body.category}, (err, data) => {
+	main.db.collection("categories").findOne({name: body.category}, (err, data) => {
 		if (err)
 			throw err
 		
@@ -116,7 +107,7 @@ export function edit_equipment_in_db(body: any, callback: () => void) {
 				image: (body.image) ? body.image : item_image_placeholder
 			}
 		}
-		db.collection("equipment").updateOne(query, update, err => {
+		main.db.collection("equipment").updateOne(query, update, err => {
 			if (err)
 				throw err
 			callback()
@@ -134,14 +125,14 @@ export function edit_category_in_db(body: any, callback: () => void) {
 	if (body.image)
 		update.$set.image = body.image
 
-	db.collection("categories").updateOne(query, update, err => {
+	main.db.collection("categories").updateOne(query, update, err => {
 		if (err)
 			throw err
 		if (!body.new_name && !body.custom_fields)
 			return callback()
 		
 		// edit all the equipment of the category
-		db.collection("equipment").find({category: body.old_name}).toArray(async (err, data) => {
+		main.db.collection("equipment").find({category: body.old_name}).toArray(async (err, data) => {
 			if (err)
 				throw err
 			if (!data)
@@ -164,7 +155,7 @@ export function edit_category_in_db(body: any, callback: () => void) {
 				if (body.new_name) {
 					update.$set.category = body.new_name
 				}
-				await db.collection("equipment").updateMany({category: body.old_name}, update)
+				await main.db.collection("equipment").updateMany({category: body.old_name}, update)
 			}
 			callback()
 		})
@@ -174,7 +165,7 @@ export function edit_category_in_db(body: any, callback: () => void) {
 export function edit_type_in_db(body: any, callback: () => void) {
 	var query: any = { name: body.category }
 	
-	db.collection("categories").findOne(query, async (err, data) => {
+	main.db.collection("categories").findOne(query, async (err, data) => {
 		if (err)
 			throw err
 		
@@ -185,20 +176,20 @@ export function edit_type_in_db(body: any, callback: () => void) {
 		var update: any = {
 			$set: { types: data.types }
 		}
-		await db.collection("categories").updateOne(query, update)
+		await main.db.collection("categories").updateOne(query, update)
 		
 		query = { category: body.category, type: body.old_name}
 		update = {
 			$set: { type: body.new_name }
 		}
-		await db.collection("equipment").updateMany(query, update)
+		await main.db.collection("equipment").updateMany(query, update)
 		callback()
 	})
 }
 
 export function delete_equipment_from_db(body: any, callback: () => void) {
 	var query = {id: body.id}
-	db.collection("equipment").deleteOne(query, err => {
+	main.db.collection("equipment").deleteOne(query, err => {
 		if (err)
 			throw err
 		callback()
@@ -206,10 +197,10 @@ export function delete_equipment_from_db(body: any, callback: () => void) {
 }
 
 export function delete_category_from_db(body: any, callback: () => void) {
-	db.collection("categories").deleteOne({name: body.name}, err => {
+	main.db.collection("categories").deleteOne({name: body.name}, err => {
 		if (err)
 			throw err
-		db.collection("equipment").deleteMany({category: body.name}, err2 => {
+		main.db.collection("equipment").deleteMany({category: body.name}, err2 => {
 			if (err2)
 				throw err2
 			callback()
@@ -218,16 +209,16 @@ export function delete_category_from_db(body: any, callback: () => void) {
 }
 
 export function delete_type_from_db(body: any, callback: () => void) {
-	db.collection("categories").findOne({name: body.category}, (err, data) => {
+	main.db.collection("categories").findOne({name: body.category}, (err, data) => {
 		if (err)
 			throw err
 		if (!data)
 			return
 		data.types.splice(data.types.indexOf(body.name), 1)
-		db.collection("categories").updateOne({name: body.category}, {$set: {types: data.types}}, err2 => {
+		main.db.collection("categories").updateOne({name: body.category}, {$set: {types: data.types}}, err2 => {
 			if (err2)
 				throw err2
-			db.collection("equipment").deleteMany({category: body.category, type: body.name}, err3 => {
+			main.db.collection("equipment").deleteMany({category: body.category, type: body.name}, err3 => {
 				if (err3)
 					throw err3
 				callback()
@@ -237,7 +228,7 @@ export function delete_type_from_db(body: any, callback: () => void) {
 }
 
 export function get_equipment_from_db(callback: (res: any) => void, project={image: 0}) {
-	db.collection("equipment").find().project(project).toArray((err, data) => {
+	main.db.collection("equipment").find().project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		callback(data)
@@ -245,7 +236,7 @@ export function get_equipment_from_db(callback: (res: any) => void, project={ima
 }
 
 export function get_categories_from_db(callback: (res: any) => void, project={image:0}) {
-	db.collection("categories").find().project(project).toArray((err, data) => {
+	main.db.collection("categories").find().project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		callback(data)
@@ -253,7 +244,7 @@ export function get_categories_from_db(callback: (res: any) => void, project={im
 }
 
 export function get_equipment_by_id_from_db(id: string, callback: (res: any) => void, project:any={image:0}) {
-	db.collection("equipment").find().project(project).toArray((err, data) => {
+	main.db.collection("equipment").find().project(project).toArray((err, data) => {
 		if (err) 
 			throw err
 		if (!data) {
@@ -270,7 +261,7 @@ export function get_equipment_by_id_from_db(id: string, callback: (res: any) => 
 }
 
 export function get_category_by_name(name: string, callback: (category: any) => void) {
-	db.collection("categories").findOne({name: name}, (err, data) => {
+	main.db.collection("categories").findOne({name: name}, (err, data) => {
 		if (err)
 			throw err
 		if (data == undefined)
@@ -280,7 +271,7 @@ export function get_category_by_name(name: string, callback: (category: any) => 
 }
 
 export function get_equipment_by_type_from_db(category: string, type: string, callback: (res: any) => void, project={image:0}) {
-	db.collection("equipment").find({category: category, type: type}).project(project).toArray((err, data) => {
+	main.db.collection("equipment").find({category: category, type: type}).project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		callback(data)
@@ -288,7 +279,7 @@ export function get_equipment_by_type_from_db(category: string, type: string, ca
 }
 
 export function check_if_category_exists(name: string, callback: (exists: boolean) => void, project={image:0}) {
-	db.collection("categories").find({name: name}).project(project).toArray((err, data) => {
+	main.db.collection("categories").find({name: name}).project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		if (data == undefined)
@@ -300,7 +291,7 @@ export function check_if_category_exists(name: string, callback: (exists: boolea
 }
 
 export function check_if_type_exists(category: string, name: string, callback: (code: number) => void, project={image:0}) {
-	db.collection("categories").find({name: category}).project(project).toArray((err, data) => {
+	main.db.collection("categories").find({name: category}).project(project).toArray((err, data) => {
 		if (err)
 			throw err
 		if (data == undefined)

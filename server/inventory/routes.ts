@@ -1,5 +1,5 @@
 import * as db_helper from "./db_helper"
-import * as main from "./main"
+import * as main from "../main"
 
 export interface Equipment {
 	id: string;

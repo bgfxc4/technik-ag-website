@@ -15,7 +15,7 @@ window.onload = function () {
 
 function setup_qrcode_scanner() {
 	scanner = new QrScanner($('#qrcode-scanner-container')[0], result => {
-		window.location = `../item?id=${result}`
+		window.location = `../inventory/item?id=${result}`
 	})
 	scanner.start()
 }
@@ -43,7 +43,7 @@ function setup_barcode_scanner() {
 	})
 
 	Quagga.onDetected(data => {
-		window.location = `../item?id=${data.codeResult.code}`
+		window.location = `../inventory/item?id=${data.codeResult.code}`
 	})
 }
 

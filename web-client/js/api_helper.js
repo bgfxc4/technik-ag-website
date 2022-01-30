@@ -1,4 +1,4 @@
-var server_url = "https://bgfxc4.de/technikag-api/" 
+var server_url = "https://bgfxc4.de/technikag-api/"
 
 function request_equipment(callback) {
 	make_get_request(`${server_url}get-equipment`, res => {
@@ -117,6 +117,84 @@ function send_delete_type(name, category, callback) {
 		category: category,
 	}
 	make_post_request(server_url + "delete-type", body, res => {
+		callback(res)
+	})
+}
+
+function request_storage(callback) {
+	make_get_request(`${server_url}get-storage`, res => {
+		if (res.responseText == undefined || res.status != 200)
+			callback(undefined)
+		else {
+			if (res.status == 401)
+				window.location = window.location.href + "login"
+			callback(JSON.parse(res.responseText))
+		}
+	})
+}
+
+function send_create_room(name, callback) {
+	var body = {
+		login_hash: get_cookie("login_hash"),
+		name: name,
+	}
+	make_post_request(server_url + "new-room", body, res => {
+		callback(res)
+	})
+}
+
+function send_delete_room(name, callback) {
+	var body = {
+		login_hash: get_cookie("login_hash"),
+		name: name,
+	}
+	make_post_request(server_url + "delete-room", body, res => {
+		callback(res)
+	})
+}
+
+function send_create_shelf(name, room, callback) {
+	var body = {
+		login_hash: get_cookie("login_hash"),
+		name: name,
+		room: room
+	}
+	make_post_request(server_url + "new-shelf", body, res => {
+		callback(res)
+	})
+}
+
+function send_delete_shelf(name, room, callback) {
+	var body = {
+		login_hash: get_cookie("login_hash"),
+		name: name,
+		room: room
+	}
+	make_post_request(server_url + "delete-shelf", body, res => {
+		callback(res)
+	})
+}
+
+function send_create_compartment(name, shelf, room, callback) {
+	var body = {
+		login_hash: get_cookie("login_hash"),
+		name: name,
+		room: room,
+		shelf: shelf
+	}
+	make_post_request(server_url + "new-compartment", body, res => {
+		callback(res)
+	})
+}
+
+function send_delete_compartment(name, shelf, room, callback) {
+	var body = {
+		login_hash: get_cookie("login_hash"),
+		name: name,
+		room: room,
+		shelf: shelf
+	}
+	make_post_request(server_url + "delete-compartment", body, res => {
 		callback(res)
 	})
 }

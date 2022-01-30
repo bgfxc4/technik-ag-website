@@ -1,0 +1,86 @@
+#storage-container {
+	width: 88%;
+	margin-top : 6%;
+	margin-left: 6%;
+	margin-right: 6%;
+	margin-bottom: 5%;
+}
+
+ul, #room_list {
+	list-style-type: none;
+}
+
+#room_list li {
+	margin: 8px;
+}
+
+#room_list {
+	margin: 0;
+	padding: 0;
+}
+
+.caret {
+	cursor: pointer;
+	user-select: none; /* Prevent text selection */
+}
+
+.caret::before {
+	content: "‣";
+	color: var(--font-color);
+	display: inline-block;
+	margin-right: 6px;
+}
+
+.caret-down::before {
+	transform: rotate(90deg);
+}
+
+.edit_btn, .delete_btn {
+	padding: 5px;
+	display: none;
+}
+
+.nested {
+	display: none;
+}
+
+.active {
+	display: block;
+}
+
+#dialog-container {
+	visibility: hidden;
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+}
+
+#dialog-container .dialog {
+	visibility: hidden;
+	text-align: center;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 40%;
+	background-color: var(--secondary-background-color);
+}
+
+#dialog-container .dialog input {
+	margin-bottom: 15px;
+}
+
+#dialog-container .dialog button {
+	margin-bottom: 15px;
+}
+
+#dialog-container .dialog img {
+	max-width: 20vw;
+	max-height: 20vh;
+}
+
+#error-msg {
+	color: red;
+}

@@ -12,6 +12,7 @@
 	<body>
 		<div id="top-bar">
 			<a href="./" class="active">Inventory</a>
+			<a href="../storage">Storage</a>
 			<a>Appointments</a>
 			<button class="login-status" id="logged-in" onclick="$('.login-status .dropdown').toggle()"><i class="fa fa-circle-user fa-2xl"></i>
 				<div class="dropdown" style="display:none;">You are logged in. <p onclick="logout()" style="color:red;">Log out</p></div>
@@ -28,7 +29,6 @@
 			<button class="admin-only" id="enter-edit-mode-btn" onclick="enter_edit_mode()">Edit category</button>
 			<button class="edit-button" id="exit-edit-mode-btn" onclick="exit_edit_mode()" style='display:none;'>Exit edit mode</button>
 		</div>
-		<p id="search-message"></p>
 		<div id="equipment-container">
 			<button class="new-category admin-only" onclick="window.location = '../create/category'">New category</button>
 			<p id="error-msg" style="visibility:hidden;"></p>
