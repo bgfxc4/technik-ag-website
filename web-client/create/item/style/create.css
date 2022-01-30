@@ -8,19 +8,6 @@
 	background-color: var(--background-color);
 }
 
-.dialog input {
-	margin-bottom: 15px;
-}
-
-.dialog button {
-	margin-bottom: 15px;
-}
-
-.dialog img {
-	max-width: 20vw;
-	max-height: 20vh;
-}
-
 ul.tree li {
 	list-style-type: none;
 	position: relative;

@@ -42,43 +42,6 @@
 	margin-bottom: 75%;
 }
 
-#dialog-container {
-	visibility: hidden;
-	position: fixed;
-	top: 0;
-	right: 0;
-	left: 0;
-	bottom: 0;
-}
-
-#dialog-container .dialog {
-	visibility: hidden;
-	text-align: center;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 40%;
-	background-color: var(--secondary-background-color);
-}
-
-#dialog-container .dialog input {
-	margin-bottom: 15px;
-}
-
-#dialog-container .dialog button {
-	margin-bottom: 15px;
-}
-
-#dialog-container .dialog img {
-	max-width: 20vw;
-	max-height: 20vh;
-}
-
-#error-msg {
-	color: red;
-}
-
 @media (orientation: portrait) {
 	#equipment-container {
 		grid-template-columns: 1fr;
