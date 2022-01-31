@@ -189,6 +189,9 @@ button#not-logged-in.login-status {
 	transform: translate(-50%, -50%);
 	width: 40%;
 	background-color: var(--secondary-background-color);
+	border: none;
+	border-radius: 4px;
+	box-shadow: -2px 2px 3px black;
 }
 
 #dialog-container .dialog input {
