@@ -36,5 +36,21 @@ app.listen(config.main_server_port, () => {
 	console.log(`[express] The server is listening on port ${config.main_server_port}`)
 })
 
+export function check_request(needed_fields: string[], needs_auth: boolean, body: any, res: any) {
+	if (needs_auth && !authorized(body)) {
+		res.status(401).send("Login credentials are wrong or not existent!")	
+		return false
+	}
+	console.log(body)
+	for (var f of needed_fields) {
+		console.log(body[f])
+		if (!body[f]) {
+			res.status(400).send(`You need to specify the field '${f}'`)
+			return false
+		}
+	}
+	return true
+}
+
 import "./inventory/routes"
 import "./storage/routes"

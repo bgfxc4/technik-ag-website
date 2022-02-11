@@ -1,5 +1,6 @@
 import * as db_helper from "./db_helper"
 import * as main from "../main"
+import * as storage_db_helper from "../storage/db_helper"
 
 export interface Equipment {
 	id: string;
@@ -25,19 +26,12 @@ main.app.post("/authorize", (req, res) => {
 	return res.send("Ok")
 })
 
-main.app.post("/new-equipment", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
-	if (!req.body.description)
-		return res.status(400).send("You have to set a description!")
-	if (!req.body.storage_place)
-		return res.status(400).send("You have to set a storage place!")
-	if (!req.body.category)
-		return res.status(400).send("You have to set a category!")
-	if (!req.body.type)
-		return res.status(400).send("You have to set a type!")
+main.app.post("/new-equipment", async (req, res) => {
+	if (!main.check_request(['name', 'description', 'room', 'category', 'type'], true, req.body, res))
+		return
+
+	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, req.body.callback)
+
 	db_helper.check_if_type_exists(req.body.category, req.body.type, code => {
 		if (code == 1)
 			return res.status(400).send("The category you specified does not exist!")
@@ -50,10 +44,9 @@ main.app.post("/new-equipment", (req, res) => {
 })
 
 main.app.post("/new-category", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
+	if (!main.check_request(['name'], true, req.body, res))
+		return
+
 	db_helper.add_category_to_db(req.body, exists => {
 		if (!exists)
 			res.status(200).send("ok")
@@ -63,12 +56,9 @@ main.app.post("/new-category", (req, res) => {
 })
 
 main.app.post("/new-type", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
-	if (!req.body.category)
-		return res.status(400).send("You have to set a category!")
+	if (!main.check_request(['name', 'category'], true, req.body, res))
+		return
+
 	db_helper.add_type_to_db(req.body, code => {
 		if (code == 0)
 			res.status(200).send("ok")
@@ -80,20 +70,9 @@ main.app.post("/new-type", (req, res) => {
 })
 
 main.app.post("/edit-equipment", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.id)
-		return res.status(400).send("You have to specify an id of the item to edit!")
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
-	if (!req.body.description)
-		return res.status(400).send("You have to set a description!")
-	if (!req.body.storage_place)
-		return res.status(400).send("You have to set a storage place!")
-	if (!req.body.category)
-		return res.status(400).send("You have to set a category!")
-	if (!req.body.type)
-		return res.status(400).send("You have to set a type!")
+	if (!main.check_request(['id', 'name', 'description', 'room', 'category', 'type'], true, req.body, res))
+		return
+
 	db_helper.check_if_type_exists(req.body.category, req.body.type, code => {
 		if (code == 1)
 			return res.status(400).send("The category you specified does not exist!")
@@ -106,13 +85,9 @@ main.app.post("/edit-equipment", (req, res) => {
 })
 
 main.app.post("/edit-type", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.old_name)
-		return res.status(400).send("You have to specify the old name of the type you want to edit!")
-	if (!req.body.category)
-		return res.status(400).send("You have to specify the name of the category the type you want to edit is in!")
-	
+	if (!main.check_request(['old_name', 'category'], true, req.body, res))
+		return
+
 	db_helper.check_if_type_exists(req.body.category, req.body.old_name, exists => {
 		if (exists != 0)
 			return res.status(400).send("A type with the old_name you specified does not exist in the category you specified!")
@@ -123,11 +98,9 @@ main.app.post("/edit-type", (req, res) => {
 })
 
 main.app.post("/edit-category", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.old_name)
-		return res.status(400).send("You have to specify the old name of the category you want to edit!")
-	
+	if (!main.check_request(['old_name'], true, req.body, res))
+		return
+
 	db_helper.check_if_category_exists(req.body.old_name, exists => {
 		if (!exists)
 			return res.status(400).send("A category with the old_name you specified does not exist!")
@@ -138,20 +111,18 @@ main.app.post("/edit-category", (req, res) => {
 })
 
 main.app.post("/delete-equipment", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")
-	if (!req.body.id)
-		return res.status(400).send("You have to set an id!")
+	if (!main.check_request(['id'], true, req.body, res))
+		return
+
 	db_helper.delete_equipment_from_db(req.body, () => {
 		res.status(200).send("ok")
 	})
 })
 
 main.app.post("/delete-category", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
+	if (!main.check_request(['name'], true, req.body, res))
+		return
+
 	db_helper.check_if_category_exists(req.body.name, exists => {
 		if (!exists)
 			return res.status(400).send("The category you specified does not exist!")
@@ -162,12 +133,9 @@ main.app.post("/delete-category", (req, res) => {
 })
 
 main.app.post("/delete-type", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
-	if (!req.body.category)
-		return res.status(400).send("You have to set a category!")
+	if (!main.check_request(['name', 'category'], true, req.body, res))
+		return
+
 	db_helper.check_if_type_exists(req.body.category, req.body.name, code => {
 		if (code != 0)
 			return res.status(400).send("The type or category you specified does not exist!")
@@ -210,8 +178,8 @@ main.app.get("/get-equipment", (req, res) => {
 })
 
 main.app.get("/get-category-img/:name", (req, res) => {
-	if (!req.params.name)
-		return res.status(400).send("The name you have given is not valid!")
+	if (!main.check_request(['name'], false, req.params, res))
+		return
 
 	db_helper.get_category_by_name(req.params.name, cat => {
 		if (cat == undefined)
@@ -229,8 +197,8 @@ main.app.get("/get-category-img/:name", (req, res) => {
 })
 
 main.app.get("/get-item-img/:id", (req, res) => {
-	if (!req.params.id)
-		return res.status(400).send("The id you have given is not valid!")
+	if (!main.check_request(['id'], false, req.params, res))
+		return
 
 	db_helper.get_equipment_by_id_from_db(req.params.id, equ => {
 		if (equ == undefined || equ.length == 0 || equ[0] == undefined)
@@ -275,8 +243,9 @@ main.app.get("/get-categories", (req, res) => {
 })
 
 main.app.get("/get-equipment-by-id/:id", (req, res) => {
-	if (!req.params.id)
-		return res.status(400).send("The id you have given is not valid!")
+	if (!main.check_request(['id'], false, req.params, res))
+		return
+
 	db_helper.get_equipment_by_id_from_db(req.params.id, list => {
 		var result: any[] = []
 		for (var equ of list) {
@@ -299,10 +268,9 @@ main.app.get("/get-equipment-by-id/:id", (req, res) => {
 })
 
 main.app.get("/get-equipment-by-type/:category/:type", (req, res) => {
-	if (!req.params.category)
-		return res.status(400).send("You have to specify a category!")
-	if (!req.params.type)
-		return res.status(400).send("You have to specify a type!")
+	if (!main.check_request(['category', 'type'], false, req.params, res))
+		return
+
 	db_helper.get_equipment_by_type_from_db(req.params.category, req.params.type, equ => {
 		res.send(JSON.stringify(equ))
 	})

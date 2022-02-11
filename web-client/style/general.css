@@ -205,6 +205,7 @@ button#not-logged-in.login-status {
 #dialog-container .dialog img {
 	max-width: 20vw;
 	max-height: 20vh;
+	border: white 5px solid;
 }
 
 #error-msg {

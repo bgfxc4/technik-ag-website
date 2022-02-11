@@ -171,3 +171,12 @@ export function delete_compartment_from_db(body: any, callback: () => void) {
 		})
 	})
 }
+
+export async function compartment_exists(room: string, shelf: string, compartment: string, callback: (exists: boolean) => void) {
+	var query = { "name": room, "shelfs": {"name": shelf, "compartments": {"name": compartment} } }
+	var count = await main.db.collection("storage").countDocuments(query, {limit: 1})
+	if (count == 0)
+		callback(false)
+	else
+		callback(true)
+}

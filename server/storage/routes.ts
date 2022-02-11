@@ -16,10 +16,8 @@ export interface Compartment {
 }
 
 main.app.post("/new-room", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
+	if (!main.check_request(['name'], true, req.body, res))
+		return
 	db_helper.add_room_to_db(req.body, exists => {
 		if (exists)
 			return res.status(400).send("The room you want to create exists already!")
@@ -29,22 +27,18 @@ main.app.post("/new-room", (req, res) => {
 })
 
 main.app.post("/delete-room", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
+	if (!main.check_request(['name'], true, req.body, res))
+		return
+
 	db_helper.delete_room_from_db(req.body, () => {
 		res.status(200).send("ok")
 	})
 })
 
 main.app.post("/new-shelf", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
-	if (!req.body.room)
-		return res.status(400).send("You have to set a room to put the shelf in!")
+	if (!main.check_request(['name', 'room'], true, req.body, res))
+		return
+
 	db_helper.add_shelf_to_db(req.body, code => {
 		if (code == 1)
 			return res.status(400).send("The room you want to create the shelf in does not exist!")
@@ -56,24 +50,18 @@ main.app.post("/new-shelf", (req, res) => {
 })
 
 main.app.post("/delete-shelf", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
-	if (!req.body.room)
-		return res.status(400).send("You have to set a room to delete the shelf from!")
+	if (!main.check_request(['name', 'room'], true, req.body, res))
+		return
+
 	db_helper.delete_shelf_from_db(req.body, () => {
 		res.status(200).send("ok")
 	})
 })
 
 main.app.post("/new-compartment", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
-	if (!req.body.room)
-		return res.status(400).send("You have to set a room to put the shelf in!")
+	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, res))
+		return
+
 	db_helper.add_compartment_to_db(req.body, code => {
 		if (code == 1)
 			return res.status(400).send("The room you want to create the compartment in does not exist!")
@@ -87,14 +75,9 @@ main.app.post("/new-compartment", (req, res) => {
 })
 
 main.app.post("/delete-compartment", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	if (!req.body.name)
-		return res.status(400).send("You have to set a name!")
-	if (!req.body.shelf)
-		return res.status(400).send("You have to set a shelf to delete the compartment from!")
-	if (!req.body.room)
-		return res.status(400).send("You have to set a room to delete the compartment from!")
+	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, res))
+		return
+
 	db_helper.delete_compartment_from_db(req.body, () => {
 		res.status(200).send("ok")
 	})
