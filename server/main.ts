@@ -41,9 +41,7 @@ export function check_request(needed_fields: string[], needs_auth: boolean, body
 		res.status(401).send("Login credentials are wrong or not existent!")	
 		return false
 	}
-	console.log(body)
 	for (var f of needed_fields) {
-		console.log(body[f])
 		if (!body[f]) {
 			res.status(400).send(`You need to specify the field '${f}'`)
 			return false

@@ -4,6 +4,11 @@ var complete_equipment = []
 var cat_name = ""
 var type_name = ""
 
+var storage_obj
+
+var room = ""
+var shelf = ""
+
 window.onload = function () {
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
@@ -32,6 +37,11 @@ window.onload = function () {
 		complete_equipment = res
 		render_template_list(res)
 	})
+
+	request_storage(res => {
+		storage_obj = res
+		render_storage(res)
+	})
 }
 
 function render_types(cat_name) {
@@ -48,17 +58,78 @@ function render_types(cat_name) {
 	}
 }
 
+function render_storage(stor) {
+	$('#create-item-storage-room').html("")
+	$('#create-item-storage-shelf').html("")
+	$('#create-item-storage-compartment').html("")
+	for (var r of stor) {
+		$('#create-item-storage-room').append(`<option value="${r.name}">${r.name}</option>`)
+	}
+	if (!stor[0])
+		return
+	room = stor[0].name
+	for (var s of stor[0].shelfs) {
+		$('#create-item-storage-shelf').append(`<option value="${s.name}">${s.name}</option>`)
+	}
+	shelf = stor[0].shelfs[0].name
+	if (!stor[0].shelfs[0])
+		return
+	for (var c of stor[0].shelfs[0].compartments) {
+		$('#create-item-storage-comaprtment').append(`<option value="${c.name}">${c.name}</option>`)
+	}
+}
+
+function render_shelfs(room_name) {
+	$('#create-item-storage-shelf').html("")
+	$('#create-item-storage-compartment').html("")
+	for (var r of storage_obj) {
+		if (room_name == r.name) {
+			room = room_name
+			if (r.shelfs[0])
+				shelf = r.shelfs[0].name
+			for (var s of r.shelfs)
+				$('#create-item-storage-shelf').append(`<option value="${s.name}">${s.name}</option>`)
+			if (r.shelfs[0])
+				render_comps(r.shelfs[0].name)
+		}
+	}
+}
+
+function render_comps(shelf_name) {
+	$('#create-item-storage-compartment').html("")
+	for (var r of storage_obj) {
+		if (room == r.name) {
+			for (var s of r.shelfs) {
+				if (s.name == shelf_name) {
+					shelf = shelf_name
+					for (var c of s.compartments) {
+						$('#create-item-storage-compartment').append(`<option value="${c.name}">${c.name}</option>`)
+					}
+					return
+				}
+			}
+		}
+	}
+}
+
 function fill_in_item(item) {
 	$('#create-item-name').val(item.name + " - copy")
 	$('#create-item-description').val(item.description)
-	$('#create-item-storage').val(item.storage_place)
+	
+	$('#create-item-storage-room').val(item.room).change()
+	$('#create-item-storage-shelf').val(item.shelf).change()
+	$('#create-item-storage-compartment').val(item.compartment).change()
+
 	$('#create-item-category').val(item.category).change()
 	render_types(item.category)
 	for (var i in item.custom_fields) {
 		$(`#custom-field-${i}`).val(item.custom_fields[i])
 	}
 	$('#create-item-type').val(item.type).change()
-	$('#create-image-preview')[0].src = `data:image/jpeg;base64,${item.image}`
+
+	url_to_base64(`${server_url}get-item-img/${item.id}`, b => {
+		$('#create-image-preview')[0].src = `${b}`
+	})
 }
 
 function render_template_list(equipment) {
@@ -105,7 +176,9 @@ function create_item_clicked() {
 	var item = {
 		name: $('#create-item-name').val(),
 		description: $('#create-item-description').val(),
-		storage_place: $('#create-item-storage').val(),
+		room: $('#create-item-storage-room').val(),
+		shelf: $('#create-item-storage-shelf').val(),
+		compartment: $('#create-item-storage-compartment').val(),
 		category: $('#create-item-category').val(),
 		type: $('#create-item-type').val(),
 		custom_fields: custom_fields,
@@ -128,6 +201,20 @@ function load_image_preview(input_query, img_query) {
 	load_image_base64(input_query, img => {
 		$(img_query)[0].src = `data:image/jpeg;base64,${img}`
 	})
+}
+
+function url_to_base64(url, callback) {
+	var xhr = new XMLHttpRequest()
+	xhr.onload = function() {
+		var reader = new FileReader()
+		reader.onloadend = function() {
+			callback(reader.result)
+		}
+		reader.readAsDataURL(xhr.response)
+	}
+	xhr.open('GET', url)
+	xhr.responseType = 'blob'
+	xhr.send()
 }
 
 function load_image_base64(query, callback) {

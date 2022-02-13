@@ -5,11 +5,21 @@
 		<script src="../js/api_helper.js"></script>
 		<script src="js/login.js"></script>
 		<link rel="stylesheet" href="../style/general.css">
+		<link rel="stylesheet" href="style/login.css">
 	</head/>
 	<body>
-		<input id="usernameInput" type="text" placeholder="Please enter your username">
-		<input id="passwordInput" type="password" placeholder="Please enter your password">
-		<input id="loginButton" type="button" onclick="try_login()" value="Login">
-		<p id="errorText" hidden=true>Login failed, try again</p>
+		<div id="login-panel">
+			<div id="center">
+				<h1>Login</h1>
+				<input id="usernameInput" type="text" placeholder="Please enter your username">
+				<input id="passwordInput" type="password" placeholder="Please enter your password">
+				<input id="loginButton" type="button" onclick="try_login()" value="Login">
+				<p id="error-msg" hidden=true>Login failed, try again</p>
+			</div>
+		</div>
+		<div id="divider-panel"></div>
+		<div id="logo-panel">
+			<img src="../imgs/logo.png">
+		</div/>
 	</body/>
 </html>

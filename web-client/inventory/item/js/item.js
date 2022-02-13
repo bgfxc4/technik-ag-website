@@ -48,9 +48,10 @@ function render_equipment(equipment) {
 				cf += `<br><b>${f}:</b> ${item.custom_fields[f]}`
 			}
 			var img = `<img src="${server_url}get-item-img/${item.id}"/>`
+			var storage = `${item.room} - ${item.shelf} - ${item.compartment}`
 			inner += `<div class="item-entry" item_id="${item.id}">${img}
 						<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
-						<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id} ${cf}</div>${actions}</div>`
+						<b>Storage:</b> ${storage}<br><b>ID:</b> ${item.id} ${cf}</div>${actions}</div>`
 		}
 	}
 	$("#equipment-container").append(inner)

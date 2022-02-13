@@ -52,9 +52,10 @@ function generate_html_for_item(item) {
 		cf += `<br><b>${f}:</b> ${item.custom_fields[f]}`
 	}
 	var img = `<img onclick="window.location = '../item?category=${cat_name}&type=${type_name}&id=${item.id}'" src="${server_url}get-item-img/${item.id}"/>`
+	var storage = `${item.room} - ${item.shelf} - ${item.compartment}`
 	return `<div class="item-entry" item_id="${item.id}">${img}
 			<div class="description"><b>Name:</b> ${item.name} <br> <b>Description:</b> ${item.description}<br>
-			<b>Storage:</b> ${item.storage_place}<br><b>ID:</b> ${item.id} ${cf}</div>${actions}</div>`
+			<b>Storage:</b> ${storage}<br><b>ID:</b> ${item.id} ${cf}</div>${actions}</div>`
 
 }
 

@@ -1,0 +1,27 @@
+.item-entry {
+	position: relative;
+	display: grid;
+	grid-template-columns: 1fr 9fr;
+}
+
+.item-entry img {
+	max-width: 30vw;
+	max-height: 30vh;
+}
+
+.item-entry .description {
+	display: inline-block;
+	padding-left: 10px;
+}
+
+.item-entry .actions {
+	position: absolute;
+	bottom: 7px;
+	right: 0;
+}
+
+.item-entry .actions button {
+	margin-right: 10px;
+	background-color: var(--foreground-color);
+	border: none;
+}

@@ -36,7 +36,9 @@
 				<input type="text" id="create-item-description" placeholder="Enter a short description..."><br>
 
 				<label for="create-item-storage">Storage place:</label><br>
-				<input type="text" id="create-item-storage" placeholder="Enter a storage place..."><br>
+				Room:<select id="create-item-storage-room" onchange="render_shelfs(this.value)"></select>
+				Shelf:<select id="create-item-storage-shelf" onchange="render_comps(this.value)"></select>
+				Compartment:<select id="create-item-storage-compartment"></select><br>
 
 				<div id="custom-field-container"></div>
 					

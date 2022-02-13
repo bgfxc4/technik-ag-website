@@ -6,7 +6,9 @@ export interface Equipment {
 	id: string;
 	name: string;
 	description: string;
-	storage_place:string;
+	room: string;
+	shelf: string;
+	compartment: string;
 	category: string;
 	type: string;
 	image: string;
@@ -27,10 +29,17 @@ main.app.post("/authorize", (req, res) => {
 })
 
 main.app.post("/new-equipment", async (req, res) => {
-	if (!main.check_request(['name', 'description', 'room', 'category', 'type'], true, req.body, res))
+	if (!main.check_request(['name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, res))
 		return
-
-	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, req.body.callback)
+	
+	var shelf_exists = false
+	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, exists => {
+		shelf_exists = exists
+		if (!exists)
+			res.status(400).send("The room, shelf or compartment you specified does not exist!")
+	})
+	if (!shelf_exists)
+		return
 
 	db_helper.check_if_type_exists(req.body.category, req.body.type, code => {
 		if (code == 1)
@@ -69,8 +78,17 @@ main.app.post("/new-type", (req, res) => {
 	})
 })
 
-main.app.post("/edit-equipment", (req, res) => {
-	if (!main.check_request(['id', 'name', 'description', 'room', 'category', 'type'], true, req.body, res))
+main.app.post("/edit-equipment", async (req, res) => {
+	if (!main.check_request(['id', 'name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, res))
+		return
+	
+	var storage_exists = false
+	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, exists => {
+		storage_exists = exists
+		if (!exists)
+			return res.status(400).send("The room, shelf or compartment you specified does not exist!")
+	})
+	if (!storage_exists)
 		return
 
 	db_helper.check_if_type_exists(req.body.category, req.body.type, code => {

@@ -10,7 +10,7 @@ function try_login() {
 			set_cookie("login_hash", login_hash, 14)
 			window.location = "../" 
 		} else {
-			document.getElementById("errorText").hidden = false
+			document.getElementById("error-msg").hidden = false
 		}
 	}
 	xhr.open("POST", url)
