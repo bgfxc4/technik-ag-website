@@ -14,7 +14,7 @@ window.onload = function () {
 		window.location = '../inventory'
 	}
 
-	$("#top-bar input").val(decodeURIComponent(search_tag))
+	$(".search-form input").val(decodeURIComponent(search_tag))
 
 	var keywords = decodeURIComponent(search_tag).split(" ").filter(val => val !== " " && val !== "")
 	send_search_items(keywords, res => {

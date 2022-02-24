@@ -35,11 +35,11 @@
 						</li>
 					</ul>
 					<form class="d-flex search-form" onsubmit="return search()">
-						<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+						<input class="form-control me-2 bg-light text-dark" type="search" placeholder="Search" aria-label="Search">
 						<button class="btn btn-outline-primary" type="submit">Search</button>
 					</form>
 					<div class="d-flex mb-2 mb-lg-0">
-						<button id="logged-in" class="btn btn-secondary login-status" data-bs-container="body" data-bs-toggle="popover" data-bs-html="true" data-bs-placement="bottom" data-bs-content='You are logged in. <a href="javascript:void(0);" onclick="logout();">Log out</a>'>
+						<button id="logged-in" class="btn btn-secondary login-status" data-bs-container="body" data-bs-toggle="popover" data-bs-html="true" data-bs-placement="bottom" data-bs-content='<div class="text-dark">You are logged in.</div><a href="javascript:void(0);" onclick="logout();">Log out</a>'>
 							<i class="fa fa-circle-user fa-2xl"></i>
 						</button>
 						<button class="login-status nav-item" id="not-logged-in" onclick="window.location = '../login'">Sign in</button>
