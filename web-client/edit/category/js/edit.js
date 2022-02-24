@@ -31,6 +31,12 @@ window.onload = function () {
 	to_data_url(`${server_url}get-category-img/${name}`, base64 => {
 		$('#edit-image-preview')[0].src = base64
 	})
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function fill_in_cat(cat) {

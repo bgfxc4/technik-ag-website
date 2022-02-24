@@ -29,6 +29,12 @@ window.onload = function () {
 		}
 		render_equipment(equipment)
 	})
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function render_equipment(equipment) {
@@ -76,6 +82,12 @@ function hide_all_dialogs() {
 function show_dialog(id) {
 	$('#' + id).css("visibility", "visible")
 	$("#dialog-container").css("visibility", "visible")
+}
+
+function search() {
+	var keyword = $(".search-form input").val()
+	window.location = "../../search/" + ((keyword == "") ? "" : "?search=" + encodeURIComponent(keyword))
+	return false
 }
 
 var code_id = ""

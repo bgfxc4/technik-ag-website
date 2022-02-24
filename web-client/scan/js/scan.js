@@ -18,6 +18,12 @@ function setup_qrcode_scanner() {
 		window.location = `../inventory/item?id=${result}`
 	})
 	scanner.start()
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function setup_barcode_scanner() {
@@ -45,6 +51,12 @@ function setup_barcode_scanner() {
 	Quagga.onDetected(data => {
 		window.location = `../inventory/item?id=${data.codeResult.code}`
 	})
+}
+
+function search() {
+	var keyword = $(".search-form input").val()
+	window.location = "../search/" + ((keyword == "") ? "" : "?search=" + encodeURIComponent(keyword))
+	return false
 }
 
 function logout() {

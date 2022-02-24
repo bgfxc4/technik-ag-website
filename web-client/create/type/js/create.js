@@ -15,6 +15,12 @@ window.onload = function () {
 			$('#create-type-category').select()
 		}
 	})
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function create_type_clicked() {

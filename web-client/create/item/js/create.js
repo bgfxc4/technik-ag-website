@@ -42,6 +42,12 @@ window.onload = function () {
 		storage_obj = res
 		render_storage(res)
 	})
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function render_types(cat_name) {

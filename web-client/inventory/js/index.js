@@ -11,6 +11,12 @@ window.onload = function () {
 		}
 		render_categories(cats)
 	})
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function render_categories(cats) {
@@ -26,15 +32,15 @@ function render_categories(cats) {
 		var img = `<img src="${server_url}get-category-img/${category.name}"/>`
 		s += `<button class="category-btn" category_name="${category.name}" onclick="window.location = '${loc}'">
 				<div><h2>${category.name}</h2> <br> ${types}</div> ${img}
-			</button>`
-		
+			</button>`	
 	}
 	$("#equipment-container").prepend(s)
 }
 
 function search() {
-	var keyword = $("#top-bar input").val()
+	var keyword = $(".search-form input").val()
 	window.location = "../search/" + ((keyword == "") ? "" : "?search=" + encodeURIComponent(keyword))
+	return false
 }
 
 function logout() {

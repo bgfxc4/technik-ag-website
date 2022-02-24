@@ -28,6 +28,12 @@ window.onload = function () {
 		exit_delete_mode()
 		exit_edit_mode()
 	})
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function render_items(items) {
@@ -65,8 +71,9 @@ function render_path_text() {
 }
 
 function search() {
-	var keyword = $("#top-bar input").val()
+	var keyword = $(".search-form input").val()
 	window.location = "../../search/" + ((keyword == "") ? "" : "?search=" + encodeURIComponent(keyword))
+	return false
 }
 
 function logout() {

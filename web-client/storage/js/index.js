@@ -11,6 +11,12 @@ window.onload = function () {
 		}
 		render_storage(stor)
 	})
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function render_storage(stor) {
@@ -62,8 +68,9 @@ function get_compartments_html(shelf, room_name) {
 }
 
 function search() {
-	var keyword = $("#top-bar input").val()
+	var keyword = $(".search-form input").val()
 	window.location = "../search/" + ((keyword == "") ? "" : "?search=" + encodeURIComponent(keyword))
+	return false
 }
 
 function logout() {

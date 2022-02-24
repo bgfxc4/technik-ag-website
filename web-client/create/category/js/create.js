@@ -3,6 +3,12 @@ var custom_fields = []
 window.onload = function () {
 	$(".admin-only").css("visibility", "hidden")
 	check_if_logged_in()
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function create_category_clicked() {

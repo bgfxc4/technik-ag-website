@@ -2,7 +2,13 @@
 	<head>
 		<title>Technik AG</title>
 		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+		<link href="../../style/bootstrap.min.css" rel="stylesheet">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="../../js/popper.min.js"></script>
+		<script src="../../js/bootstrap.min.js"></script>
+
 		<script src="../../js/api_helper.js"></script>
 		<script src="js/create.js"></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css">
@@ -10,15 +16,33 @@
 		<link rel="stylesheet" href="style/create.css">
 	</head>
 	<body>
-		<div id="top-bar">
-			<a href="../../inventory/" >Inventory</a>
-			<a href="../../storage">Storage</a>
-			<a>Appointments</a>
-			<button class="login-status" id="logged-in" onclick="$('.login-status .dropdown').toggle()"><i class="fa fa-circle-user fa-2xl"></i>
-				<div class="dropdown" style="display:none;">You are logged in. <p onclick="logout()" style="color:red;">Log out</p></div>
-			</button>
-			<button class="login-status" id="not-logged-in" onclick="window.location = '../../login'">Sign in</button>
-		</div>
+		<nav class="navbar navbar-expand-md navbar-dark bg-secondary">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="../../">Technik AG</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item">
+							<a class="nav-link active" aria-current="page" href="../../inventory/">Inventory</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="../../storage/">Storage</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link disabled">Appointments</a>
+						</li>
+					</ul>
+					<div class="d-flex mb-2 mb-lg-0">
+						<button id="logged-in" class="btn btn-secondary login-status" data-bs-container="body" data-bs-toggle="popover" data-bs-html="true" data-bs-placement="bottom" data-bs-content='You are logged in. <a href="javascript:void(0);" onclick="logout();">Log out</a>'>
+							<i class="fa fa-circle-user fa-xl"></i>
+						</button>
+						<button class="login-status nav-item" id="not-logged-in" onclick="window.location = '../login'">Sign in</button>
+					</div>
+				</div>
+			</div>
+		</nav>
 		<div class="dialog" id="create-container">
 			<h3>Create type</h3>
 

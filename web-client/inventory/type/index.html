@@ -2,7 +2,13 @@
 	<head>
 		<title>Technik AG</title>
 		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<link href="../../style/bootstrap.min.css" rel="stylesheet">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="../../js/popper.min.js"></script>
+		<script src="../../js/bootstrap.min.js"></script>
+
 		<script src="../../js/qrcode.min.js"></script>
 		<script src="../../js/JsBarcode.all.min.js"></script>
 		<script src="../../js/api_helper.js"></script>
@@ -12,18 +18,38 @@
 		<link rel="stylesheet" href="../../style/general.css">
 	</head>
 	<body>
-		<div id="top-bar">
-			<a href="../" class="active">Inventory</a>
-			<a href="../../storage">Storage</a>
-			<a>Appointments</a>
-			<button class="login-status" id="logged-in" onclick="$('.login-status .dropdown').toggle()"><i class="fa fa-circle-user fa-2xl"></i>
-				<div class="dropdown" style="display:none;">You are logged in. <p onclick="logout()" style="color:red;">Log out</p></div>
-			</button>
-			<button class="login-status" id="not-logged-in" onclick="window.location = '../../login'">Sign in</button>
-			<button onclick="search()"><i class="fa fa-search"></i></button>
-			<button class="x" onclick="window.location='./'"><i class="fa fa-x"></i></button>
-			<input type="text" onchange="search()" placeholder="search...">
-		</div>
+		<nav class="navbar navbar-expand-md navbar-dark bg-secondary">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="../../">Technik AG</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item">
+							<a class="nav-link active" aria-current="page" href="../">Inventory</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="../../storage/">Storage</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link disabled">Appointments</a>
+						</li>
+					</ul>
+					<form class="d-flex search-form" onsubmit="return search()">
+						<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+						<button class="btn btn-outline-primary" type="submit">Search</button>
+					</form>
+					<div class="d-flex mb-2 mb-lg-0">
+						<button id="logged-in" class="btn btn-secondary login-status" data-bs-container="body" data-bs-toggle="popover" data-bs-html="true" data-bs-placement="bottom" data-bs-content='You are logged in. <a href="javascript:void(0);" onclick="logout();">Log out</a>'>
+							<i class="fa fa-circle-user fa-2xl"></i>
+						</button>
+						<button class="login-status nav-item" id="not-logged-in" onclick="window.location = '../login'">Sign in</button>
+					</div>
+				</div>
+			</div>
+		</nav>
+
 		<div id="top-actions">
 			<button onclick="window.location = '../../scan'" class="scan-code"><i class="fa-solid fa-barcode fa-xl"></i></button>
 			<button class="admin-only" id="enter-delete-mode-btn" onclick="enter_delete_mode()">Delete item</button>

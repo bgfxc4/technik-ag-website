@@ -44,6 +44,12 @@ window.onload = function () {
 		})
 
 	})
+
+	$('[data-bs-toggle="popover"]').popover({
+		trigger: "focus",
+		html: true,
+		sanitize: false
+	})
 }
 
 function render_types(cat_name, item) {
