@@ -33,8 +33,11 @@
 							<a class="nav-link disabled">Appointments</a>
 						</li>
 					</ul>
+					<li class="nav-item">
+							<a class="nav-link" href="../../scan/">Scan Code</a>
+					</li>
 					<div class="d-flex mb-2 mb-lg-0">
-						<button id="logged-in" class="btn btn-secondary login-status" data-bs-container="body" data-bs-toggle="popover" data-bs-html="true" data-bs-placement="bottom" data-bs-content='You are logged in. <a href="javascript:void(0);" onclick="logout();">Log out</a>'>
+						<button id="logged-in" class="btn btn-secondary login-status" data-bs-container="body" data-bs-toggle="popover" data-bs-html="true" data-bs-placement="bottom" data-bs-content='<div class="text-dark">You are logged in.</div> <a href="javascript:void(0);" onclick="logout();">Log out</a>'>
 							<i class="fa fa-circle-user fa-xl"></i>
 						</button>
 						<button class="login-status nav-item" id="not-logged-in" onclick="window.location = '../login'">Sign in</button>

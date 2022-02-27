@@ -35,6 +35,9 @@
 						<li class="nav-item">
 							<a class="nav-link disabled">Appointments</a>
 						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="../../scan/">Scan Code</a>
+						</li>
 					</ul>
 					<form class="d-flex search-form" onsubmit="return search()">
 						<input class="form-control me-2 bg-light text-dark" type="search" placeholder="Search" aria-label="Search">
@@ -51,7 +54,6 @@
 		</nav>
 
 		<div id="top-actions">
-			<button onclick="window.location = '../../scan'" class="scan-code"><i class="fa-solid fa-barcode fa-xl"></i></button>
 			<button class="admin-only" id="enter-delete-mode-btn" onclick="enter_delete_mode()">Delete item</button>
 			<button class="delete-button" id="exit-delete-mode-btn" onclick="exit_delete_mode()" style='display:none;'>Exit delete mode</button>
 			<button class="admin-only" id="enter-edit-mode-btn" onclick="enter_edit_mode()">Edit item</button>
