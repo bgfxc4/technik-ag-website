@@ -173,6 +173,11 @@ button {
 	max-height: 20vh;
 }
 
+#path-text {
+	width: 80%;
+	margin: 0 auto;
+}
+
 #error-msg {
 	color: red;
 }

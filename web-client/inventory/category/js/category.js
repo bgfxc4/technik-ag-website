@@ -56,7 +56,12 @@ function render_types(cats, cat_name) {
 }
 
 function render_path_text() {
-	$('#path-text').html(`<a href='../'>Inventory</a> > <a href='../category?category=${cat_name}'>${decodeURIComponent(cat_name)}</a>`)
+	$('#path-text').html(`<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href='../'>Inventory</a></li>
+				<li class="breadcrumb-item active" aria-current="page">${cat_name}</li>
+			</ol>
+		</nav>`)
 }
 
 function search() {

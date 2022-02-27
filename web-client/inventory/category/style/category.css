@@ -2,11 +2,6 @@
 	display: none;
 }
 
-#path-text {
-	width: 80%;
-	margin: 0 auto;
-}
-
 #equipment-container {
 	width: 88%;
 	display: grid;
