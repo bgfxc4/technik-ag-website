@@ -32,7 +32,7 @@ function render_categories(cats) {
 		var img = `<img src="${server_url}get-category-img/${category.name}"/>`
 		s += `<button class="category-btn" category_name="${category.name}" onclick="window.location = '${loc}'">
 				<div><h2>${category.name}</h2> <br> ${types}</div> ${img}
-			</button>`	
+			</button>`
 	}
 	$("#equipment-container").prepend(s)
 }
@@ -62,7 +62,11 @@ var delete_category_name = ""
 function delete_category_clicked(item) {
 	var name = item.getAttribute("category_name")
 	delete_category_name = name
-	show_dialog("delete-category-dialog")
+	//show_dialog("delete-category-dialog")
+	//var modal = bootstrap.Modal.getOrCreateInstance($("#modal-delete-category"))
+	//modal.show()
+	var myModal = new bootstrap.Modal(document.getElementById('modal-delete-category'))
+	myModal.show()
 }
 
 function delete_category_confirmed() {
