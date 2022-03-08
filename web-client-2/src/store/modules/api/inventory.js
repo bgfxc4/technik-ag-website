@@ -24,6 +24,14 @@ const actions = {
             console.log(err)
             params["callback"](undefined, err)
         })
+    },
+    async getItemByID({commit}, params) {
+        axios.get(`get-equipment-by-id/${params["itemID"]}`).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
     }
 }
 

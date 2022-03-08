@@ -4,10 +4,13 @@ import { store } from "./store/store"
 
 import Login from "./components/Login.vue"
 import Home from "./components/Home.vue"
+
 import Inventory from "./components/Inventory/Inventory.vue"
 import Category from "./components/Inventory/Category.vue"
 import Type from "./components/Inventory/Type.vue"
+import Item from "./components/Inventory/Item.vue"
 import Storage from "./components/Storage.vue"
+
 import Appointments from "./components/Appointments.vue"
 import Scan from "./components/Scan.vue"
 
@@ -38,6 +41,11 @@ const routes = [
 		path: "/inventory/:category/:type",
 		name: "InventoryType",
 		component: Type
+	},
+	{
+		path: "/inventory/:category/:type/:itemID",
+		name: "InventoryItem",
+		component: Item
 	},
 	{
 		path: "/storage",

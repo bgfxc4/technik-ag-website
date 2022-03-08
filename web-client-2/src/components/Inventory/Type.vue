@@ -12,6 +12,11 @@
     					<div class="col-8 my-auto">
 							<div class="card-body">
 								<h5 class="card-title">{{ item.name }}</h5>
+								<p>
+									<b>Description:</b> {{ item.description }} <br>
+									<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
+									<b>ID:</b> {{ item.id }}
+								</p>
 								<router-link :to="`/inventory/${catName}/${typeName}/${item.id}`" class="btn btn-outline-primary mt-2">Open Item</router-link>
 							</div>
 						</div>
