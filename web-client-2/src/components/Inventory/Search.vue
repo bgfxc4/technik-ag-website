@@ -1,13 +1,7 @@
 <template>
-	<div id="type">
-		<nav aria-label="breadcrumb" class="mx-4 my-2">
-			<ol class="breadcrumb">
-				<li class="breadcrumb-item"><router-link to='/inventory'>Inventory</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/`'>{{ $route.params.category }}</router-link></li>
-				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.type }}</li>
-			</ol>
-		</nav>
+	<div id="search">
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
+		<p class="mx-4 my-2">Search results for "{{ keyword }}"</p>
 		<div class="row row-cols-1 g-4 m-3">
 			<div v-for="item in itemList" :key="item.id" class="col">
 				<div class="card mb-3 bg-secondary" style="height: 32vh">
@@ -24,7 +18,7 @@
 									<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
 									<b>ID:</b> {{ item.id }}
 								</p>
-								<router-link :to="`/inventory/${catName}/${typeName}/${item.id}`" class="btn btn-outline-primary mt-2">Open Item</router-link>
+								<router-link :to="`/inventory/${item.category}/${item.type}/${item.id}`" class="btn btn-outline-primary mt-2">Open Item</router-link>
 							</div>
 						</div>
 					</div>
@@ -39,28 +33,37 @@
 	import ErrorText from "../ErrorText.vue"
 
 	export default {
-		name: "Type",
+		name: "Search",
 		data () {
 			return {
 				itemList: [],
-				catName: "",
-				typeName: "",
+				keyword: "",
 				errorText: ""
 			}
 		},
 		components: {
 			ErrorText
 		},
+		methods: {
+			search: function () {
+				this.itemList = []
+				this.$store.dispatch("getItemsBySearch", {keyword: this.keyword, callback: (answ, err) => {
+					if (!answ) {
+						this.errortext = err
+						return
+					}
+					this.itemList = answ.data
+				}})
+			}
+		},
 		async created () {
-			this.catName = this.$route.params.category
-			this.typeName = this.$route.params.type
-			this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: this.typeName, callback: (answ, err, _t) => {
-				if (!answ) {
-					this.errorText = err
-					return
-				}
-				this.itemList = answ.data
-			}})
+			this.keyword = this.$route.params.keyword
+			this.search()
+
+			this.$watch(() => this.$route.params.keyword, to => {
+				this.keyword = to
+				this.search()
+			})
 		}
 	}
 </script>

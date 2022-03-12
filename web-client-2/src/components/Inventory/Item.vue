@@ -4,10 +4,11 @@
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><router-link to='/inventory'>Inventory</router-link></li>
 				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/`'>{{ $route.params.category }}</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/${$route.params.type}`'>{{ $route.params.category }}</router-link></li>
-				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.type }}</li>
+				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/${$route.params.type}`'>{{ $route.params.type }}</router-link></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.itemID }}</li>
 			</ol>
 		</nav>
+		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row container m-3">
 			<div class="col-5">
 				<img v-if="item.id" v-bind:src="$store.state.apiUrl + '/get-item-img/' + item.id" class="card-img" 
@@ -28,27 +29,32 @@
 
 <script>
 	import ShowQrBarCode from "../ShowQrBarCode.vue"	
+	import ErrorText from "../ErrorText.vue"
 
 	export default {
 		name: "Item",
 		components: {
-			ShowQrBarCode
+			ShowQrBarCode,
+			ErrorText
 		},
 		data () {
 			return {
 				item: {},
 				catName: "",
 				typeName: "",
-				itemID: ""
+				itemID: "",
+				errorText: ""
 			}
 		},
 		async created () {
 			this.catName = this.$route.params.category
 			this.typeName = this.$route.params.type
 			this.itemID = this.$route.params.itemID
-			this.$store.dispatch("getItemByID", {itemID: this.itemID, callback: answ => {
-				if (!answ)
+			this.$store.dispatch("getItemByID", {itemID: this.itemID, callback: (answ, err) => {
+				if (!answ) {
+					this.errorText = err
 					return
+				}
 				console.log(answ.data[0].equipment[0])
 				this.item = answ.data[0].equipment[0]
 			}})

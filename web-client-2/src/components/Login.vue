@@ -9,7 +9,7 @@
 					<button class="btn btn-light" type="button" v-on:click=tryLogin >Login</button>
 					<button class="btn btn-outline-light" type="button" v-on:click=openHome >Cancel</button>
 				</form>
-				<p id="error-msg" hidden=true>Login failed, try again</p>
+				<error-text v-if="!!errorText" v-bind:msg="errorText" />
 			</div>
 		</div>
 		<div id="divider-panel"></div>
@@ -21,19 +21,24 @@
 
 <script>
 	import { mapActions } from "vuex"
+	import ErrorText from "./ErrorText.vue"
 
 	export default {
 		name: "Login",
-		emits: ['openPanel'],
+		components: {
+			ErrorText
+		},
 		data() {
 			return {
 				usernameInput: "",
-				passwordInput: ""
+				passwordInput: "",
+				errorText: ""
 			}
 		},
 		methods: {
 			...mapActions(["LogIn"]),
 			async tryLogin() {
+				this.errorText = ""
 				const User = new FormData()
 				User.append("username", this.usernameInput)
 				User.append("password", this.passwordInput)
@@ -41,11 +46,11 @@
 					await this.LogIn(User)
 					this.$router.push("/")
 				} catch (error) {
-					setError(error)
+					this.setError(error)
 				}
 			},
 			setError(msg) {
-				console.log(msg)
+				this.errorText = msg
 			},
 			openHome() {
 				this.$router.push("/")

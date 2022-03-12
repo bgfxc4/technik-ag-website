@@ -6,6 +6,7 @@
 				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.category }}</li>
 			</ol>
 		</nav>
+		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row row-cols-1 row-cols-lg-3 g-4 m-3">
 			<div v-for="t in typeList" :key="t.name" class="col">
 				<div class="card mb-3 bg-secondary" style="min-height: 20vh">
@@ -27,13 +28,19 @@
 </template>
 
 <script>
+	import ErrorText from "../ErrorText.vue"
+
 	export default {
 		name: "Category",
 		data () {
 			return {
 				typeList: [],
-				catName: ""
+				catName: "",
+				errorText: ""
 			}
+		},
+		components: {
+			ErrorText
 		},
 		methods: {
 			loadItemsForTypes: async function (list) {
@@ -53,7 +60,11 @@
 		},
 		async created () {
 			this.catName = this.$route.params.category
-			this.$store.dispatch("getCategories", answ => {
+			this.$store.dispatch("getCategories", (answ, err) => {
+				if (!answ) {
+					this.errorText = err
+					return
+				}
 				for (var cat of answ.data) {
 					if (cat.name == this.catName) {
 						this.loadItemsForTypes(cat.types)

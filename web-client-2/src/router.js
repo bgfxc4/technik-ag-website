@@ -9,6 +9,7 @@ import Inventory from "./components/Inventory/Inventory.vue"
 import Category from "./components/Inventory/Category.vue"
 import Type from "./components/Inventory/Type.vue"
 import Item from "./components/Inventory/Item.vue"
+import Search from "./components/Inventory/Search.vue"
 import Storage from "./components/Storage.vue"
 
 import Appointments from "./components/Appointments.vue"
@@ -46,6 +47,11 @@ const routes = [
 		path: "/inventory/:category/:type/:itemID",
 		name: "InventoryItem",
 		component: Item
+	},
+	{
+		path: "/search/:keyword",
+		name: "Search",
+		component: Search
 	},
 	{
 		path: "/storage",

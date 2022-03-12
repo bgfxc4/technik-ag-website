@@ -41,7 +41,7 @@
 
 <script>
 	export default {
-		name: "TopBar>",
+		name: "TopBar",
 		data () {
 			return {
 				searchStr: "" 
@@ -58,7 +58,7 @@
 				this.$router.push("/login")
 			},
 			openSearch: function () {
-				this.$router.push("/search")
+				this.$router.push("/search/" + this.searchStr)
 			}
 		}
 	}

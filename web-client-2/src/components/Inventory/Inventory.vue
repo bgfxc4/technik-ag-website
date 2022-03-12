@@ -1,5 +1,6 @@
 <template>
 	<div id="inventory">
+		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row row-cols-1 row-cols-lg-3 g-4 m-3">
 			<div v-for="cat in categoryList" :key="cat.name" class="col">
 				<div class="card mb-3 bg-secondary" style="height: 32vh">
@@ -24,15 +25,25 @@
 </template>
 
 <script>
+	import ErrorText from "../ErrorText.vue"
+
 	export default {
 		name: "Inventory",
+		components: {
+			ErrorText
+		},
 		data () {
 			return {
-				categoryList: []
+				categoryList: [],
+				errorText: ""
 			}
 		},
 		async created () {
-			this.$store.dispatch("getCategories", answ => {
+			this.$store.dispatch("getCategories", (answ, err) => {
+				if (!answ) {
+					this.errorText = err
+					return
+				}
 				console.log(answ.data)
 				this.categoryList = answ.data
 			});

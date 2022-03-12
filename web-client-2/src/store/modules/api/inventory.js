@@ -32,6 +32,14 @@ const actions = {
             console.log(err)
             params["callback"](undefined, err)
         })
+    },
+    async getItemsBySearch({commit}, params) {
+        axios.post("search-equipment", {keywords: params["keyword"]}).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
     }
 }
 

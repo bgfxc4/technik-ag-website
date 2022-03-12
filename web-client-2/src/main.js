@@ -3,7 +3,7 @@ import { BootstrapVue3 } from 'bootstrap-vue-3'
 import jQuery from 'jquery'
 import axios from "axios"
 
-axios.defaults.baseURL = 'https://bgfxc4.de/technikag-api/'
+axios.defaults.baseURL = process.env.VUE_APP_ApiServerUrl
 
 import { library } from "@fortawesome/fontawesome-svg-core"
 import { fas } from "@fortawesome/free-solid-svg-icons"
