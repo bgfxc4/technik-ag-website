@@ -1,5 +1,13 @@
 <template>
 	<div id="item">
+		<nav aria-label="breadcrumb" class="mx-4 my-2">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><router-link to='/inventory'>Inventory</router-link></li>
+				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/`'>{{ $route.params.category }}</router-link></li>
+				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/${$route.params.type}`'>{{ $route.params.category }}</router-link></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.type }}</li>
+			</ol>
+		</nav>
 		<div class="row container m-3">
 			<div class="col-5">
 				<img v-if="item.id" v-bind:src="$store.state.apiUrl + '/get-item-img/' + item.id" class="card-img" 

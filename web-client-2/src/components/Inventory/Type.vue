@@ -1,7 +1,13 @@
 <template>
 	<div id="type">
+		<nav aria-label="breadcrumb" class="mx-4 my-2">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><router-link to='/inventory'>Inventory</router-link></li>
+				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/`'>{{ $route.params.category }}</router-link></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.type }}</li>
+			</ol>
+		</nav>
 		<div class="row row-cols-1 g-4 m-3">
-
 			<div v-for="item in itemList" :key="item.id" class="col">
 				<div class="card mb-3 bg-secondary" style="height: 32vh">
 			  		<div class="row g-0" style="height: 100%">
