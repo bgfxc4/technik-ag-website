@@ -42,9 +42,9 @@ const routes = [
 		path: "/inventory/:category/:type",
 		name: "InventoryType",
 		component: Type
-	},
+	},	
 	{
-		path: "/inventory/:category/:type/:itemID",
+		path: "/inventory/item/byId/:itemID",
 		name: "InventoryItem",
 		component: Item
 	},

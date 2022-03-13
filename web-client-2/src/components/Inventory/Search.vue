@@ -18,7 +18,7 @@
 									<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
 									<b>ID:</b> {{ item.id }}
 								</p>
-								<router-link :to="`/inventory/${item.category}/${item.type}/${item.id}`" class="btn btn-outline-primary mt-2">Open Item</router-link>
+								<router-link :to="`/inventory/item/byId/${item.id}?category=${item.category}&type=${item.type}`" class="btn btn-outline-primary mt-2">Open Item</router-link>
 							</div>
 						</div>
 					</div>

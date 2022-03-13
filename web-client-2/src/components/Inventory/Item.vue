@@ -1,10 +1,10 @@
 <template>
 	<div id="item">
 		<nav aria-label="breadcrumb" class="mx-4 my-2">
-			<ol class="breadcrumb">
+			<ol class="breadcrumb" v-if="catName && typeName">
 				<li class="breadcrumb-item"><router-link to='/inventory'>Inventory</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/`'>{{ $route.params.category }}</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/${$route.params.type}`'>{{ $route.params.type }}</router-link></li>
+				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.query.category}/`'>{{ $route.query.category }}</router-link></li>
+				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.query.category}/${$route.query.type}`'>{{ $route.query.type }}</router-link></li>
 				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.itemID }}</li>
 			</ol>
 		</nav>
@@ -47,8 +47,8 @@
 			}
 		},
 		async created () {
-			this.catName = this.$route.params.category
-			this.typeName = this.$route.params.type
+			this.catName = this.$route.query.category
+			this.typeName = this.$route.query.type
 			this.itemID = this.$route.params.itemID
 			this.$store.dispatch("getItemByID", {itemID: this.itemID, callback: (answ, err) => {
 				if (!answ) {
