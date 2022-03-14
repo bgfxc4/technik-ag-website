@@ -6,7 +6,7 @@
 				<form @submit.prevent="submit">
 					<input id="usernameInput" type="text" placeholder="Please enter your username" v-model="usernameInput">
 					<input id="passwordInput" type="password" placeholder="Please enter your password" v-model="passwordInput">
-					<button class="btn btn-light" type="button" v-on:click=tryLogin >Login</button>
+					<button id="login-btn" class="btn btn-light" type="button" v-on:click=tryLogin >Login</button>
 					<button class="btn btn-outline-light" type="button" v-on:click=openHome >Cancel</button>
 				</form>
 				<error-text v-if="!!errorText" v-bind:msg="errorText" />
@@ -55,6 +55,13 @@
 			openHome() {
 				this.$router.push("/")
 			}
+		},
+		mounted () {
+			$('#passwordInput').keydown(e => {
+				if (e.which == 13) {//enter
+					$('#login-btn').click()
+				}
+			})
 		}
 	}
 </script>
