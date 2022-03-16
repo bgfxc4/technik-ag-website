@@ -20,17 +20,21 @@
 					</div>
 				</div>
 			</div>
+
+			<create-category />
 		</div>
 	</div>
 </template>
 
 <script>
 	import ErrorText from "../ErrorText.vue"
+	import CreateCategory from "./create/CreateCategory.vue"
 
 	export default {
 		name: "Inventory",
 		components: {
-			ErrorText
+			ErrorText,
+			CreateCategory,
 		},
 		data () {
 			return {
