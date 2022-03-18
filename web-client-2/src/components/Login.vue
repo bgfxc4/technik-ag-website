@@ -9,6 +9,7 @@
 					<button id="login-btn" class="btn btn-light" type="button" v-on:click=tryLogin >Login</button>
 					<button class="btn btn-outline-light" type="button" v-on:click=openHome >Cancel</button>
 				</form>
+				<loading-icon v-if="isLoading" size="3x"/>
 				<error-text v-if="!!errorText" v-bind:msg="errorText" />
 			</div>
 		</div>
@@ -21,18 +22,21 @@
 
 <script>
 	import { mapActions } from "vuex"
-	import ErrorText from "./ErrorText.vue"
+	import ErrorText from "./helpers/ErrorText.vue"
+	import LoadingIcon from "./helpers/LoadingIcon.vue"
 
 	export default {
 		name: "Login",
 		components: {
-			ErrorText
+			ErrorText,
+			LoadingIcon
 		},
 		data() {
 			return {
 				usernameInput: "",
 				passwordInput: "",
-				errorText: ""
+				errorText: "",
+				isLoading: false
 			}
 		},
 		methods: {
@@ -42,12 +46,14 @@
 				const User = new FormData()
 				User.append("username", this.usernameInput)
 				User.append("password", this.passwordInput)
+				this.isLoading = true
 				try {
 					await this.LogIn(User)
 					this.$router.push("/")
 				} catch (error) {
 					this.setError(error)
 				}
+				this.isLoading = false
 			},
 			setError(msg) {
 				this.errorText = msg

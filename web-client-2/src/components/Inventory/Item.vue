@@ -8,6 +8,7 @@
 				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.itemID }}</li>
 			</ol>
 		</nav>
+		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row container m-3">
 			<div class="col-5">
@@ -28,14 +29,16 @@
 </template>
 
 <script>
-	import ShowQrBarCode from "../ShowQrBarCode.vue"	
-	import ErrorText from "../ErrorText.vue"
+	import ShowQrBarCode from "../helpers/ShowQrBarCode.vue"	
+	import ErrorText from "../helpers/ErrorText.vue"
+	import LoadingIcon from "../helpers/LoadingIcon.vue"
 
 	export default {
 		name: "Item",
 		components: {
 			ShowQrBarCode,
-			ErrorText
+			ErrorText,
+			LoadingIcon
 		},
 		data () {
 			return {
@@ -43,14 +46,17 @@
 				catName: "",
 				typeName: "",
 				itemID: "",
-				errorText: ""
+				errorText: "",
+				isLoading: false
 			}
 		},
 		async created () {
 			this.catName = this.$route.query.category
 			this.typeName = this.$route.query.type
 			this.itemID = this.$route.params.itemID
+			this.isLoading = true
 			this.$store.dispatch("getItemByID", {itemID: this.itemID, callback: (answ, err) => {
+				this.isLoading = false
 				if (!answ) {
 					this.errorText = err
 					return

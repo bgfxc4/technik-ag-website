@@ -1,5 +1,6 @@
 <template>
 	<div id="search">
+		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<p class="mx-4 my-2">Search results for "{{ keyword }}"</p>
 		<div class="row row-cols-1 g-4 m-3">
@@ -30,7 +31,8 @@
 </template>
 
 <script>
-	import ErrorText from "../ErrorText.vue"
+	import ErrorText from "../helpers/ErrorText.vue"
+	import LoadingIcon from "../helpers/LoadingIcon.vue"
 
 	export default {
 		name: "Search",
@@ -38,16 +40,20 @@
 			return {
 				itemList: [],
 				keyword: "",
-				errorText: ""
+				errorText: "",
+				isLoading: false
 			}
 		},
 		components: {
-			ErrorText
+			ErrorText,
+			LoadingIcon
 		},
 		methods: {
 			search: function () {
 				this.itemList = []
+				this.isLoading = true
 				this.$store.dispatch("getItemsBySearch", {keyword: this.keyword, callback: (answ, err) => {
+					this.isLoading = false
 					if (!answ) {
 						this.errortext = err
 						return

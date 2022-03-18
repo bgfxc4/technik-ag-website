@@ -12,14 +12,14 @@
                 
                 <image-upload-preview ref="image-upload"/><br/>
                 <button class="btn btn-outline-primary" @click="createCategory">Create Category</button>
-                <v-button id="closeModalButton" class="btn btn-secondary" v-b-modal.createCategoryModal>Cancel</v-button>
+                <b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.createCategoryModal>Cancel</b-button>
             </div>
         </b-modal>
     </b-button>
 </template>
 
 <script>
-    import ImageUploadPreview from "../ImageUploadPreview.vue"
+    import ImageUploadPreview from "../../helpers/ImageUploadPreview.vue"
 
     export default {
         name: "CreateCategory",

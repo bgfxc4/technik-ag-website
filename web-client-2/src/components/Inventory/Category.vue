@@ -6,6 +6,7 @@
 				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.category }}</li>
 			</ol>
 		</nav>
+		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row row-cols-1 row-cols-lg-3 g-4 m-3">
 			<div v-for="t in typeList" :key="t.name" class="col">
@@ -28,7 +29,8 @@
 </template>
 
 <script>
-	import ErrorText from "../ErrorText.vue"
+	import ErrorText from "../helpers/ErrorText.vue"
+	import LoadingIcon from "../helpers/LoadingIcon.vue"
 
 	export default {
 		name: "Category",
@@ -36,17 +38,21 @@
 			return {
 				typeList: [],
 				catName: "",
-				errorText: ""
+				errorText: "",
+				isLoading: false,
 			}
 		},
 		components: {
-			ErrorText
+			ErrorText,
+			LoadingIcon
 		},
 		methods: {
 			loadItemsForTypes: async function (list) {
 				for (var t of list) {
 					this.typeList.push({ name: t, items: [] })
+					this.isLoading = true
 					this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: t, callback: (answ, err, _t) => {
+						this.isLoading = false
 						if (!answ)
 							return
 						for (var i in this.typeList) {
@@ -59,8 +65,10 @@
 			}
 		},
 		async created () {
+			this.isLoading = true
 			this.catName = this.$route.params.category
 			this.$store.dispatch("getCategories", (answ, err) => {
+				this.isLoading = false
 				if (!answ) {
 					this.errorText = err
 					return

@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "vite",
     "dev-cli": "vue-cli-service serve --https true",
+    "dev-cli-http": "vue-cli-service serve",
     "build": "vite build",
     "preview": "vite preview --port 5050"
   },

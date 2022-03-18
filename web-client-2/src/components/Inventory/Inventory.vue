@@ -1,5 +1,6 @@
 <template>
 	<div id="inventory">
+		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row row-cols-1 row-cols-lg-3 g-4 m-3">
 			<div v-for="cat in categoryList" :key="cat.name" class="col">
@@ -27,7 +28,8 @@
 </template>
 
 <script>
-	import ErrorText from "../ErrorText.vue"
+	import ErrorText from "../helpers/ErrorText.vue"
+	import LoadingIcon from '../helpers/LoadingIcon.vue'
 	import CreateCategory from "./create/CreateCategory.vue"
 
 	export default {
@@ -35,15 +37,19 @@
 		components: {
 			ErrorText,
 			CreateCategory,
+			LoadingIcon,
 		},
 		data () {
 			return {
 				categoryList: [],
-				errorText: ""
+				errorText: "",
+				isLoading: false
 			}
 		},
 		async created () {
+			this.isLoading = true
 			this.$store.dispatch("getCategories", (answ, err) => {
+				this.isLoading = false
 				if (!answ) {
 					this.errorText = err
 					return
