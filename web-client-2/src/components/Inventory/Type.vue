@@ -11,7 +11,7 @@
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row row-cols-1 g-4 m-3">
 			<div v-for="item in itemList" :key="item.id" class="col">
-				<div class="card mb-3 bg-secondary" style="height: 32vh">
+				<div class="card mb-3 bg-secondary" style="padding: 10px">
 			  		<div class="row g-0" style="height: 100%">
     					<div class="col-4 my-auto">
 							<img v-bind:src="$store.state.apiUrl + '/get-item-img/' + item.id" class="card-img" 
@@ -20,11 +20,16 @@
     					<div class="col-8 my-auto">
 							<div class="card-body">
 								<h5 class="card-title">{{ item.name }}</h5>
-								<p>
+								<div>
 									<b>Description:</b> {{ item.description }} <br>
+									<div v-if="item.custom_fields.length">
+										<div v-for="f of Object.keys(item.custom_fields)" :key="f">
+											<b>{{f}}:</b> {{ item.custom_fields[f] }} <br>
+										</div>
+									</div>
 									<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
 									<b>ID:</b> {{ item.id }}
-								</p>
+								</div>
 								<router-link :to="`/inventory/item/byId/${item.id}?category=${item.category}&type=${item.type}`" class="btn btn-outline-primary mt-2">Open Item</router-link>
 								<br>
     							<button v-b-modal.deleteItemModal @click="deleteItemId = item.id" class="btn btn-danger" style="max-height: 6vh">
