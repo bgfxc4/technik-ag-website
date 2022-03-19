@@ -50,7 +50,7 @@ const actions = {
             console.log(err)
             params["callback"](undefined, err)
         })
-    },    
+    },
     async createType({rootState}, params) {
         params['type'].login_hash = rootState.auth.loginHash
         axios.post("new-type", params['type']).then(res => {
@@ -59,7 +59,7 @@ const actions = {
             console.log(err)
             params["callback"](undefined, err)
         })
-    },    
+    },
     async createItem({rootState}, params) {
         params['item'].login_hash = rootState.auth.loginHash
         axios.post("new-equipment", params['item']).then(res => {
@@ -78,7 +78,7 @@ const actions = {
             console.log(err)
             params["callback"](undefined, err)
         })
-    },    
+    },
     async deleteType({rootState}, params) {
         params['type'].login_hash = rootState.auth.loginHash
         axios.post("delete-type", params['type']).then(res => {
@@ -87,10 +87,38 @@ const actions = {
             console.log(err)
             params["callback"](undefined, err)
         })
-    },    
+    },
     async deleteItem({rootState}, params) {
         params['item'].login_hash = rootState.auth.loginHash
         axios.post("delete-equipment", params['item']).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },
+
+    async editCategory({rootState}, params) {
+        params['category'].login_hash = rootState.auth.loginHash
+        axios.post("edit-category", params['category']).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },
+    async editType({rootState}, params) {
+        params['type'].login_hash = rootState.auth.loginHash
+        axios.post("edit-type", params['type']).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },
+    async editItem({rootState}, params) {
+        params['item'].login_hash = rootState.auth.loginHash
+        axios.post("edit-equipment", params['item']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)

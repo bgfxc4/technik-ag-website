@@ -136,6 +136,7 @@
                 this.shelfIndex = this.storage[this.roomIndex].shelfs.findIndex(s => s.name == item.shelf)
                 this.compIndex = this.storage[this.roomIndex].shelfs[this.shelfIndex].compartments.findIndex(c => c.name == item.compartment)
                 this.itemDescription = item.description
+                this.$refs['image-upload']._url = this.$store.state.apiUrl + '/get-item-img/' + item.id
 
                 for (var f of Object.keys(item.custom_fields)) {
                     if (this.customFieldsLoaded.indexOf(f) == -1)

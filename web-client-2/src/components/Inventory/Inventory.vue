@@ -20,6 +20,9 @@
     							<button v-b-modal.deleteCategoryModal @click="deleteCategoryName = cat.name" class="btn btn-danger" style="max-height: 6vh">
 									<font-awesome-icon icon="trash-can"/>
 								</button>
+    							<button @click="editCategory = cat" v-b-modal.editCategoryModal class="btn btn-info" style="max-height: 6vh">
+									<font-awesome-icon icon="pen"/>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -28,6 +31,7 @@
 			<create-category @onCreate="loadCategoryList" />
 		</div>
 		<delete-category @onDelete="loadCategoryList" :categoryName="deleteCategoryName"/>
+		<edit-category @onEdit="loadCategoryList" :category="editCategory"/>
 	</div>
 </template>
 
@@ -36,6 +40,7 @@
 	import LoadingIcon from '../helpers/LoadingIcon.vue'
 	import CreateCategory from "./create/CreateCategory.vue"
 	import DeleteCategory from './delete/DeleteCategory.vue'
+	import EditCategory from './edit/EditCategory.vue'
 
 	export default {
 		name: "Inventory",
@@ -44,13 +49,15 @@
 			CreateCategory,
 			LoadingIcon,
 			DeleteCategory,
+			EditCategory,
 		},
 		data () {
 			return {
 				categoryList: [],
 				errorText: "",
 				isLoading: false,
-				deleteCategoryName: undefined
+				deleteCategoryName: undefined,
+				editCategory: {}
 			}
 		},
 		methods: {

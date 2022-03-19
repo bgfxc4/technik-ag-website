@@ -22,10 +22,8 @@
 								<h5 class="card-title">{{ item.name }}</h5>
 								<div>
 									<b>Description:</b> {{ item.description }} <br>
-									<div v-if="item.custom_fields.length">
-										<div v-for="f of Object.keys(item.custom_fields)" :key="f">
-											<b>{{f}}:</b> {{ item.custom_fields[f] }} <br>
-										</div>
+									<div v-for="f of Object.keys(item.custom_fields)" :key="f">
+										<b>{{f}}:</b> {{ item.custom_fields[f] }} <br>
 									</div>
 									<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
 									<b>ID:</b> {{ item.id }}
@@ -35,6 +33,9 @@
     							<button v-b-modal.deleteItemModal @click="deleteItemId = item.id" class="btn btn-danger" style="max-height: 6vh">
 									<font-awesome-icon icon="trash-can"/>
 								</button>
+    							<button @click="editItem = item" v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
+									<font-awesome-icon icon="pen"/>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -43,6 +44,7 @@
 			<create-item :categoryName="catName" :typeName="typeName" @onCreate="loadItems"/>
 		</div>
 		<delete-item :categoryName="catName" :typeName="typeName" :itemId="deleteItemId" @onDelete="loadItems"/>
+		<edit-item :item="editItem" @onEdit="loadItems"/>
 	</div>
 </template>
 
@@ -51,6 +53,7 @@
 	import LoadingIcon from "../helpers/LoadingIcon.vue"
 	import createItem from "./create/CreateItem.vue"
 	import DeleteItem from './delete/DeleteItem.vue'
+	import EditItem from './edit/EditItem.vue'
 
 	export default {
 		name: "Type",
@@ -61,14 +64,16 @@
 				typeName: "",
 				errorText: "",
 				isLoading: false,
-				deleteItemId: ""
+				deleteItemId: "",
+				editItem: {},
 			}
 		},
 		components: {
 			ErrorText,
 			LoadingIcon,
 			createItem,
-			DeleteItem
+			DeleteItem,
+			EditItem
 		},
 		methods: {
 			loadItems () {

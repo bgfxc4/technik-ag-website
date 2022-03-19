@@ -31,9 +31,13 @@
 				<button v-b-modal.deleteItemModal class="btn btn-danger" style="max-height: 6vh">
 					<font-awesome-icon icon="trash-can"/>
 				</button>
+				<button v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
+					<font-awesome-icon icon="pen"/>
+				</button>
 			</div>
 		</div>
 		<delete-item :categoryName="item.category" :typeName="item.type" :itemId="item.id" @onDelete="itemDeleted"/>
+		<edit-item :item="item" @onEdit="loadItem"/>
 	</div>
 </template>
 
@@ -42,6 +46,7 @@
 	import ErrorText from "../helpers/ErrorText.vue"
 	import LoadingIcon from "../helpers/LoadingIcon.vue"
 	import DeleteItem from './delete/DeleteItem.vue'
+	import EditItem from "./edit/EditItem.vue"
 
 	export default {
 		name: "Item",
@@ -49,7 +54,8 @@
 			ShowQrBarCode,
 			ErrorText,
 			LoadingIcon,
-			DeleteItem
+			DeleteItem,
+			EditItem
 		},
 		data () {
 			return {
@@ -65,22 +71,25 @@
 		methods: {
 			itemDeleted () {
 				this.$router.push(`/inventory/${this.item.category}/${this.item.type}`)
+			},
+			loadItem () {
+				this.isLoading = true
+				this.$store.dispatch("getItemByID", {itemID: this.itemID, callback: (answ, err) => {
+					this.isLoading = false
+					if (!answ) {
+						this.errorText = err
+						return
+					}
+					console.log(answ.data[0].equipment[0])
+					this.item = answ.data[0].equipment[0]
+				}})
 			}
 		},
 		async created () {
 			this.catName = this.$route.query.category
 			this.typeName = this.$route.query.type
 			this.itemID = this.$route.params.itemID
-			this.isLoading = true
-			this.$store.dispatch("getItemByID", {itemID: this.itemID, callback: (answ, err) => {
-				this.isLoading = false
-				if (!answ) {
-					this.errorText = err
-					return
-				}
-				console.log(answ.data[0].equipment[0])
-				this.item = answ.data[0].equipment[0]
-			}})
+			this.loadItem()
 		}
 	}
 </script>

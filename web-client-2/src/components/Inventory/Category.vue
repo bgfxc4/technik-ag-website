@@ -22,6 +22,9 @@
     							<button v-b-modal.deleteTypeModal @click="deleteTypeName = t.name" class="btn btn-danger" style="max-height: 6vh">
 									<font-awesome-icon icon="trash-can"/>
 								</button>
+    							<button @click="editType = t" v-b-modal.editTypeModal class="btn btn-info" style="max-height: 6vh">
+									<font-awesome-icon icon="pen"/>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -30,6 +33,7 @@
 			<create-type :categoryName="catName" @onCreate="loadTypeList" />
 		</div>
 		<delete-type @onDelete="loadTypeList" :typeName="deleteTypeName" :categoryName="catName"/>
+		<edit-type @onEdit="loadTypeList" :type="editType" :catName="catName"/>
 	</div>
 </template>
 
@@ -38,6 +42,7 @@
 	import LoadingIcon from "../helpers/LoadingIcon.vue"
 	import CreateType from "./create/CreateType.vue"
 	import DeleteType from "./delete/DeleteType.vue"
+	import EditType from "./edit/EditType.vue"
 
 	export default {
 		name: "Category",
@@ -48,13 +53,15 @@
 				deleteTypeName: undefined,
 				errorText: "",
 				isLoading: false,
+				editType: {}
 			}
 		},
 		components: {
 			ErrorText,
 			LoadingIcon,
 			CreateType,
-			DeleteType
+			DeleteType,
+			EditType
 		},
 		methods: {
 			loadItemsForTypes: async function (list) {

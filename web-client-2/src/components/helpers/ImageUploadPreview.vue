@@ -1,7 +1,7 @@
 <template>
     <div>
-        <div v-if="previewImage" class="imagePreviewWrapper"
-            :style="{ 'background-image': `url(${previewImage})` }">
+        <div v-if="previewImage || _url" class="imagePreviewWrapper"
+            :style="(_url) ? { 'background-image': `url(${_url})` } : { 'background-image': `url(${previewImage})` }">
         </div>
  
         <input
@@ -14,9 +14,13 @@
 <script>
     export default {
         name: "ImageUploadPreview",
+        props: {
+            url: String
+        },
         data() {
             return {
-                previewImage: null
+                previewImage: null,
+                _url: this.url,
             };
         },
         methods: {
@@ -30,6 +34,7 @@
                 let reader = new FileReader
                 reader.onload = e => {
                     this.previewImage = e.target.result
+                    this._url = undefined
                 }
                 reader.readAsDataURL(file[0])
                 this.$emit('input', file[0])
