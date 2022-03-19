@@ -16,14 +16,18 @@
 								<router-link v-for="t in cat.types" :key="t" :to="`/inventory/${cat.name}/${t}`" 
 									class="fs-6 text-break d-block text-truncate">{{ t }}</router-link>
 								<router-link :to="`/inventory/${cat.name}/`" class="btn btn-outline-primary mt-2">Open Category</router-link>
+								<br>
+    							<button v-b-modal.deleteCategoryModal @click="deleteCategoryName = cat.name" class="btn btn-danger" style="max-height: 6vh">
+									<font-awesome-icon icon="trash-can"/>
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-
-			<create-category />
+			<create-category @onCreate="loadCategoryList" />
 		</div>
+		<delete-category @onDelete="loadCategoryList" :categoryName="deleteCategoryName"/>
 	</div>
 </template>
 
@@ -31,6 +35,7 @@
 	import ErrorText from "../helpers/ErrorText.vue"
 	import LoadingIcon from '../helpers/LoadingIcon.vue'
 	import CreateCategory from "./create/CreateCategory.vue"
+	import DeleteCategory from './delete/DeleteCategory.vue'
 
 	export default {
 		name: "Inventory",
@@ -38,25 +43,31 @@
 			ErrorText,
 			CreateCategory,
 			LoadingIcon,
+			DeleteCategory,
 		},
 		data () {
 			return {
 				categoryList: [],
 				errorText: "",
-				isLoading: false
+				isLoading: false,
+				deleteCategoryName: undefined
+			}
+		},
+		methods: {
+			async loadCategoryList () {
+				this.isLoading = true
+				this.$store.dispatch("getCategories", (answ, err) => {
+					this.isLoading = false
+					if (!answ) {
+						this.errorText = err
+						return
+					}
+					this.categoryList = answ.data
+				});
 			}
 		},
 		async created () {
-			this.isLoading = true
-			this.$store.dispatch("getCategories", (answ, err) => {
-				this.isLoading = false
-				if (!answ) {
-					this.errorText = err
-					return
-				}
-				console.log(answ.data)
-				this.categoryList = answ.data
-			});
+			this.loadCategoryList()
 		}
 	}
 </script>

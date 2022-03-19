@@ -18,19 +18,26 @@
 								<router-link v-for="i in t.items" :key="i.name" :to="`/inventory/item/byId/${i.id}?category=${i.category}&type=${i.type}`" 
 									class="fs-6 text-break d-block text-truncate">{{ i.name }}</router-link>
 								<router-link :to="`/inventory/${catName}/${t.name}`" class="btn btn-outline-primary mt-2">Open Type</router-link>
+								<br>
+    							<button v-b-modal.deleteTypeModal @click="deleteTypeName = t.name" class="btn btn-danger" style="max-height: 6vh">
+									<font-awesome-icon icon="trash-can"/>
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-
+			<create-type :categoryName="catName" @onCreate="loadTypeList" />
 		</div>
+		<delete-type @onDelete="loadTypeList" :typeName="deleteTypeName" :categoryName="catName"/>
 	</div>
 </template>
 
 <script>
 	import ErrorText from "../helpers/ErrorText.vue"
 	import LoadingIcon from "../helpers/LoadingIcon.vue"
+	import CreateType from "./create/CreateType.vue"
+	import DeleteType from "./delete/DeleteType.vue"
 
 	export default {
 		name: "Category",
@@ -38,13 +45,16 @@
 			return {
 				typeList: [],
 				catName: "",
+				deleteTypeName: undefined,
 				errorText: "",
 				isLoading: false,
 			}
 		},
 		components: {
 			ErrorText,
-			LoadingIcon
+			LoadingIcon,
+			CreateType,
+			DeleteType
 		},
 		methods: {
 			loadItemsForTypes: async function (list) {
@@ -62,23 +72,27 @@
 						}
 					}})
 				}
+			},
+			loadTypeList () {
+				this.isLoading = true
+				this.typeList = []
+				this.$store.dispatch("getCategories", (answ, err) => {
+					this.isLoading = false
+					if (!answ) {
+						this.errorText = err
+						return
+					}
+					for (var cat of answ.data) {
+						if (cat.name == this.catName) {
+							this.loadItemsForTypes(cat.types)
+						}
+					}
+				})
 			}
 		},
 		async created () {
-			this.isLoading = true
 			this.catName = this.$route.params.category
-			this.$store.dispatch("getCategories", (answ, err) => {
-				this.isLoading = false
-				if (!answ) {
-					this.errorText = err
-					return
-				}
-				for (var cat of answ.data) {
-					if (cat.name == this.catName) {
-						this.loadItemsForTypes(cat.types)
-					}
-				}
-			})
+			this.loadTypeList()
 		}
 	}
 </script>

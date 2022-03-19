@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="imagePreviewWrapper"
+        <div v-if="previewImage" class="imagePreviewWrapper"
             :style="{ 'background-image': `url(${previewImage})` }">
         </div>
  

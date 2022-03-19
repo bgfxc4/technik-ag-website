@@ -11,8 +11,8 @@
                 <h6 v-for="f in customFields" :key="f">-{{f}} <button class="btn btn-danger btn-sm" @click="deleteCustomField(customFields.indexOf(f))">Delete</button></h6>
                 
                 <image-upload-preview ref="image-upload"/><br/>
-                <button class="btn btn-outline-primary" @click="createCategory">Create Category</button>
                 <b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.createCategoryModal>Cancel</b-button>
+                <button class="btn btn-outline-primary" @click="createCategory">Create Category</button>
             </div>
         </b-modal>
     </b-button>
@@ -23,6 +23,7 @@
 
     export default {
         name: "CreateCategory",
+        emits: ['onCreate'],
         components: {
             ImageUploadPreview
         },
@@ -53,7 +54,7 @@
 	            this.customFields.splice(i, 1)
             },
             closeModal () {
-                $('#closeModalButton').click()
+                $('#createCategoryModal div #closeModalButton').click()
             },
             createCategory () {
                 var category = {
@@ -65,6 +66,8 @@
                     if (!answ) {
                         this.errorText = err
                         return
+                    } else {
+                        this.$emit("onCreate")
                     }
                     this.closeModal()
                 }})

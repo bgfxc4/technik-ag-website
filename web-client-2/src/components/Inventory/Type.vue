@@ -26,19 +26,26 @@
 									<b>ID:</b> {{ item.id }}
 								</p>
 								<router-link :to="`/inventory/item/byId/${item.id}?category=${item.category}&type=${item.type}`" class="btn btn-outline-primary mt-2">Open Item</router-link>
+								<br>
+    							<button v-b-modal.deleteItemModal @click="deleteItemId = item.id" class="btn btn-danger" style="max-height: 6vh">
+									<font-awesome-icon icon="trash-can"/>
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-
+			<create-item :categoryName="catName" :typeName="typeName" @onCreate="loadItems"/>
 		</div>
+		<delete-item :categoryName="catName" :typeName="typeName" :itemId="deleteItemId" @onDelete="loadItems"/>
 	</div>
 </template>
 
 <script>
 	import ErrorText from "../helpers/ErrorText.vue"
 	import LoadingIcon from "../helpers/LoadingIcon.vue"
+	import createItem from "./create/CreateItem.vue"
+	import DeleteItem from './delete/DeleteItem.vue'
 
 	export default {
 		name: "Type",
@@ -49,24 +56,32 @@
 				typeName: "",
 				errorText: "",
 				isLoading: false,
+				deleteItemId: ""
 			}
 		},
 		components: {
 			ErrorText,
-			LoadingIcon
+			LoadingIcon,
+			createItem,
+			DeleteItem
+		},
+		methods: {
+			loadItems () {
+				this.isLoading = true
+				this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: this.typeName, callback: (answ, err, _t) => {
+					this.isLoading = false
+					if (!answ) {
+						this.errorText = err
+						return
+					}
+					this.itemList = answ.data
+				}})
+			}
 		},
 		async created () {
 			this.catName = this.$route.params.category
 			this.typeName = this.$route.params.type
-			this.isLoading = true
-			this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: this.typeName, callback: (answ, err, _t) => {
-				this.isLoading = false
-				if (!answ) {
-					this.errorText = err
-					return
-				}
-				this.itemList = answ.data
-			}})
+			this.loadItems()
 		}
 	}
 </script>

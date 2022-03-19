@@ -43,7 +43,6 @@ const actions = {
     },
 
     async createCategory({rootState}, params) {
-        console.log(rootState.auth.loginHash)
         params['category'].login_hash = rootState.auth.loginHash
         axios.post("new-category", params['category']).then(res => {
             params["callback"](res, undefined)
@@ -51,7 +50,53 @@ const actions = {
             console.log(err)
             params["callback"](undefined, err)
         })
-    }
+    },    
+    async createType({rootState}, params) {
+        params['type'].login_hash = rootState.auth.loginHash
+        axios.post("new-type", params['type']).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },    
+    async createItem({rootState}, params) {
+        params['item'].login_hash = rootState.auth.loginHash
+        axios.post("new-equipment", params['item']).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },
+
+    async deleteCategory({rootState}, params) {
+        params['category'].login_hash = rootState.auth.loginHash
+        axios.post("delete-category", params['category']).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },    
+    async deleteType({rootState}, params) {
+        params['type'].login_hash = rootState.auth.loginHash
+        axios.post("delete-type", params['type']).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },    
+    async deleteItem({rootState}, params) {
+        params['item'].login_hash = rootState.auth.loginHash
+        axios.post("delete-equipment", params['item']).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },
 }
 
 export default {
