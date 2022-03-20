@@ -5,15 +5,15 @@ A website to manage a technical inventory and book appointments
 ## Webclient 2
 An one-site webclient, written in vue.js.
 
-#### Build
+### Build
 
 In the `web-client-2` directory:
 `$ npm i` to install the dependencies
 `$ npm run build` to build to the `dist` directory
 
-#### Configuration
+### Configuration
 
-##### .env:
+#### .env:
 example:
 ```
 VUE_APP_ApiServerUrl=https://bgfxc4.de/technikag-api
@@ -24,7 +24,7 @@ RELATIVE_PATH=/technikag/
 * `VUE_BASE_URL`: the folder that is prepended in front of the URL in the browser by the vue-router
 * `RELATIVE_PATH`: similar to `VUE_BASE_URL` but used by `vue-cli build`
 
-##### Webserver:
+#### Webserver:
 the vue-router needs some additional configuration by the Webserver, here for example for Apache:
 ```html
 <IfModule mod_rewrite.c>
@@ -47,7 +47,7 @@ More information at https://router.vuejs.org/guide/essentials/history-mode.html#
 
 
 ## Server
-#### Installation
+### Installation
 After cloning the repo with `$ git clone https://github.com/bgfxc4/technik-ag-website`:
 
 In the `server` directory execute:
@@ -55,7 +55,7 @@ In the `server` directory execute:
 `$ npm run start` to start the server
 **NOTE**: Before starting the server you have to configure it. See [#Configuration](#configuration-1)
 
-#### Configuration
+### Configuration
 Create `server/configs/config.json`
 Example:
 ```JSON
