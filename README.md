@@ -13,7 +13,7 @@ In the `web-client-2` directory:
 
 #### Configuration
 
-#####.env:
+##### .env:
 example:
 ```
 VUE_APP_ApiServerUrl=https://bgfxc4.de/technikag-api
@@ -37,7 +37,7 @@ the vue-router needs some additional configuration by the Webserver, here for ex
 </IfModule>
 ```
 nginx:
-```json
+```
 location /ur-subdirectory-path/ {
   try_files $uri $uri/ /index.html;
 }
