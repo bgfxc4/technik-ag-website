@@ -2,11 +2,9 @@
   "name": "web-client-2",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
-    "dev-cli": "vue-cli-service serve --https true",
-    "dev-cli-http": "vue-cli-service serve",
-    "build": "vite build",
-    "preview": "vite preview --port 5050"
+    "dev": "vue-cli-service serve --https true",
+    "dev-http": "vue-cli-service serve",
+    "build": "vue-cli-service build"
   },
   "dependencies": {
     "@chenfengyuan/vue-barcode": "^2.0.0",
@@ -28,8 +26,6 @@
     "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^2.2.2",
-    "@vue/cli-service": "^5.0.1",
-    "vite": "^2.8.4"
+    "@vue/cli-service": "^5.0.1"
   }
 }
