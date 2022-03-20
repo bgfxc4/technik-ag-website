@@ -53,7 +53,7 @@ After cloning the repo with `$ git clone https://github.com/bgfxc4/technik-ag-we
 In the `server` directory execute:
 `$ npm i` to install the dependencies
 `$ npm run start` to start the server
-**NOTE**: Before starting the server you have to configure it. See #Configuration
+**NOTE**: Before starting the server you have to configure it. See [#Configuration](#configuration-1)
 
 #### Configuration
 Create `server/configs/config.json`
