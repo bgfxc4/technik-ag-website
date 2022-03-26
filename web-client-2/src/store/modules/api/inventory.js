@@ -2,7 +2,7 @@ import axios from "axios"
 
 const actions = {
 	async getEquipment({}, callback) {
-        axios.get('get-equipment').then(res => {
+        axios.get('equipment/list').then(res => {
             callback(res)
         }).catch(err => {
             console.log(err)
@@ -10,7 +10,7 @@ const actions = {
         })
     },
     async getCategories({}, callback) {
-        axios.get('get-categories').then(res => {
+        axios.get('categories/list').then(res => {
             callback(res)
         }).catch(err => {
             console.log(err)
@@ -18,7 +18,7 @@ const actions = {
         })
     },
     async getItemsByType({}, params) {
-        axios.get(`get-equipment-by-type/${params["catName"]}/${params["typeName"]}`).then(res => {
+        axios.get(`equipment/bytype/${params["catName"]}/${params["typeName"]}`).then(res => {
             params["callback"](res, undefined, params["typeName"])
         }).catch(err => {
             console.log(err)
@@ -26,7 +26,7 @@ const actions = {
         })
     },
     async getItemByID({}, params) {
-        axios.get(`get-equipment-by-id/${params["itemID"]}`).then(res => {
+        axios.get(`equipment/byid/${params["itemID"]}`).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -34,7 +34,7 @@ const actions = {
         })
     },
     async getItemsBySearch({}, params) {
-        axios.post("search-equipment", {keywords: params["keyword"]}).then(res => {
+        axios.post("equipment/search", {keywords: params["keyword"]}).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -44,7 +44,7 @@ const actions = {
 
     async createCategory({rootState}, params) {
         params['category'].login_hash = rootState.auth.loginHash
-        axios.post("new-category", params['category']).then(res => {
+        axios.post("category/new", params['category']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -53,7 +53,7 @@ const actions = {
     },
     async createType({rootState}, params) {
         params['type'].login_hash = rootState.auth.loginHash
-        axios.post("new-type", params['type']).then(res => {
+        axios.post("type/new", params['type']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -62,7 +62,7 @@ const actions = {
     },
     async createItem({rootState}, params) {
         params['item'].login_hash = rootState.auth.loginHash
-        axios.post("new-equipment", params['item']).then(res => {
+        axios.post("equipment/new", params['item']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -72,7 +72,7 @@ const actions = {
 
     async deleteCategory({rootState}, params) {
         params['category'].login_hash = rootState.auth.loginHash
-        axios.post("delete-category", params['category']).then(res => {
+        axios.post("category/delete", params['category']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -81,7 +81,7 @@ const actions = {
     },
     async deleteType({rootState}, params) {
         params['type'].login_hash = rootState.auth.loginHash
-        axios.post("delete-type", params['type']).then(res => {
+        axios.post("type/delete", params['type']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -90,7 +90,7 @@ const actions = {
     },
     async deleteItem({rootState}, params) {
         params['item'].login_hash = rootState.auth.loginHash
-        axios.post("delete-equipment", params['item']).then(res => {
+        axios.post("equipment/delete", params['item']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -100,7 +100,7 @@ const actions = {
 
     async editCategory({rootState}, params) {
         params['category'].login_hash = rootState.auth.loginHash
-        axios.post("edit-category", params['category']).then(res => {
+        axios.post("category/edit", params['category']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -109,7 +109,7 @@ const actions = {
     },
     async editType({rootState}, params) {
         params['type'].login_hash = rootState.auth.loginHash
-        axios.post("edit-type", params['type']).then(res => {
+        axios.post("type/edit", params['type']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -118,7 +118,7 @@ const actions = {
     },
     async editItem({rootState}, params) {
         params['item'].login_hash = rootState.auth.loginHash
-        axios.post("edit-equipment", params['item']).then(res => {
+        axios.post("equipment/edit", params['item']).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)

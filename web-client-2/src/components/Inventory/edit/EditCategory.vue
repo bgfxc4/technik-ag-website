@@ -84,7 +84,7 @@
                 console.log(this.category)
                 this.categoryName = this.category.name
                 this.customFields = this.category.custom_fields
-                this.$refs['image-upload']._url = this.$store.state.apiUrl + '/get-category-img/' + this.category.name
+                this.$refs['image-upload']._url = this.$store.state.apiUrl + '/category/getimg/' + this.category.name
             }
         }
     }

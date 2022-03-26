@@ -22,13 +22,7 @@ export interface Category {
 	custom_fields: string[];
 }
 
-main.app.post("/authorize", (req, res) => {
-	if (!main.authorized(req.body))
-		return res.status(401).send("Login credentials are wrong or not existent!")	
-	return res.send("Ok")
-})
-
-main.app.post("/new-equipment", async (req, res) => {
+main.app.post("/equipment/new", async (req, res) => {
 	if (!main.check_request(['name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, res))
 		return
 	
@@ -52,7 +46,7 @@ main.app.post("/new-equipment", async (req, res) => {
 	})
 })
 
-main.app.post("/new-category", (req, res) => {
+main.app.post("/category/new", (req, res) => {
 	if (!main.check_request(['name'], true, req.body, res))
 		return
 
@@ -64,7 +58,7 @@ main.app.post("/new-category", (req, res) => {
 	})
 })
 
-main.app.post("/new-type", (req, res) => {
+main.app.post("/type/new", (req, res) => {
 	if (!main.check_request(['name', 'category'], true, req.body, res))
 		return
 
@@ -78,7 +72,7 @@ main.app.post("/new-type", (req, res) => {
 	})
 })
 
-main.app.post("/edit-equipment", async (req, res) => {
+main.app.post("/equipment/edit", async (req, res) => {
 	if (!main.check_request(['id', 'name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, res))
 		return
 	
@@ -102,7 +96,7 @@ main.app.post("/edit-equipment", async (req, res) => {
 	})
 })
 
-main.app.post("/edit-type", (req, res) => {
+main.app.post("/type/edit", (req, res) => {
 	if (!main.check_request(['old_name', 'category'], true, req.body, res))
 		return
 
@@ -115,7 +109,7 @@ main.app.post("/edit-type", (req, res) => {
 	})
 })
 
-main.app.post("/edit-category", (req, res) => {
+main.app.post("/category/edit", (req, res) => {
 	if (!main.check_request(['old_name'], true, req.body, res))
 		return
 
@@ -128,7 +122,7 @@ main.app.post("/edit-category", (req, res) => {
 	})
 })
 
-main.app.post("/delete-equipment", (req, res) => {
+main.app.post("/equipment/delete", (req, res) => {
 	if (!main.check_request(['id'], true, req.body, res))
 		return
 
@@ -137,7 +131,7 @@ main.app.post("/delete-equipment", (req, res) => {
 	})
 })
 
-main.app.post("/delete-category", (req, res) => {
+main.app.post("/category/delete", (req, res) => {
 	if (!main.check_request(['name'], true, req.body, res))
 		return
 
@@ -150,7 +144,7 @@ main.app.post("/delete-category", (req, res) => {
 	})
 })
 
-main.app.post("/delete-type", (req, res) => {
+main.app.post("/type/delete", (req, res) => {
 	if (!main.check_request(['name', 'category'], true, req.body, res))
 		return
 
@@ -163,7 +157,7 @@ main.app.post("/delete-type", (req, res) => {
 	})
 })
 
-main.app.get("/get-equipment", (req, res) => {
+main.app.get("/equipment/list", (_req, res) => {
 	db_helper.get_equipment_from_db(list => {
 		db_helper.get_categories_from_db(cats => {
 			var result: any[] = []
@@ -195,7 +189,7 @@ main.app.get("/get-equipment", (req, res) => {
 	})
 })
 
-main.app.get("/get-category-img/:name", (req, res) => {
+main.app.get("/category/getimg/:name", (req, res) => {
 	if (!main.check_request(['name'], false, req.params, res))
 		return
 
@@ -214,7 +208,7 @@ main.app.get("/get-category-img/:name", (req, res) => {
 	})
 })
 
-main.app.get("/get-item-img/:id", (req, res) => {
+main.app.get("/equipment/getimg/:id", (req, res) => {
 	if (!main.check_request(['id'], false, req.params, res))
 		return
 
@@ -240,7 +234,7 @@ function fits_search(name: string, keywords: any[]) {
 	return false
 }
 
-main.app.post("/search-equipment", (req, res) => {
+main.app.post("/equipment/search", (req, res) => {
 	if (!req.body.keywords || !req.body.keywords[0])
 		return res.status(400).send("You have to provide keywords to search for!")
 
@@ -254,13 +248,13 @@ main.app.post("/search-equipment", (req, res) => {
 	})
 })
 
-main.app.get("/get-categories", (req, res) => {
+main.app.get("/categories/list", (_req, res) => {
 	db_helper.get_categories_from_db(list => {
 		res.send(JSON.stringify(list))
 	})
 })
 
-main.app.get("/get-equipment-by-id/:id", (req, res) => {
+main.app.get("/equipment/byid/:id", (req, res) => {
 	if (!main.check_request(['id'], false, req.params, res))
 		return
 
@@ -285,7 +279,7 @@ main.app.get("/get-equipment-by-id/:id", (req, res) => {
 	})
 })
 
-main.app.get("/get-equipment-by-type/:category/:type", (req, res) => {
+main.app.get("/equipment/bytype/:category/:type", (req, res) => {
 	if (!main.check_request(['category', 'type'], false, req.params, res))
 		return
 

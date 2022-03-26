@@ -12,7 +12,7 @@
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row container m-3">
 			<div class="col-5">
-				<img v-if="item.id" v-bind:src="$store.state.apiUrl + '/get-item-img/' + item.id" class="card-img" 
+				<img v-if="item.id" v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + item.id" class="card-img" 
 									style="max-width: 30vw; max-height: 30vh; width: auto; height: auto; margin-left: 10px">
 			</div>
 			<div class="col-7">

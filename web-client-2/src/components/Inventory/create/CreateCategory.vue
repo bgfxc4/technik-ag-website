@@ -3,7 +3,7 @@
         <b-modal size="lg" id="createCategoryModal" class="text-secondary" centered hide-footer scrollable hide-header-close title="Create Category" header="test" header-class="justify-content-center">
             <div class="modal-body text-center">
                 <label for="create-category-name">Name:</label><br/><input id="create-category-name" v-model="categoryName" placeholder="Enter a name..."><br/>
-                <label for="create-fiel-name">New Custom Field:</label><br/><input id="create-field-name" v-model="customFieldName" placeholder="Enter a name..."><br>
+                <label for="create-field-name">New Custom Field:</label><br/><input id="create-field-name" v-model="customFieldName" placeholder="Enter a name..."><br>
 
                 <button class="btn btn-secondary" @click="createCustomField">Create Custom Field</button><br/>
                 <p class="text-danger" v-if="customFieldErrorText">{{ customFieldErrorText }}</p>

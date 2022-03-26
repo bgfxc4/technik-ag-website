@@ -15,7 +15,7 @@ export interface Compartment {
 	name: string
 }
 
-main.app.post("/new-room", (req, res) => {
+main.app.post("/room/new", (req, res) => {
 	if (!main.check_request(['name'], true, req.body, res))
 		return
 	db_helper.add_room_to_db(req.body, exists => {
@@ -26,7 +26,7 @@ main.app.post("/new-room", (req, res) => {
 	})
 })
 
-main.app.post("/delete-room", (req, res) => {
+main.app.post("/room/delete", (req, res) => {
 	if (!main.check_request(['name'], true, req.body, res))
 		return
 
@@ -35,7 +35,7 @@ main.app.post("/delete-room", (req, res) => {
 	})
 })
 
-main.app.post("/new-shelf", (req, res) => {
+main.app.post("/shelf/new", (req, res) => {
 	if (!main.check_request(['name', 'room'], true, req.body, res))
 		return
 
@@ -49,7 +49,7 @@ main.app.post("/new-shelf", (req, res) => {
 	})
 })
 
-main.app.post("/delete-shelf", (req, res) => {
+main.app.post("/shelf/delete", (req, res) => {
 	if (!main.check_request(['name', 'room'], true, req.body, res))
 		return
 
@@ -58,7 +58,7 @@ main.app.post("/delete-shelf", (req, res) => {
 	})
 })
 
-main.app.post("/new-compartment", (req, res) => {
+main.app.post("/compartment/new", (req, res) => {
 	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, res))
 		return
 
@@ -74,7 +74,7 @@ main.app.post("/new-compartment", (req, res) => {
 	})
 })
 
-main.app.post("/delete-compartment", (req, res) => {
+main.app.post("/compartment/delete", (req, res) => {
 	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, res))
 		return
 
@@ -83,7 +83,7 @@ main.app.post("/delete-compartment", (req, res) => {
 	})
 })
 
-main.app.get("/get-storage", (req, res) => {
+main.app.get("/storage/list", (_req, res) => {
 	db_helper.get_storage_from_db(data => {
 		res.send(JSON.stringify(data))
 	})

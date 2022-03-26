@@ -14,7 +14,7 @@
 				<div class="card mb-3 bg-secondary" style="padding: 10px">
 			  		<div class="row g-0" style="height: 100%">
     					<div class="col-4 my-auto">
-							<img v-bind:src="$store.state.apiUrl + '/get-item-img/' + item.id" class="card-img" 
+							<img v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + item.id" class="card-img" 
 								style="max-width: 30vw; max-height: 30vh; width: auto; height: auto; margin-left: 10px">
 						</div>
     					<div class="col-8 my-auto">

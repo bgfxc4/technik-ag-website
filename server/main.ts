@@ -50,5 +50,11 @@ export function check_request(needed_fields: string[], needs_auth: boolean, body
 	return true
 }
 
+app.post("/authorize", (req, res) => {
+	if (!authorized(req.body))
+		return res.status(401).send("Login credentials are wrong or not existent!")	
+	return res.send("Ok")
+})
+
 import "./inventory/routes"
 import "./storage/routes"

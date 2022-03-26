@@ -7,7 +7,7 @@
 				<div class="card mb-3 bg-secondary" style="height: 32vh">
 			  		<div class="row g-0" style="height: 100%">
     					<div class="col-6 my-auto">
-							<img v-bind:src="$store.state.apiUrl + '/get-category-img/' + cat.name" class="card-img" 
+							<img v-bind:src="$store.state.apiUrl + '/category/getimg/' + cat.name" class="card-img" 
 								style="max-width: 30vw; max-height: 30vh; height: auto; margin-left: 10px">
 						</div>
     					<div class="col-6 my-auto">

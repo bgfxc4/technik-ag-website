@@ -105,7 +105,7 @@
                 this.itemName = this.item.name
                 this.itemDescription = this.item.description
                 this.customFields = this.item.custom_fields
-                this.$refs['image-upload']._url = this.$store.state.apiUrl + '/get-item-img/' + this.item.id
+                this.$refs['image-upload']._url = this.$store.state.apiUrl + '/equipment/getimg/' + this.item.id
 
                 this.$store.dispatch("getStorage", (res, err) => {
                     if (err) {
