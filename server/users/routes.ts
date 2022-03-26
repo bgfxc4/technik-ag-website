@@ -7,6 +7,6 @@ export interface user {
     permissions: Number
 }
 
-main.app.post("/users/list", (req, res) => {
+main.app.get("/users/list", (req, res) => {
     db_helper.get_users_from_db(l => res.send(l))
 })

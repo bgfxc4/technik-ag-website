@@ -13,10 +13,11 @@ export const app = express()
 app.use(body_parser.json({limit: "50mb"}))
 app.use(cors())
 
-export function authorized(req_body:any) {
-	if (req_body.login_hash === undefined) return false 
+export function authorized(req_headers:any) {
+	console.log(req_headers.authorization)
+	if (req_headers.authorization === undefined) return false 
 	for (var user of config.users) {
-		if (sha512(req_body.login_hash) == user) {
+		if (sha512(req_headers.authorization) == user) {
 			return true
 		}
 	}
@@ -36,8 +37,8 @@ app.listen(config.main_server_port, () => {
 	console.log(`[express] The server is listening on port ${config.main_server_port}`)
 })
 
-export function check_request(needed_fields: string[], needs_auth: boolean, body: any, res: any) {
-	if (needs_auth && !authorized(body)) {
+export function check_request(needed_fields: string[], needs_auth: boolean, body: any, headers: any, res: any) {
+	if (needs_auth && !authorized(headers)) {
 		res.status(401).send("Login credentials are wrong or not existent!")	
 		return false
 	}
@@ -50,11 +51,12 @@ export function check_request(needed_fields: string[], needs_auth: boolean, body
 	return true
 }
 
-app.post("/authorize", (req, res) => {
-	if (!authorized(req.body))
+app.get("/authorize", (req, res) => {
+	if (!authorized(req.headers))
 		return res.status(401).send("Login credentials are wrong or not existent!")	
 	return res.send("Ok")
 })
 
 import "./inventory/routes"
 import "./storage/routes"
+import "./users/routes"

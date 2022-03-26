@@ -19,6 +19,8 @@
     "js-sha512": "^0.8.0",
     "jsbarcode": "^3.11.5",
     "qrcode.vue": "^3.3.3",
+    "sass": "^1.49.9",
+    "sass-loader": "^12.6.0",
     "vue": "^3.2.31",
     "vue-barcode-reader": "^1.0.2",
     "vue-router": "^4.0.13",

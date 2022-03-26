@@ -15,6 +15,8 @@ import Storage from "./components/Storage.vue"
 import Appointments from "./components/Appointments.vue"
 import Scan from "./components/Scan.vue"
 
+import SettingsPanel from "./components/settings/SettingsPanel.vue"
+
 // to create and edit website add 'meta: {requiresAuth: true}'
 
 const routes = [
@@ -67,6 +69,11 @@ const routes = [
 		path: "/appointments",
 		name: "Appointments",
 		component: Appointments
+	},
+	{
+		path: "/settings",
+		name: "SettingsPanel",
+		component: SettingsPanel
 	}
 ]
 

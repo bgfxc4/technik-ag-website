@@ -23,7 +23,7 @@ export interface Category {
 }
 
 main.app.post("/equipment/new", async (req, res) => {
-	if (!main.check_request(['name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, res))
+	if (!main.check_request(['name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, req.headers, res))
 		return
 	
 	var shelf_exists = false
@@ -47,7 +47,7 @@ main.app.post("/equipment/new", async (req, res) => {
 })
 
 main.app.post("/category/new", (req, res) => {
-	if (!main.check_request(['name'], true, req.body, res))
+	if (!main.check_request(['name'], true, req.body, req.headers, res))
 		return
 
 	db_helper.add_category_to_db(req.body, exists => {
@@ -59,7 +59,7 @@ main.app.post("/category/new", (req, res) => {
 })
 
 main.app.post("/type/new", (req, res) => {
-	if (!main.check_request(['name', 'category'], true, req.body, res))
+	if (!main.check_request(['name', 'category'], true, req.body, req.headers, res))
 		return
 
 	db_helper.add_type_to_db(req.body, code => {
@@ -73,7 +73,7 @@ main.app.post("/type/new", (req, res) => {
 })
 
 main.app.post("/equipment/edit", async (req, res) => {
-	if (!main.check_request(['id', 'name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, res))
+	if (!main.check_request(['id', 'name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, req.headers, res))
 		return
 	
 	var storage_exists = false
@@ -97,7 +97,7 @@ main.app.post("/equipment/edit", async (req, res) => {
 })
 
 main.app.post("/type/edit", (req, res) => {
-	if (!main.check_request(['old_name', 'category'], true, req.body, res))
+	if (!main.check_request(['old_name', 'category'], true, req.body, req.headers, res))
 		return
 
 	db_helper.check_if_type_exists(req.body.category, req.body.old_name, exists => {
@@ -110,7 +110,7 @@ main.app.post("/type/edit", (req, res) => {
 })
 
 main.app.post("/category/edit", (req, res) => {
-	if (!main.check_request(['old_name'], true, req.body, res))
+	if (!main.check_request(['old_name'], true, req.body, req.headers, res))
 		return
 
 	db_helper.check_if_category_exists(req.body.old_name, exists => {
@@ -123,7 +123,7 @@ main.app.post("/category/edit", (req, res) => {
 })
 
 main.app.post("/equipment/delete", (req, res) => {
-	if (!main.check_request(['id'], true, req.body, res))
+	if (!main.check_request(['id'], true, req.body, req.headers, res))
 		return
 
 	db_helper.delete_equipment_from_db(req.body, () => {
@@ -132,7 +132,7 @@ main.app.post("/equipment/delete", (req, res) => {
 })
 
 main.app.post("/category/delete", (req, res) => {
-	if (!main.check_request(['name'], true, req.body, res))
+	if (!main.check_request(['name'], true, req.body, req.headers, res))
 		return
 
 	db_helper.check_if_category_exists(req.body.name, exists => {
@@ -145,7 +145,7 @@ main.app.post("/category/delete", (req, res) => {
 })
 
 main.app.post("/type/delete", (req, res) => {
-	if (!main.check_request(['name', 'category'], true, req.body, res))
+	if (!main.check_request(['name', 'category'], true, req.body, req.headers, res))
 		return
 
 	db_helper.check_if_type_exists(req.body.category, req.body.name, code => {
@@ -190,7 +190,7 @@ main.app.get("/equipment/list", (_req, res) => {
 })
 
 main.app.get("/category/getimg/:name", (req, res) => {
-	if (!main.check_request(['name'], false, req.params, res))
+	if (!main.check_request(['name'], false, req.params, req.headers, res))
 		return
 
 	db_helper.get_category_by_name(req.params.name, cat => {
@@ -209,7 +209,7 @@ main.app.get("/category/getimg/:name", (req, res) => {
 })
 
 main.app.get("/equipment/getimg/:id", (req, res) => {
-	if (!main.check_request(['id'], false, req.params, res))
+	if (!main.check_request(['id'], false, req.params, req.headers, res))
 		return
 
 	db_helper.get_equipment_by_id_from_db(req.params.id, equ => {
@@ -235,8 +235,8 @@ function fits_search(name: string, keywords: any[]) {
 }
 
 main.app.post("/equipment/search", (req, res) => {
-	if (!req.body.keywords || !req.body.keywords[0])
-		return res.status(400).send("You have to provide keywords to search for!")
+	if (!main.check_request(['keywords'], false, req.body, req.headers, res))
+		return
 
 	db_helper.get_equipment_from_db(list => {
 		var ret:any[] = []
@@ -255,7 +255,7 @@ main.app.get("/categories/list", (_req, res) => {
 })
 
 main.app.get("/equipment/byid/:id", (req, res) => {
-	if (!main.check_request(['id'], false, req.params, res))
+	if (!main.check_request(['id'], false, req.params, req.headers, res))
 		return
 
 	db_helper.get_equipment_by_id_from_db(req.params.id, list => {
@@ -280,7 +280,7 @@ main.app.get("/equipment/byid/:id", (req, res) => {
 })
 
 main.app.get("/equipment/bytype/:category/:type", (req, res) => {
-	if (!main.check_request(['category', 'type'], false, req.params, res))
+	if (!main.check_request(['category', 'type'], false, req.params, req.headers, res))
 		return
 
 	db_helper.get_equipment_by_type_from_db(req.params.category, req.params.type, equ => {

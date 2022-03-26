@@ -1,8 +1,9 @@
 import axios from "axios"
 
 const actions = {
-	async getStorage({}, callback) {
-        axios.get('storage/list').then(res => {
+	async getStorage({rootState}, callback) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.get('storage/list', {headers}).then(res => {
             callback(res)
         }).catch(err => {
             console.log(err)
@@ -11,8 +12,8 @@ const actions = {
     },
 
     async createRoom({rootState}, params) {
-        params['room'].login_hash = rootState.auth.loginHash
-        axios.post("room/new", params['room']).then(res => {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("room/new", params['room'], {headers}).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -20,8 +21,8 @@ const actions = {
         })
     },
     async createShelf({rootState}, params) {
-        params['shelf'].login_hash = rootState.auth.loginHash
-        axios.post("shelf/new", params['shelf']).then(res => {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("shelf/new", params['shelf'], {headers}).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -29,8 +30,8 @@ const actions = {
         })
     },
     async createComp({rootState}, params) {
-        params['comp'].login_hash = rootState.auth.loginHash
-        axios.post("compartment/new", params['comp']).then(res => {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("compartment/new", params['comp'], {headers}).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -39,8 +40,8 @@ const actions = {
     },
 
     async deleteRoom({rootState}, params) {
-        params['room'].login_hash = rootState.auth.loginHash
-        axios.post("room/delete", params['room']).then(res => {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("room/delete", params['room'], {headers}).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -48,8 +49,8 @@ const actions = {
         })
     },
     async deleteShelf({rootState}, params) {
-        params['shelf'].login_hash = rootState.auth.loginHash
-        axios.post("shelf/delete", params['shelf']).then(res => {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("shelf/delete", params['shelf'], {headers}).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)
@@ -57,8 +58,8 @@ const actions = {
         })
     },
     async deleteComp({rootState}, params) {
-        params['comp'].login_hash = rootState.auth.loginHash
-        axios.post("compartment/delete", params['comp']).then(res => {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("compartment/delete", params['comp'], {headers}).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
             console.log(err)

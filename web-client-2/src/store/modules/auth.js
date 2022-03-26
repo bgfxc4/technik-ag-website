@@ -13,8 +13,8 @@ const getters = {
 const actions = {
 	async LogIn({commit}, User) {
 		var hash = ("login_hash", sha512("technikag" + User.get('username') + ":" + User.get('password')))
-		
-		await axios.post('authorize', {login_hash: hash})
+        var headers = {'Authorization': hash}
+		await axios.get('authorize', {headers})
 		await commit("setHash", hash)
 	},
 	async LogOut({commit}) {

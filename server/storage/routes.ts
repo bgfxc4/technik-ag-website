@@ -16,7 +16,7 @@ export interface Compartment {
 }
 
 main.app.post("/room/new", (req, res) => {
-	if (!main.check_request(['name'], true, req.body, res))
+	if (!main.check_request(['name'], true, req.body, req.headers, res))
 		return
 	db_helper.add_room_to_db(req.body, exists => {
 		if (exists)
@@ -27,7 +27,7 @@ main.app.post("/room/new", (req, res) => {
 })
 
 main.app.post("/room/delete", (req, res) => {
-	if (!main.check_request(['name'], true, req.body, res))
+	if (!main.check_request(['name'], true, req.body, req.headers, res))
 		return
 
 	db_helper.delete_room_from_db(req.body, () => {
@@ -36,7 +36,7 @@ main.app.post("/room/delete", (req, res) => {
 })
 
 main.app.post("/shelf/new", (req, res) => {
-	if (!main.check_request(['name', 'room'], true, req.body, res))
+	if (!main.check_request(['name', 'room'], true, req.body, req.headers, res))
 		return
 
 	db_helper.add_shelf_to_db(req.body, code => {
@@ -50,7 +50,7 @@ main.app.post("/shelf/new", (req, res) => {
 })
 
 main.app.post("/shelf/delete", (req, res) => {
-	if (!main.check_request(['name', 'room'], true, req.body, res))
+	if (!main.check_request(['name', 'room'], true, req.body, req.headers, res))
 		return
 
 	db_helper.delete_shelf_from_db(req.body, () => {
@@ -59,7 +59,7 @@ main.app.post("/shelf/delete", (req, res) => {
 })
 
 main.app.post("/compartment/new", (req, res) => {
-	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, res))
+	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, req.headers, res))
 		return
 
 	db_helper.add_compartment_to_db(req.body, code => {
@@ -75,7 +75,7 @@ main.app.post("/compartment/new", (req, res) => {
 })
 
 main.app.post("/compartment/delete", (req, res) => {
-	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, res))
+	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, req.headers, res))
 		return
 
 	db_helper.delete_compartment_from_db(req.body, () => {
