@@ -14,14 +14,16 @@ app.use(body_parser.json({limit: "50mb"}))
 app.use(cors())
 
 export function authorized(req_headers:any) {
-	console.log(req_headers.authorization)
-	if (req_headers.authorization === undefined) return false 
+	if (req_headers.authorization === undefined) return undefined
 	for (var user of config.users) {
-		if (sha512(req_headers.authorization) == user) {
-			return true
+		if (sha512(req_headers.authorization) == user.login_hash) {
+			return {
+				permissions: user.permissions,
+				display_name: user.display_name
+			}
 		}
 	}
-	return false
+	return undefined
 }
 
 function setup_mongodb() {
@@ -43,7 +45,7 @@ export function check_request(needed_fields: string[], needs_auth: boolean, body
 		return false
 	}
 	for (var f of needed_fields) {
-		if (!body[f]) {
+		if (body[f] == undefined) {
 			res.status(400).send(`You need to specify the field '${f}'`)
 			return false
 		}
@@ -52,9 +54,10 @@ export function check_request(needed_fields: string[], needs_auth: boolean, body
 }
 
 app.get("/authorize", (req, res) => {
-	if (!authorized(req.headers))
+	var auth = authorized(req.headers)
+	if (auth === undefined)
 		return res.status(401).send("Login credentials are wrong or not existent!")	
-	return res.send("Ok")
+	return res.send(auth)
 })
 
 import "./inventory/routes"

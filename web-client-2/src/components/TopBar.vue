@@ -1,5 +1,5 @@
 <template>
-	<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-secondary py-2">
 		<div class="container-fluid">
 			<router-link class="navbar-brand" to="/">Technik AG</router-link>
 			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,6 +19,9 @@
 					<li class="nav-item">
 						<router-link to="/scan" class="nav-link" v-bind:class="{ active: ($route.path.startsWith('/scan'))}">Scan Code</router-link>
 					</li>
+					<li class="nav-item">
+						<router-link to="/settings" class="nav-link" v-bind:class="{ active: ($route.path.startsWith('/settings'))}">Settings</router-link>
+					</li>
 				</ul>
 				<form class="d-flex search-form" onclick="return false">
 					<input class="form-control me-2 bg-light text-dark" type="search" placeholder="Search" aria-label="Search" v-model=searchStr>
@@ -29,7 +32,7 @@
 						<font-awesome-icon icon="circle-user" class="fa-xl"></font-awesome-icon>
 					</button>
 					<b-popover target="trigger-login-popover" triggers="focus">
-					  <div class="text-dark">You are logged in.</div><a href="javascript:void(0);" v-on:click=logout>Log out</a>
+					  <div class="text-dark">You are logged in as <b>{{$store.getters.StateDisplayName}}</b>.</div><a href="javascript:void(0);" v-on:click=logout>Log out</a>
 					</b-popover>
 				</template>
 				<button v-if=!isLoggedIn class="btn btn-secondary login-status" id="not-logged-in" v-on:click=openLogin>Sign in</button>
@@ -68,5 +71,13 @@
 	.login-status {
 		height: 4vh;
 		margin-left: 10px !important;
+	}
+	.nav-item {
+		margin: 0;
+	} 
+	.nav-link {
+		overflow: hidden;
+    	white-space: nowrap;
+		margin: 0;
 	}
 </style>
