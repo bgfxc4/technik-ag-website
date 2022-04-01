@@ -78,9 +78,10 @@
 		methods: {
 			loadItems () {
 				this.isLoading = true
+				this.errorText = ""
 				this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: this.typeName, callback: (answ, err, _t) => {
 					this.isLoading = false
-					if (!answ) {
+					if (err) {
 						this.errorText = err
 						return
 					}

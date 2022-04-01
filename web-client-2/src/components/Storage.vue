@@ -1,6 +1,7 @@
 <template>
 	<div id="storage">
 		<loading-icon v-if="isLoading" size="3x"/>
+		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<ul class="tree h3 m-5">
 			<li v-for="r of storage" :key="r.name"><a class="text-light" @click="clickTreeLink" href="#">{{r.name}}</a>
 				<button v-b-modal.deleteRoomModal class="btn btn-danger btn-sm" @click="roomName=r.name">
@@ -30,6 +31,8 @@
 		<b-modal size="lg" id="createRoomModal" class="text-secondary" centered hide-footer hide-header-close title="Create Room" header="test" header-class="justify-content-center">
 			<div class="modal-body text-center">
 				<label for="create-room-name">Name:</label><br/><input id="create-room-name" v-model="roomName" placeholder="Enter a name..."><br/>
+				<loading-icon v-if="isLoading" size="3x"/>
+				<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 				<b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.createRoomModal>Cancel</b-button>
 				<button class="btn btn-outline-primary" v-b-modal.createRoomModal @click="createRoom">Create Room</button>
 			</div>
@@ -37,6 +40,8 @@
 		<b-modal size="lg" id="createShelfModal" class="text-secondary" centered hide-footer hide-header-close title="Create Shelf" header="test" header-class="justify-content-center">
 			<div class="modal-body text-center">
 				<label for="create-shelf-name">Name:</label><br/><input id="create-shelf-name" v-model="shelfName" placeholder="Enter a name..."><br/>
+				<loading-icon v-if="isLoading" size="3x"/>
+				<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 				<b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.createShelfModal>Cancel</b-button>
 				<button class="btn btn-outline-primary" v-b-modal.createShelfModal @click="createShelf">Create Shelf</button>
 			</div>
@@ -44,6 +49,8 @@
 		<b-modal size="lg" id="createCompModal" class="text-secondary" centered hide-footer hide-header-close title="Create Compartment" header="test" header-class="justify-content-center">
 			<div class="modal-body text-center">
 				<label for="create-comp-name">Name:</label><br/><input id="create-comp-name" v-model="compName" placeholder="Enter a name..."><br/>
+				<loading-icon v-if="isLoading" size="3x"/>
+				<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 				<b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.createCompModal>Cancel</b-button>
 				<button class="btn btn-outline-primary" v-b-modal.createCompModal @click="createComp">Create Compartment</button>
 			</div>
@@ -52,6 +59,8 @@
 				<b-modal size="lg" id="deleteRoomModal" class="text-secondary" centered hide-footer hide-header-close title="Delete Room" header="test" header-class="justify-content-center">
 			<div class="modal-body text-center">
 				<h6>Do you really want to delete the room?</h6>
+				<loading-icon v-if="isLoading" size="3x"/>
+				<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 				<b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.deleteRoomModal>Cancel</b-button>
 				<button class="btn btn-outline-danger" v-b-modal.deleteRoomModal @click="deleteRoom">Delete Room</button>
 			</div>
@@ -59,6 +68,8 @@
 		<b-modal size="lg" id="deleteShelfModal" class="text-secondary" centered hide-footer hide-header-close title="Delete Shelf" header="test" header-class="justify-content-center">
 			<div class="modal-body text-center">
 				<h6>Do you really want to delete the shelf?</h6>
+				<loading-icon v-if="isLoading" size="3x"/>
+				<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 				<b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.deleteShelfModal>Cancel</b-button>
 				<button class="btn btn-outline-danger" v-b-modal.deleteShelfModal @click="deleteShelf">Create Shelf</button>
 			</div>
@@ -66,6 +77,8 @@
 		<b-modal size="lg" id="deleteCompModal" class="text-secondary" centered hide-footer hide-header-close title="Delete Compartment" header="test" header-class="justify-content-center">
 			<div class="modal-body text-center">
 				<h6>Do you really want to delete the compartment?</h6>
+				<loading-icon v-if="isLoading" size="3x"/>
+				<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 				<b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.deleteCompModal>Cancel</b-button>
 				<button class="btn btn-outline-danger" v-b-modal.deleteCompModa @click="deleteComp">Delete Compartment</button>
 			</div>
@@ -75,11 +88,13 @@
 
 <script>
 	import LoadingIcon from "./helpers/LoadingIcon.vue"
+	import ErrorText from "./helpers/ErrorText.vue"
 
 	export default {
 		name: "Storage",
 		components: {
-			LoadingIcon
+			LoadingIcon,
+			ErrorText
 		},
 		data: function () {
 			return {
@@ -116,7 +131,6 @@
 						return
 					}
 					this.storage = res.data
-					console.log(this.storage)
 				})
 			},
 			createRoom () {
@@ -201,7 +215,8 @@
 					shelf: this.shelfName,
 					name: this.compName
 				}
-				this.$store.dispatch("deleteComp", {comp: comp, callback: (res, err) => {
+				this.errorText = ""
+				this.$store.dispatch("deleteComp", {comp: comp, callback: (_res, err) => {
 					this.isLoading = false
 					if (err) {
 						this.errorText = err

@@ -52,10 +52,11 @@
 			search: function () {
 				this.itemList = []
 				this.isLoading = true
+				this.errortext = ""
 				this.$store.dispatch("getItemsBySearch", {keyword: this.keyword, callback: (answ, err) => {
 					this.isLoading = false
-					if (!answ) {
-						this.errortext = err
+					if (err) {
+						this.errorText = err
 						return
 					}
 					this.itemList = answ.data

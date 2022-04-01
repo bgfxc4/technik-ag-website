@@ -74,9 +74,10 @@
 			},
 			loadItem () {
 				this.isLoading = true
+				this.errorText = ""
 				this.$store.dispatch("getItemByID", {itemID: this.itemID, callback: (answ, err) => {
 					this.isLoading = false
-					if (!answ) {
+					if (err) {
 						this.errorText = err
 						return
 					}

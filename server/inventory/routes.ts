@@ -1,6 +1,7 @@
 import * as db_helper from "./db_helper"
 import * as main from "../main"
 import * as storage_db_helper from "../storage/db_helper"
+import {PERMS} from "../permissions"
 
 export interface Equipment {
 	id: string;
@@ -23,7 +24,7 @@ export interface Category {
 }
 
 main.app.post("/equipment/new", async (req, res) => {
-	if (!main.check_request(['name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, req.headers, res))
+	if (!(await main.check_request(['name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], PERMS.EditInv, req.body, req.headers, res)))
 		return
 	
 	var shelf_exists = false
@@ -46,8 +47,8 @@ main.app.post("/equipment/new", async (req, res) => {
 	})
 })
 
-main.app.post("/category/new", (req, res) => {
-	if (!main.check_request(['name'], true, req.body, req.headers, res))
+main.app.post("/category/new", async (req, res) => {
+	if (!(await main.check_request(['name'], PERMS.EditInv, req.body, req.headers, res)))
 		return
 
 	db_helper.add_category_to_db(req.body, exists => {
@@ -58,8 +59,8 @@ main.app.post("/category/new", (req, res) => {
 	})
 })
 
-main.app.post("/type/new", (req, res) => {
-	if (!main.check_request(['name', 'category'], true, req.body, req.headers, res))
+main.app.post("/type/new", async (req, res) => {
+	if (!(await main.check_request(['name', 'category'], PERMS.EditInv, req.body, req.headers, res)))
 		return
 
 	db_helper.add_type_to_db(req.body, code => {
@@ -73,7 +74,7 @@ main.app.post("/type/new", (req, res) => {
 })
 
 main.app.post("/equipment/edit", async (req, res) => {
-	if (!main.check_request(['id', 'name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], true, req.body, req.headers, res))
+	if (!(await main.check_request(['id', 'name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], PERMS.EditInv, req.body, req.headers, res)))
 		return
 	
 	var storage_exists = false
@@ -96,8 +97,8 @@ main.app.post("/equipment/edit", async (req, res) => {
 	})
 })
 
-main.app.post("/type/edit", (req, res) => {
-	if (!main.check_request(['old_name', 'category'], true, req.body, req.headers, res))
+main.app.post("/type/edit", async (req, res) => {
+	if (!(await main.check_request(['old_name', 'category'], PERMS.EditInv, req.body, req.headers, res)))
 		return
 
 	db_helper.check_if_type_exists(req.body.category, req.body.old_name, exists => {
@@ -109,8 +110,8 @@ main.app.post("/type/edit", (req, res) => {
 	})
 })
 
-main.app.post("/category/edit", (req, res) => {
-	if (!main.check_request(['old_name'], true, req.body, req.headers, res))
+main.app.post("/category/edit", async (req, res) => {
+	if (!(await main.check_request(['old_name'], PERMS.EditInv, req.body, req.headers, res)))
 		return
 
 	db_helper.check_if_category_exists(req.body.old_name, exists => {
@@ -122,8 +123,8 @@ main.app.post("/category/edit", (req, res) => {
 	})
 })
 
-main.app.post("/equipment/delete", (req, res) => {
-	if (!main.check_request(['id'], true, req.body, req.headers, res))
+main.app.post("/equipment/delete", async (req, res) => {
+	if (!(await main.check_request(['id'], PERMS.EditInv, req.body, req.headers, res)))
 		return
 
 	db_helper.delete_equipment_from_db(req.body, () => {
@@ -131,8 +132,8 @@ main.app.post("/equipment/delete", (req, res) => {
 	})
 })
 
-main.app.post("/category/delete", (req, res) => {
-	if (!main.check_request(['name'], true, req.body, req.headers, res))
+main.app.post("/category/delete", async (req, res) => {
+	if (!(await main.check_request(['name'], PERMS.EditInv, req.body, req.headers, res)))
 		return
 
 	db_helper.check_if_category_exists(req.body.name, exists => {
@@ -144,8 +145,8 @@ main.app.post("/category/delete", (req, res) => {
 	})
 })
 
-main.app.post("/type/delete", (req, res) => {
-	if (!main.check_request(['name', 'category'], true, req.body, req.headers, res))
+main.app.post("/type/delete", async (req, res) => {
+	if (!(await main.check_request(['name', 'category'], PERMS.EditInv, req.body, req.headers, res)))
 		return
 
 	db_helper.check_if_type_exists(req.body.category, req.body.name, code => {
@@ -157,7 +158,9 @@ main.app.post("/type/delete", (req, res) => {
 	})
 })
 
-main.app.get("/equipment/list", (_req, res) => {
+main.app.get("/equipment/list", async (req, res) => {
+	if (!(await main.check_request([], PERMS.ViewInv, req.body, req.headers, res)))
+		return
 	db_helper.get_equipment_from_db(list => {
 		db_helper.get_categories_from_db(cats => {
 			var result: any[] = []
@@ -189,8 +192,8 @@ main.app.get("/equipment/list", (_req, res) => {
 	})
 })
 
-main.app.get("/category/getimg/:name", (req, res) => {
-	if (!main.check_request(['name'], false, req.params, req.headers, res))
+main.app.get("/category/getimg/:name", async (req, res) => {
+	if (!(await main.check_request(['name'], PERMS.None, req.params, req.headers, res)))
 		return
 
 	db_helper.get_category_by_name(req.params.name, cat => {
@@ -208,8 +211,8 @@ main.app.get("/category/getimg/:name", (req, res) => {
 	})
 })
 
-main.app.get("/equipment/getimg/:id", (req, res) => {
-	if (!main.check_request(['id'], false, req.params, req.headers, res))
+main.app.get("/equipment/getimg/:id", async (req, res) => {
+	if (!(await main.check_request(['id'], PERMS.None, req.params, req.headers, res)))
 		return
 
 	db_helper.get_equipment_by_id_from_db(req.params.id, equ => {
@@ -234,8 +237,8 @@ function fits_search(name: string, keywords: any[]) {
 	return false
 }
 
-main.app.post("/equipment/search", (req, res) => {
-	if (!main.check_request(['keywords'], false, req.body, req.headers, res))
+main.app.post("/equipment/search", async (req, res) => {
+	if (!(await main.check_request(['keywords'], PERMS.ViewInv, req.body, req.headers, res)))
 		return
 
 	db_helper.get_equipment_from_db(list => {
@@ -248,14 +251,16 @@ main.app.post("/equipment/search", (req, res) => {
 	})
 })
 
-main.app.get("/categories/list", (_req, res) => {
+main.app.get("/categories/list", async (req, res) => {
+	if (!(await main.check_request([], PERMS.ViewInv, req.params, req.headers, res)))
+		return
 	db_helper.get_categories_from_db(list => {
 		res.send(JSON.stringify(list))
 	})
 })
 
-main.app.get("/equipment/byid/:id", (req, res) => {
-	if (!main.check_request(['id'], false, req.params, req.headers, res))
+main.app.get("/equipment/byid/:id", async (req, res) => {
+	if (!(await main.check_request(['id'], PERMS.ViewInv, req.params, req.headers, res)))
 		return
 
 	db_helper.get_equipment_by_id_from_db(req.params.id, list => {
@@ -279,8 +284,8 @@ main.app.get("/equipment/byid/:id", (req, res) => {
 	})
 })
 
-main.app.get("/equipment/bytype/:category/:type", (req, res) => {
-	if (!main.check_request(['category', 'type'], false, req.params, req.headers, res))
+main.app.get("/equipment/bytype/:category/:type", async (req, res) => {
+	if (!(await main.check_request(['category', 'type'], PERMS.ViewInv, req.params, req.headers, res)))
 		return
 
 	db_helper.get_equipment_by_type_from_db(req.params.category, req.params.type, equ => {

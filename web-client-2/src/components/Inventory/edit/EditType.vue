@@ -2,6 +2,8 @@
     <b-modal size="lg" id="editTypeModal" class="text-secondary" centered hide-footer scrollable hide-header-close title="Edit Type" header="test" header-class="justify-content-center">
         <div class="modal-body text-center">
             <label for="edit-type-name">Name:</label><br/><input id="edit-type-name" v-model="typeName" placeholder="Enter a name..."><br/>
+            <loading-icon v-if="isLoading" size="3x"/>
+            <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
             <b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.editTypeModal>Cancel</b-button>
             <button class="btn btn-outline-primary" @click="editType">Edit Type</button>
         </div>
@@ -9,9 +11,16 @@
 </template>
 
 <script>
+    import ErrorText from "../../helpers/ErrorText.vue"
+    import LoadingIcon from "../../helpers/LoadingIcon.vue"
+
     export default {
         name: "EditType",
         emits: ['onEdit'],
+        components: {
+            ErrorText,
+            LoadingIcon
+        },
         props: {
             type: Object,
             catName: String
@@ -20,6 +29,7 @@
             return  {
                 typeName: "",
                 errorText: "",
+                isLoading: false
             }
         },
         watch: {
@@ -38,13 +48,15 @@
                     new_name: this.typeName,
                     category: this.catName
                 }
-                this.$store.dispatch("editType", {type, callback: (answ, err) => {
-                    if (!answ) {
+                this.isLoading = true
+                this.errorText = ""
+                this.$store.dispatch("editType", {type, callback: (_answ, err) => {
+                    this.isLoading = false
+                    if (err) {
                         this.errorText = err
                         return
-                    } else {
-                        this.$emit("onEdit")
                     }
+                    this.$emit("onEdit")
                     this.closeModal()
                 }})
             },

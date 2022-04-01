@@ -1,5 +1,8 @@
 <template>
 	<div id="manageUsers">
+		<loading-icon v-if="isLoading" size="3x"/>
+		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
+
         <h4 style="margin-left: 4%">Manage Users:</h4>
         <ul class="list-group" style="width: 80%; margin-left: 10%">
             <li v-for="u in userList" style="margin: 0; position: relative" :key="u.display_name" class="list-group-item">
@@ -63,6 +66,7 @@
 <script>
     import { sha512 } from "js-sha512"
     import ErrorText from "../helpers/ErrorText.vue"
+	import LoadingIcon from "../helpers/LoadingIcon.vue"
 
 	export default {
 		name: "ManageUsers",
@@ -84,6 +88,8 @@
                 permViewUsrChecked: false,
                 permEditUsrChecked: false,
 
+                isLoading: false,
+                errorText: "",
                 permissionsUserErrorText: "",
                 createUserErrorText: "",
                 deleteUserErrorText: "",
@@ -164,9 +170,12 @@
                 }})
             },
             loadUsers () {
+                this.isLoading = true
+                this.errorText = ""
                 this.$store.dispatch("getUsers", (res, err) => {
+                    this.isLoading = false
                     if (err) {
-                        console.log(err)
+                        this.errorText = err
                         return
                     }
                     this.userList = res.data

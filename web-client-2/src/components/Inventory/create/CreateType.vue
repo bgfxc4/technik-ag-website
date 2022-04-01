@@ -3,6 +3,8 @@
         <b-modal size="lg" id="createTypeModal" class="text-secondary" centered hide-footer hide-header-close title="Create Type" header="test" header-class="justify-content-center">
             <div class="modal-body text-center">
                 <label for="create-type-name">Name:</label><br/><input id="create-type-name" v-model="typeName" placeholder="Enter a name..."><br/>
+                <loading-icon v-if="isLoading" size="3x"/>
+                <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
                 <b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.createTypeModal>Cancel</b-button>
                 <button class="btn btn-outline-primary" @click="createType">Create Type</button>
             </div>
@@ -11,9 +13,16 @@
 </template>
 
 <script>
+    import ErrorText from "../../helpers/ErrorText.vue"
+    import LoadingIcon from "../../helpers/LoadingIcon.vue"
+
     export default {
         name: "CreateType",
         emits: ['onCreate'],
+        components: {
+            ErrorText,
+            LoadingIcon
+        },
         props: {
             categoryName: String
         },
@@ -21,6 +30,7 @@
             return  {
                 typeName: "",
                 errorText: "",
+                isLoading: false
             }
         },
         methods: {
@@ -32,13 +42,15 @@
                     name: this.typeName,
                     category: this.categoryName
                 }
-                this.$store.dispatch("createType", {type, callback: (answ, err) => {
-                    if (!answ) {
+                this.isLoading = true
+                this.errorText = ""
+                this.$store.dispatch("createType", {type, callback: (_answ, err) => {
+                    this.isLoading = false
+                    if (err) {
                         this.errorText = err
                         return
-                    } else {
-                        this.$emit("onCreate")
                     }
+                    this.$emit("onCreate")
                     this.closeModal()
                 }})
             }

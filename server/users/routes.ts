@@ -1,5 +1,6 @@
 import * as db_helper from "./db_helper"
 import * as main from "../main"
+import {PERMS} from "../permissions"
 
 export interface User {
     display_name: String,
@@ -7,12 +8,14 @@ export interface User {
     permissions: Number
 }
 
-main.app.get("/users/list", (req, res) => {
+main.app.get("/users/list", async (req, res) => {
+    if (!(await main.check_request([], PERMS.ViewUsrs, req.body, req.headers, res)))
+        return
     db_helper.get_users_from_db(l => res.send(l))
 })
 
 main.app.post("/users/new", async (req, res) => {
-    if (!main.check_request(['login_hash', 'display_name'], false, req.body, req.headers, res))
+    if (!(await main.check_request(['login_hash', 'display_name'], PERMS.EditUsrs, req.body, req.headers, res)))
         return
     
     if (await db_helper.user_exists_in_db(req.body.login_hash, req.body.display_name)) {
@@ -26,7 +29,7 @@ main.app.post("/users/new", async (req, res) => {
 })
 
 main.app.post("/users/delete", async (req, res) => {
-    if (!main.check_request(['display_name'], false, req.body, req.headers, res))
+    if (!(await main.check_request(['display_name'], PERMS.EditUsrs, req.body, req.headers, res)))
         return
     
     if (!(await db_helper.user_exists_in_db("", req.body.display_name))) {
@@ -40,10 +43,13 @@ main.app.post("/users/delete", async (req, res) => {
 })
 
 main.app.post("/users/permedit", async (req, res) => {
-    if (!main.check_request(['display_name', 'permissions'], false, req.body, req.headers, res))
+    if (!(await main.check_request(['display_name', 'permissions'], PERMS.EditUsrs, req.body, req.headers, res)))
         return
     
-    if (isNaN(req.body.permissions))
+    if (isNaN(req.body.permissions)) {
+        res.status(400).send("The permission has to be a number!")
+        return
+    }
 
     if (!(await db_helper.user_exists_in_db("", req.body.display_name))) {
         res.status(400).send("An user with this name does not exist!")

@@ -50,6 +50,8 @@
                         </ul>
                     </div>
                 </div>
+                <loading-icon v-if="isLoading" size="3x"/>
+                <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
                 <b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.createItemModal>Cancel</b-button>
                 <button class="btn btn-outline-primary" @click="createItem">Create Item</button>
             </div>
@@ -59,12 +61,16 @@
 
 <script>
     import ImageUploadPreview from "../../helpers/ImageUploadPreview.vue"
+    import ErrorText from "../../helpers/ErrorText.vue"
+    import LoadingIcon from "../../helpers/LoadingIcon.vue"
 
     export default {
         name: "CreateCategory",
         emits: ['onCreate'],
         components: {
-            ImageUploadPreview
+            ImageUploadPreview,
+            ErrorText,
+            LoadingIcon
         },
         props: {
             categoryName: String,
@@ -85,6 +91,7 @@
                 compIndex: 0,
 
                 templateList: [],
+                isLoading: false,
                 errorText: "",
             }
         },
@@ -120,13 +127,15 @@
                     custom_fields: this.customFields,
                     image: (!!this.$refs['image-upload'].previewImage) ? this.$refs['image-upload'].previewImage.split('base64,')[1] : undefined
                 }
-                this.$store.dispatch("createItem", {item, callback: (answ, err) => {
-                    if (!answ) {
+                this.isLoading = true
+                this.errorText = ""
+                this.$store.dispatch("createItem", {item, callback: (_answ, err) => {
+                    this.isLoading = false
+                    if (err) {
                         this.errorText = err
                         return
-                    } else {
-                        this.$emit("onCreate")
                     }
+                    this.$emit("onCreate")
                     this.closeModal()
                 }})
             },

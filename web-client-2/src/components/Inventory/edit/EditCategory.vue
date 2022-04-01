@@ -10,6 +10,8 @@
             <h6 v-for="f in customFields" :key="f">-{{f}} <button class="btn btn-danger btn-sm" @click="deleteCustomField(customFields.indexOf(f))">Delete</button></h6>
             
             <image-upload-preview ref="image-upload"/><br/>
+            <loading-icon v-if="isLoading" size="3x"/>
+            <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
             <b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.editCategoryModal>Cancel</b-button>
             <button class="btn btn-outline-primary" @click="editCategory">Edit Category</button>
         </div>
@@ -18,6 +20,8 @@
 
 <script>
     import ImageUploadPreview from "../../helpers/ImageUploadPreview.vue"
+    import ErrorText from "../../helpers/ErrorText.vue"
+    import LoadingIcon from "../../helpers/LoadingIcon.vue"
 
     export default {
         name: "EditCategory",
@@ -26,7 +30,9 @@
             category: Object
         },
         components: {
-            ImageUploadPreview
+            ImageUploadPreview,
+            ErrorText,
+            LoadingIcon
         },
         data: function () {
             return  {
@@ -35,6 +41,7 @@
                 customFieldName: "",
                 customFields: [],
                 errorText: "",
+                isLoading: false
             }
         },
         watch: {
@@ -70,13 +77,15 @@
                     custom_fields: this.customFields,
                     image: (!!this.$refs['image-upload'].previewImage) ? this.$refs['image-upload'].previewImage.split('base64,')[1] : undefined
                 }
-                this.$store.dispatch("editCategory", {category, callback: (answ, err) => {
-                    if (!answ) {
+                this.isLoading = true
+                this.errorText = ""
+                this.$store.dispatch("editCategory", {category, callback: (_answ, err) => {
+                    this.isLoading = false
+                    if (err) {
                         this.errorText = err
                         return
-                    } else {
-                        this.$emit("onEdit")
                     }
+                    this.$emit("onEdit")
                     this.closeModal()
                 }})
             },

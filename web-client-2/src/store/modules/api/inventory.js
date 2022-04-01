@@ -42,7 +42,8 @@ const actions = {
         axios.post("equipment/search", {keywords: params["keyword"]}, {headers}).then(res => {
             params["callback"](res, undefined)
         }).catch(err => {
-            console.log(err)
+            console.log("search err")
+
             params["callback"](undefined, err)
         })
     },

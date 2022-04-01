@@ -1,5 +1,5 @@
-import { callbackify } from "util"
 import * as main from "../main"
+import {sha512} from "js-sha512"
 import * as storage from "./routes"
 
 export function get_users_from_db(callback: (res: any) => void, with_login_hash=false) {
@@ -8,8 +8,13 @@ export function get_users_from_db(callback: (res: any) => void, with_login_hash=
 		if (err)
 			throw err
 		for (var u of main.config.users) {
-			if (!with_login_hash)
-				u["login_hash"] = undefined
+			var user = {
+				display_name: u.display_name,
+				permissions: u.permissions,
+				login_hash: null
+			}
+			if (with_login_hash)
+				user.login_hash = u.login_hash
 			data?.push(u)
 		}
 		callback(data)
@@ -19,7 +24,7 @@ export function get_users_from_db(callback: (res: any) => void, with_login_hash=
 export async function add_user_to_db(user: any, callback: () => void) {
 	var u: storage.User = {
 		display_name: user.display_name,
-		login_hash: user.login_hash,
+		login_hash: sha512(user.login_hash),
 		permissions: 0
 	}
 	await main.db.collection("users").insertOne(u)

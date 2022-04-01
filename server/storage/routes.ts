@@ -1,5 +1,6 @@
 import * as db_helper from "./db_helper"
 import * as main from "../main"
+import {PERMS} from "../permissions"
 
 export interface Room {
 	name: string,
@@ -15,8 +16,8 @@ export interface Compartment {
 	name: string
 }
 
-main.app.post("/room/new", (req, res) => {
-	if (!main.check_request(['name'], true, req.body, req.headers, res))
+main.app.post("/room/new", async (req, res) => {
+	if (!(await main.check_request(['name'], PERMS.EditStor, req.body, req.headers, res)))
 		return
 	db_helper.add_room_to_db(req.body, exists => {
 		if (exists)
@@ -26,8 +27,8 @@ main.app.post("/room/new", (req, res) => {
 	})
 })
 
-main.app.post("/room/delete", (req, res) => {
-	if (!main.check_request(['name'], true, req.body, req.headers, res))
+main.app.post("/room/delete", async (req, res) => {
+	if (!(await main.check_request(['name'], PERMS.EditStor, req.body, req.headers, res)))
 		return
 
 	db_helper.delete_room_from_db(req.body, () => {
@@ -35,8 +36,8 @@ main.app.post("/room/delete", (req, res) => {
 	})
 })
 
-main.app.post("/shelf/new", (req, res) => {
-	if (!main.check_request(['name', 'room'], true, req.body, req.headers, res))
+main.app.post("/shelf/new", async (req, res) => {
+	if (!(await main.check_request(['name', 'room'], PERMS.EditStor, req.body, req.headers, res)))
 		return
 
 	db_helper.add_shelf_to_db(req.body, code => {
@@ -49,8 +50,8 @@ main.app.post("/shelf/new", (req, res) => {
 	})
 })
 
-main.app.post("/shelf/delete", (req, res) => {
-	if (!main.check_request(['name', 'room'], true, req.body, req.headers, res))
+main.app.post("/shelf/delete", async (req, res) => {
+	if (!(await main.check_request(['name', 'room'], PERMS.EditStor, req.body, req.headers, res)))
 		return
 
 	db_helper.delete_shelf_from_db(req.body, () => {
@@ -58,8 +59,8 @@ main.app.post("/shelf/delete", (req, res) => {
 	})
 })
 
-main.app.post("/compartment/new", (req, res) => {
-	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, req.headers, res))
+main.app.post("/compartment/new", async (req, res) => {
+	if (!(await main.check_request(['name', 'shelf', 'room'], PERMS.EditStor, req.body, req.headers, res)))
 		return
 
 	db_helper.add_compartment_to_db(req.body, code => {
@@ -74,8 +75,8 @@ main.app.post("/compartment/new", (req, res) => {
 	})
 })
 
-main.app.post("/compartment/delete", (req, res) => {
-	if (!main.check_request(['name', 'shelf', 'room'], true, req.body, req.headers, res))
+main.app.post("/compartment/delete", async (req, res) => {
+	if (!(await main.check_request(['name', 'shelf', 'room'], PERMS.EditStor, req.body, req.headers, res)))
 		return
 
 	db_helper.delete_compartment_from_db(req.body, () => {
@@ -83,7 +84,9 @@ main.app.post("/compartment/delete", (req, res) => {
 	})
 })
 
-main.app.get("/storage/list", (_req, res) => {
+main.app.get("/storage/list", async (req, res) => {
+	if (!(await main.check_request([], PERMS.ViewStor, req.body, req.headers, res)))
+		return
 	db_helper.get_storage_from_db(data => {
 		res.send(JSON.stringify(data))
 	})
