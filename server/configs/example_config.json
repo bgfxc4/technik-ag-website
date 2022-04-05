@@ -6,7 +6,8 @@
 			"login_hash": "add here your login hashes of the users in the format
 						sha512(sha512(\"technikag[username]:[password]\")), Eg sha512(sha512(\"technikagTestUserName:TestPassword\"))",
 			"name": "admin user",
-			"permissions": 1
+			"permissions": 1,
+			"id": 0
 		}
 	]
 }

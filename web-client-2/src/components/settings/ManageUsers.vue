@@ -7,12 +7,20 @@
         <ul class="list-group" style="width: 80%; margin-left: 10%">
             <li v-for="u in userList" style="margin: 0; position: relative" :key="u.display_name" class="list-group-item">
                 <b>Name: </b>{{u.display_name}}
-                <button v-if="u.permissions != 1" v-b-modal.deleteUserModal @click="deleteUserName = u.display_name" class="btn btn-danger" style="position: absolute; right: 10px;; top: 3px">
-					<font-awesome-icon icon="trash-can"/>
-				</button>
-                <button v-if="u.permissions != 1" v-b-modal.userPermissionsModal @click="editPermUserClicked(u)" class="btn btn-primary" style="position: absolute; right: 60px;; top: 3px">
-					Edit Permissions
-				</button>
+                <button v-if="u.permissions != 1" :id="`trigger-menu-popover-${u.id}`" class="btn btn-dark" href="#" tabindex="0" style="position: absolute; right: 10px; top: 3px">
+                    <font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
+                </button>
+                <b-popover :target="`trigger-menu-popover-${u.id}`" triggers="focus">
+                    <button v-b-modal.deleteUserModal @click="deleteUserObject = u" class="btn btn-danger">
+                        Delete User
+                    </button><br>
+                    <button v-b-modal.userPermissionsModal @click="editPermUserClicked(u)" class="btn btn-primary">
+                        Edit Permissions
+                    </button><br>
+                    <button v-b-modal.userEditModal @click="editUserObject = u" class="btn btn-primary">
+                        Edit User
+                    </button>
+                </b-popover>
             </li>
         </ul>
         <button class="btn btn-secondary" style="margin-left: 11%" v-b-modal.createUserModal>Create new user</button>
@@ -22,6 +30,7 @@
 				<label for="create-user-name">Username:</label><br/><input id="create-user-name" v-model="userName" placeholder="Enter a username..."><br/>
 				<label for="create-user-pass">Password:</label><br/><input id="create-user-pass" type="password" v-model="userPassword" placeholder="Enter a password..."><br/>
 				<label for="create-user-pass2">Repeat Password:</label><br/><input id="create-user-pass2" type="password" v-model="userPassword2" placeholder="Repeat your password..."><br/>
+		        <loading-icon v-if="isLoading" size="3x"/>
                 <error-text v-if="createUserErrorText != ''" :msg="createUserErrorText"/><br>
 				<b-button id="createUserModalButton" class="btn btn-secondary" v-b-modal.createUserModal>Cancel</b-button>
 				<button class="btn btn-outline-primary" @click="createUser">Create User</button>
@@ -29,7 +38,8 @@
 		</b-modal>
         <b-modal size="lg" id="deleteUserModal" class="text-secondary" centered hide-footer hide-header-close title="Delete User" header="test" header-class="justify-content-center">
 			<div class="modal-body text-center">
-                Do you really want to delete the user {{deleteUserName}}?
+                Do you really want to delete the user {{deleteUserObject.name}}?
+                <loading-icon v-if="isLoading" size="3x"/>
                 <error-text v-if="deleteUserErrorText != ''" :msg="deleteUserErrorText"/><br>
 				<b-button id="deleteUserModalButton" class="btn btn-secondary" v-b-modal.deleteUserModal>Cancel</b-button>
 				<button class="btn btn-outline-danger" @click="deleteUser">Delete User</button>
@@ -55,9 +65,24 @@
                 <input class="form-check-input" type="checkbox" v-model="permEditUsrChecked" id="permEditUsr">
                 <label class="form-check-label" for="permEditUsr">Edit Users</label>
 
+                <loading-icon v-if="isLoading" size="3x"/>
                 <error-text v-if="permissionsUserErrorText != ''" :msg="permissionsUserErrorText"/><br>
 				<b-button id="userPermissionsModalButton" class="btn btn-secondary" v-b-modal.userPermissionsModal>Cancel</b-button>
-				<button class="btn btn-outline-primary" @click="editPermUserConfirmed">Apply</button>
+				<button class="btn btn-outline-primary" @click="editPermUser">Apply</button>
+			</div>
+		</b-modal>
+        <b-modal size="lg" id="userEditModal" class="text-secondary" centered hide-footer hide-header-close title="Edit User" header="test" header-class="justify-content-center">
+            <div class="modal-body text-center">
+                <h5>Fill in the fields you want to edit on <b>{{editUserObject.display_name}}</b>:</h5>
+
+				<label for="edit-user-name">Username:</label><br/><input id="edit-user-name" v-model="editUserName" placeholder="Enter a username..."><br/>
+				<label for="edit-user-pass">Password:</label><br/><input id="edit-user-pass" type="password" v-model="editUserPassword" placeholder="Enter a password..."><br/>
+				<label for="edit-user-pass2">Repeat Password:</label><br/><input id="edit-user-pass2" type="password" v-model="editUserPassword2" placeholder="Repeat your password..."><br/>
+
+                <loading-icon v-if="isLoading" size="3x"/>
+                <error-text v-if="editUserErrorText != ''" :msg="editUserErrorText"/><br>
+				<b-button id="userEditModalButton" class="btn btn-secondary" v-b-modal.userEditModal>Cancel</b-button>
+				<button class="btn btn-outline-primary" @click="editUser" >Edit</button>
 			</div>
 		</b-modal>
 	</div>
@@ -71,7 +96,8 @@
 	export default {
 		name: "ManageUsers",
 		components: {
-            ErrorText
+            ErrorText,
+            LoadingIcon
 		},
 		data () {
 			return {
@@ -80,6 +106,11 @@
                 userName: "",
                 userPassword: "",
                 userPassword2: "",
+
+                editUserObject: {},
+                editUserName: "",
+                editUserPassword: "",
+                editUserPassword2: "",
 
                 permViewInvChecked: false,
                 permEditInvChecked: false,
@@ -93,9 +124,10 @@
                 permissionsUserErrorText: "",
                 createUserErrorText: "",
                 deleteUserErrorText: "",
+                editUserErrorText: "",
 
-                editPermUser: {},
-                deleteUserName: ""
+                editPermUserObject: {},
+                deleteUserObject: {}
 			}
 		},
         methods: {
@@ -113,7 +145,7 @@
                     display_name: this.userName,
                     login_hash: ("login_hash", sha512("technikag" + this.userName + ":" + this.userPassword))
                 }
-                this.$store.dispatch("createUser", {user, callback: (res, err) => {
+                this.$store.dispatch("createUser", {user, callback: (_res, err) => {
                     if (err) {
                         this.createUserErrorText = err
                         return
@@ -128,7 +160,7 @@
             },
             deleteUser () {
                 this.deleteUserErrorText = ""
-                this.$store.dispatch("deleteUser", { user: {display_name: this.deleteUserName}, callback: (res, err) => {
+                this.$store.dispatch("deleteUser", { user: {id: this.deleteUserObject.id}, callback: (_res, err) => {
                     if (err) {
                         this.deleteUserErrorText = err
                         return
@@ -139,15 +171,15 @@
                 }})
             },
             editPermUserClicked (u) {
-                this.editPermUser = u
-                this.permViewInvChecked = (this.editPermUser.permissions & (1 << 1)) != 0
-                this.permEditInvChecked = (this.editPermUser.permissions & (1 << 2)) != 0
-                this.permViewStorChecked = (this.editPermUser.permissions & (1 << 3)) != 0
-                this.permEditStorChecked = (this.editPermUser.permissions & (1 << 4)) != 0
-                this.permViewUsrChecked = (this.editPermUser.permissions & (1 << 5)) != 0
-                this.permEditUsrChecked = (this.editPermUser.permissions & (1 << 6)) != 0
+                this.editPermUserObject = u
+                this.permViewInvChecked = (this.editPermUserObject.permissions & (1 << 1)) != 0
+                this.permEditInvChecked = (this.editPermUserObject.permissions & (1 << 2)) != 0
+                this.permViewStorChecked = (this.editPermUserObject.permissions & (1 << 3)) != 0
+                this.permEditStorChecked = (this.editPermUserObject.permissions & (1 << 4)) != 0
+                this.permViewUsrChecked = (this.editPermUserObject.permissions & (1 << 5)) != 0
+                this.permEditUsrChecked = (this.editPermUserObject.permissions & (1 << 6)) != 0
             },
-            editPermUserConfirmed () {
+            editPermUser () {
                 this.permissionsUserErrorText = ""
                 var permissions = 0;
                 if (this.permViewInvChecked) permissions += (1 << 1)
@@ -157,16 +189,45 @@
                 if (this.permViewUsrChecked) permissions += (1 << 5)
                 if (this.permEditUsrChecked) permissions += (1 << 6)
                 var user = {
-                    display_name: this.editPermUser.display_name,
+                    id: this.editPermUserObject.id,
                     permissions
                 }
-                this.$store.dispatch("editPermUser", {user, callback: (res, err) => {
+                this.$store.dispatch("editPermUser", {user, callback: (_res, err) => {
                     if (err) {
                         this.permissionsUserErrorText = err
                         return
                     }
                     $('#userPermissionsModalButton').click()
                     this.loadUsers()
+                }})
+            },
+            editUser() {
+                var user = {
+                    id: this.editUserObject.id
+                }
+                if (this.editUserPassword != this.editUserPassword2) {
+                    this.editUserErrorText = "The two passwords do not match!"
+                    return
+                }
+                if (!this.editUserName) {
+                    this.editUserErrorText = "The username can not be empty!"
+                    return
+                }
+                if (this.editUserPassword && this.editUserName) {
+                    user.login_hash = ("login_hash", sha512("technikag" + this.editUserName + ":" + this.editUserPassword))
+                    user.display_name = this.editUserName
+                }
+
+                this.isLoading = true
+                this.editUserErrorText = ""
+                this.$store.dispatch("editUser", {user, callback: (_res, err) => {
+                    this.isLoading = false
+                    if (err) {
+                        this.editUserErrorText = err
+                        return
+                    }
+                    this.loadUsers()
+                    $('#userEditModalButton').click()
                 }})
             },
             loadUsers () {

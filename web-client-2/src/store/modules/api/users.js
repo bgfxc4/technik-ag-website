@@ -36,6 +36,15 @@ const actions = {
             console.log(err)
             params['callback'](undefined, err)
         })
+    },
+    async editUser({rootState}, params) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("users/edit", params["user"], {headers}).then(res => {
+            params['callback'](res)
+        }).catch(err => {
+            console.log(err)
+            params['callback'](undefined, err)
+        })
     }
 }
 
