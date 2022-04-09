@@ -2,20 +2,20 @@
 	<div id="storage">
 		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
-		<ul class="tree h3 m-5">
+		<ul class="tree h3 m-4">
 			<li v-for="r of storage" :key="r.name"><a class="text-light" @click="clickTreeLink" href="#">{{r.name}}</a>
-				<button v-b-modal.deleteRoomModal class="btn btn-danger btn-sm" @click="roomName=r.name">
+				<button v-if="deleteMode" v-b-modal.deleteRoomModal class="btn btn-danger btn-sm" @click="roomName=r.name">
 					<font-awesome-icon icon="trash-can"/>
 				</button>
 				<ul>
 					<li v-for="s of r.shelfs" :key="s.name"><a class="text-light" @click="clickTreeLink" href="#">{{s.name}}</a>
-						<button v-b-modal.deleteShelfModal class="btn btn-danger btn-sm" @click="roomName=r.name; shelfName=s.name">
+						<button v-if="deleteMode" v-b-modal.deleteShelfModal class="btn btn-danger btn-sm" @click="roomName=r.name; shelfName=s.name">
 							<font-awesome-icon icon="trash-can"/>
 						</button>
 						<ul>
 							<li v-for="c of s.compartments" :key="c.name">
 								<a class="item-template text-light" href="#">{{c.name}}</a>
-								<button v-b-modal.deleteCompModal class="btn btn-danger btn-sm" @click="roomName=r.name; shelfName=s.name; compName=c.name">
+								<button v-if="deleteMode" v-b-modal.deleteCompModal class="btn btn-danger btn-sm" @click="roomName=r.name; shelfName=s.name; compName=c.name">
 									<font-awesome-icon icon="trash-can"/>
 								</button>
 							</li>
@@ -25,7 +25,9 @@
 					<button v-b-modal.createShelfModal @click="roomName=r.name" class="btn btn-secondary btn-sm">Create Shelf</button>
 				</ul>
 			</li>
-			<button v-b-modal.createRoomModal class="btn btn-secondary btn-sm">Create Room</button>
+			<button v-b-modal.createRoomModal class="btn btn-secondary btn-sm mx-1">Create Room</button>
+			<button v-if="!deleteMode" @click="deleteMode=true" class="btn btn-danger btn-sm" type="button">Enter Delete Mode</button>
+			<button v-if="deleteMode" @click="deleteMode=false" class="btn btn-danger btn-sm" type="button">Exit Delete Mode</button>
 		</ul>
 
 		<b-modal size="lg" id="createRoomModal" class="text-secondary" centered hide-footer hide-header-close title="Create Room" header="test" header-class="justify-content-center">
@@ -98,6 +100,7 @@
 		},
 		data: function () {
 			return {
+				deleteMode: false,
 				errorText: "",
 				storage: [],
 				isLoading: false,
