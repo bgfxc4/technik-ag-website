@@ -22,7 +22,7 @@
 </template>
 
 <script>
-	import ManageUsers from "./ManageUsers.vue"
+	import ManageUsers from "./ManageUsers/ManageUsers.vue"
 
 	export default {
 		name: "SettingsPanel",
