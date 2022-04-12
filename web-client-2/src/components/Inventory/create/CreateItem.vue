@@ -31,6 +31,7 @@
                                 </select>
                             </div>
                         </div>
+                        <label for="create-item-amount">Amount:</label><br/><input id="create-item-amount" v-model="itemAmount" placeholder="Enter an amount..."><br/>
                         <image-upload-preview ref="image-upload"/><br/>
                     </div>
                     <div class="col-3">
@@ -84,6 +85,7 @@
                 customFieldName: "",
                 customFieldsLoaded: [],
                 customFields: {},
+                itemAmount: 1,
 
                 storage: [],
                 roomIndex: 0,
@@ -124,6 +126,7 @@
                     shelf: this.storage[this.roomIndex].shelfs[this.shelfIndex].name,
                     compartment: this.storage[this.roomIndex].shelfs[this.shelfIndex].compartments[this.compIndex].name,
 
+                    amount: this.itemAmount,
                     custom_fields: this.customFields,
                     image: (!!this.$refs['image-upload'].previewImage) ? this.$refs['image-upload'].previewImage.split('base64,')[1] : undefined
                 }
@@ -145,6 +148,7 @@
                 this.shelfIndex = this.storage[this.roomIndex].shelfs.findIndex(s => s.name == item.shelf)
                 this.compIndex = this.storage[this.roomIndex].shelfs[this.shelfIndex].compartments.findIndex(c => c.name == item.compartment)
                 this.itemDescription = item.description
+                this.itemAmount = item.amount
                 this.$refs['image-upload']._url = this.$store.state.apiUrl + '/equipment/getimg/' + item.id
 
                 for (var f of Object.keys(item.custom_fields)) {

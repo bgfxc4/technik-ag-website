@@ -12,6 +12,7 @@ export interface Equipment {
 	compartment: string;
 	category: string;
 	type: string;
+	amount: number;
 	image: string;
 	custom_fields: any;
 }
@@ -24,8 +25,11 @@ export interface Category {
 }
 
 main.app.post("/equipment/new", async (req, res) => {
-	if (!(await main.check_request(['name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], PERMS.EditInv, req.body, req.headers, res)))
+	if (!(await main.check_request(['name', 'description', 'room', 'shelf', 'compartment', 'category', 'type', 'amount'], PERMS.EditInv, req.body, req.headers, res)))
 		return
+
+	if (isNaN(req.body.amount))
+		return res.status(400).send("The field amount has to be a number!")
 	
 	var shelf_exists = false
 	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, exists => {
@@ -74,9 +78,12 @@ main.app.post("/type/new", async (req, res) => {
 })
 
 main.app.post("/equipment/edit", async (req, res) => {
-	if (!(await main.check_request(['id', 'name', 'description', 'room', 'shelf', 'compartment', 'category', 'type'], PERMS.EditInv, req.body, req.headers, res)))
+	if (!(await main.check_request(['id', 'name', 'description', 'room', 'shelf', 'compartment', 'category', 'type', 'amount'], PERMS.EditInv, req.body, req.headers, res)))
 		return
-	
+
+	if (isNaN(req.body.amount))
+		return res.status(400).send("The field amount has to be a number!")
+
 	var storage_exists = false
 	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, exists => {
 		storage_exists = exists

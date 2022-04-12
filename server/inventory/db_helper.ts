@@ -27,6 +27,7 @@ export function add_equipment_to_db(body: any, callback: () => void) {
 			compartment: body.compartment,
 			category: body.category,
 			type: body.type,
+			amount: body.amount,
 			image: (body.image) ? body.image : item_image_placeholder,
 			custom_fields: custom_fields
 		}
@@ -107,6 +108,7 @@ export function edit_equipment_in_db(body: any, callback: () => void) {
 				compartment: body.compartment,
 				category: body.category,
 				type: body.type,
+				amount: body.amount,
 				custom_fields: custom_fields,
 				image: (body.image) ? body.image : item_image_placeholder
 			}

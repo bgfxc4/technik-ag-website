@@ -26,6 +26,7 @@
 										<b>{{f}}:</b> {{ item.custom_fields[f] }} <br>
 									</div>
 									<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
+									<b>Amount:</b> {{item.amount}}<br>
 									<b>ID:</b> {{ item.id }}
 								</div>
 								<router-link :to="`/inventory/item/byId/${item.id}?category=${item.category}&type=${item.type}`" class="btn btn-outline-primary mt-2">Open Item</router-link>

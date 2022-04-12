@@ -25,6 +25,7 @@
 						</div>
 					</div>
 					<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
+					<b>Amount:</b> {{item.amount}}<br>
 					<b>ID:</b> {{ item.id }}
 				</div>
 				<ShowQrBarCode :toShow="item.id"></ShowQrBarCode>

@@ -28,6 +28,7 @@
                     </select>
                 </div>
             </div>
+            <label for="edit-item-amount">Amount:</label><br/><input id="edit-item-amount" v-model="itemAmount" placeholder="Enter an amount..."><br/>
             <image-upload-preview ref="image-upload"/><br/>
 
             <loading-icon v-if="isLoading" size="3x"/>
@@ -67,6 +68,7 @@
                 shelfIndex: 0,
                 compIndex: 0,
 
+                itemAmount: 1,
                 errorText: "",
                 isLoading: false
             }
@@ -93,7 +95,8 @@
 
                     category: this.item.category,
                     type: this.item.type,
-
+                    
+                    amount: this.itemAmount,
                     custom_fields: this.customFields,
                     image: (!!this.$refs['image-upload'].previewImage) ? this.$refs['image-upload'].previewImage.split('base64,')[1] : undefined
                 }
@@ -114,6 +117,7 @@
                 this.itemName = this.item.name
                 this.itemDescription = this.item.description
                 this.customFields = this.item.custom_fields
+                this.itemAmount = this.item.amount
                 this.$refs['image-upload']._url = this.$store.state.apiUrl + '/equipment/getimg/' + this.item.id
 
                 this.$store.dispatch("getStorage", (res, err) => {
