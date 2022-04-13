@@ -10,11 +10,13 @@
 							<img v-bind:src="$store.state.apiUrl + '/category/getimg/' + cat.name" class="card-img" 
 								style="max-width: 30vw; max-height: 30vh; height: auto; margin-left: 10px">
 						</div>
-    					<div class="col-6 my-auto">
-							<div class="card-body">
+    					<div class="col-6 my-auto" style="max-height: 30vh">
+							<div class="card-body" style="max-height: 30vh">
 								<h5 class="card-title">{{ cat.name }}</h5>
-								<router-link v-for="t in cat.types" :key="t" :to="`/inventory/${cat.name}/${t}`" 
-									class="fs-6 text-break d-block text-truncate">{{ t }}</router-link>
+								<div style="max-height: 15vh; overflow: hidden;">
+									<router-link v-for="t in cat.types" :key="t" :to="`/inventory/${cat.name}/${t}`" 
+										class="fs-6 text-break d-block text-truncate">{{ t }}</router-link>
+								</div>
 								<router-link :to="`/inventory/${cat.name}/`" class="btn btn-outline-primary mt-2">Open Category</router-link>
 								<br>
     							<button v-b-modal.deleteCategoryModal @click="deleteCategoryName = cat.name" class="btn btn-danger" style="max-height: 6vh">
