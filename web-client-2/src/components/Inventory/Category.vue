@@ -15,7 +15,7 @@
     					<div class="col-12 my-auto">
 							<div class="card-body">
 								<h5 class="card-title">{{ t.name }}</h5>
-								<router-link v-for="i in t.items" :key="i.name" :to="`/inventory/item/byId/${i.id}?category=${i.category}&type=${i.type}`" 
+								<router-link v-for="i in t.items" :key="i.name" :to="`/inventory/item/byId/${i.id}?category=${i.category}&type=${i.type}`"
 									class="fs-6 text-break d-block text-truncate">{{ i.name }}</router-link>
 								<router-link :to="`/inventory/${catName}/${t.name}`" class="btn btn-outline-primary mt-2">Open Type</router-link>
 								<br>

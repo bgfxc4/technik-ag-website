@@ -38,6 +38,28 @@ export function delete_room_from_db(body: any, callback: () => void) {
 	})
 }
 
+export async function edit_room_in_db(body: any, callback: () => void) {
+	main.db.collection("storage").findOne({name: body.old_name}, async (err, data) => {
+		if (err)
+			throw err
+		if (!data)
+			return callback()
+
+		await main.db.collection("storage").updateOne({name: body.old_name}, {$set: {name: body.name}})
+
+		var query = {
+			room: body.old_name,
+		}
+		var update = {
+			$set: {
+				room: body.name
+			}
+		}
+		await main.db.collection("equipment").updateMany(query, update)
+		callback()
+	})
+}
+
 export function add_shelf_to_db(body: any, callback: (code: number) => void) {
 	var query = { name: body.room}
 	main.db.collection("storage").findOne(query, (err, data) => {
@@ -98,6 +120,33 @@ export function delete_shelf_from_db(body: any, callback: () => void) {
 				throw err
 			callback()
 		})
+	})
+}
+
+export async function edit_shelf_in_db(body: any, callback: () => void) {
+	main.db.collection("storage").findOne({name: body.room}, async (err, data) => {
+		if (err)
+			throw err
+		if (!data)
+			return callback()
+		
+		for (var i in data.shelfs) {
+			if (data.shelfs[i].name == body.old_name) {
+				data.shelfs[i].name = body.name
+				await main.db.collection("storage").updateOne({name: body.room}, {$set: {shelfs: data.shelfs}})
+			}
+		}
+		var query = {
+			room: body.room,
+			shelf: body.old_name
+		}
+		var update = {
+			$set: {
+				shelf: body.name
+			}
+		}
+		await main.db.collection("equipment").updateMany(query, update)
+		callback()
 	})
 }
 
@@ -169,6 +218,38 @@ export function delete_compartment_from_db(body: any, callback: () => void) {
 				throw err
 			callback()
 		})
+	})
+}
+
+export async function edit_compartment_in_db(body: any, callback: () => void) {
+	main.db.collection("storage").findOne({name: body.room}, async (err, data) => {
+		if (err)
+			throw err
+		if (!data)
+			return callback()
+		
+		for (var i in data.shelfs) {
+			if (data.shelfs[i].name == body.shelf) {
+				for (var j in data.shelfs[i].compartments) {
+					if (data.shelfs[i].compartments[j].name == body.old_name) {
+						data.shelfs[i].compartments[j].name = body.name
+						await main.db.collection("storage").updateOne({name: body.room}, {$set: {shelfs: data.shelfs}})
+					}
+				}
+			}
+		}
+		var query = {
+			room: body.room,
+			shelf: body.shelf,
+			compartment: body.old_name
+		}
+		var update = {
+			$set: {
+				compartment: body.name
+			}
+		}
+		await main.db.collection("equipment").updateMany(query, update)
+		callback()
 	})
 }
 

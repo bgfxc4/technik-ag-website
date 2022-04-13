@@ -10,7 +10,7 @@ import Category from "./components/Inventory/Category.vue"
 import Type from "./components/Inventory/Type.vue"
 import Item from "./components/Inventory/Item.vue"
 import Search from "./components/Inventory/Search.vue"
-import Storage from "./components/Storage.vue"
+import Storage from "./components/storage/Storage.vue"
 
 import Appointments from "./components/Appointments.vue"
 import Scan from "./components/Scan.vue"

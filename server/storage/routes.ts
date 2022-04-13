@@ -36,6 +36,15 @@ main.app.post("/room/delete", async (req, res) => {
 	})
 })
 
+main.app.post("/room/edit", async (req, res) => {
+	if (!(await main.check_request(['old_name', 'name'], PERMS.EditStor, req.body, req.headers, res)))
+		return
+
+	db_helper.edit_room_in_db(req.body, () => {
+		res.status(200).send("ok")
+	})
+})
+
 main.app.post("/shelf/new", async (req, res) => {
 	if (!(await main.check_request(['name', 'room'], PERMS.EditStor, req.body, req.headers, res)))
 		return
@@ -55,6 +64,15 @@ main.app.post("/shelf/delete", async (req, res) => {
 		return
 
 	db_helper.delete_shelf_from_db(req.body, () => {
+		res.status(200).send("ok")
+	})
+})
+
+main.app.post("/shelf/edit", async (req, res) => {
+	if (!(await main.check_request(['old_name', 'name', 'room'], PERMS.EditStor, req.body, req.headers, res)))
+		return
+
+	db_helper.edit_shelf_in_db(req.body, () => {
 		res.status(200).send("ok")
 	})
 })
@@ -83,6 +101,16 @@ main.app.post("/compartment/delete", async (req, res) => {
 		res.status(200).send("ok")
 	})
 })
+
+main.app.post("/compartment/edit", async (req, res) => {
+	if (!(await main.check_request(['old_name', 'name', 'shelf', 'room'], PERMS.EditStor, req.body, req.headers, res)))
+		return
+
+	db_helper.edit_compartment_in_db(req.body, () => {
+		res.status(200).send("ok")
+	})
+})
+
 
 main.app.get("/storage/list", async (req, res) => {
 	if (!(await main.check_request([], PERMS.ViewStor, req.body, req.headers, res)))

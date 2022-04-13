@@ -66,6 +66,34 @@ const actions = {
             params["callback"](undefined, err)
         })
     },
+
+    async editRoom({rootState}, params) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("room/edit", params['room'], {headers}).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },
+    async editShelf({rootState}, params) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("shelf/edit", params['shelf'], {headers}).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },
+    async editComp({rootState}, params) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        axios.post("compartment/edit", params['comp'], {headers}).then(res => {
+            params["callback"](res, undefined)
+        }).catch(err => {
+            console.log(err)
+            params["callback"](undefined, err)
+        })
+    },
 }
 
 export default {
