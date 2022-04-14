@@ -38,9 +38,7 @@
             },
             deleteItem () {
                 var item = {
-                    id: this.itemId,
-                    category: this.categoryName,
-                    type: this.typeName
+                    id: this.itemId
                 }
                 this.isLoading = true
                 this.errorText = ""

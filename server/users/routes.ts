@@ -10,13 +10,25 @@ export interface User {
 }
 
 main.app.get("/users/list", async (req, res) => {
-    if (!(await main.check_request([], PERMS.ViewUsrs, req.body, req.headers, res)))
+	var type: main.bodyType = {
+		fields: {},
+	}
+
+    if (!(await main.check_request(type, PERMS.ViewUsrs, req.body, req.headers, res)))
         return
     db_helper.get_users_from_db(l => res.send(l))
 })
 
 main.app.post("/users/new", async (req, res) => {
-    if (!(await main.check_request(['login_hash', 'display_name'], PERMS.EditUsrs, req.body, req.headers, res)))
+	var type: main.bodyType = {
+		fields: {
+            "login_hash": "string",
+            "display_name": "string"
+        },
+        required: ["login_hash", "display_name"]
+	}
+
+    if (!(await main.check_request(type, PERMS.EditUsrs, req.body, req.headers, res)))
         return
     
     if (await db_helper.user_exists_in_db(req.body.login_hash, req.body.display_name, "")) {
@@ -30,7 +42,14 @@ main.app.post("/users/new", async (req, res) => {
 })
 
 main.app.post("/users/delete", async (req, res) => {
-    if (!(await main.check_request(['id'], PERMS.EditUsrs, req.body, req.headers, res)))
+	var type: main.bodyType = {
+		fields: {
+            "id": "string",
+        },
+        required: ["id"]
+	}
+
+    if (!(await main.check_request(type, PERMS.EditUsrs, req.body, req.headers, res)))
         return
     
     if (!(await db_helper.user_exists_in_db("", "", req.body.id))) {
@@ -44,13 +63,16 @@ main.app.post("/users/delete", async (req, res) => {
 })
 
 main.app.post("/users/permedit", async (req, res) => {
-    if (!(await main.check_request(['id', 'permissions'], PERMS.EditUsrs, req.body, req.headers, res)))
+	var type: main.bodyType = {
+		fields: {
+            "id": "string",
+            "permissions": "number"
+        },
+        required: ["id", "permissions"]
+	}
+
+    if (!(await main.check_request(type, PERMS.EditUsrs, req.body, req.headers, res)))
         return
-    
-    if (isNaN(req.body.permissions)) {
-        res.status(400).send("The permission has to be a number!")
-        return
-    }
 
     if (!(await db_helper.user_exists_in_db("", "", req.body.id))) {
         res.status(400).send("An user with this name does not exist!")
@@ -63,7 +85,16 @@ main.app.post("/users/permedit", async (req, res) => {
 })
 
 main.app.post("/users/edit", async (req, res) => {
-    if (!(await main.check_request(['id'], PERMS.EditUsrs, req.body, req.headers, res)))
+	var type: main.bodyType = {
+		fields: {
+            "id": "string",
+            "login_hash": "string",
+            "display_name": "string"
+        },
+        required: ["id"]
+	}
+
+    if (!(await main.check_request(type, PERMS.EditUsrs, req.body, req.headers, res)))
         return
 
     if (!(await db_helper.user_exists_in_db("", "", req.body.id))) {
@@ -74,4 +105,26 @@ main.app.post("/users/edit", async (req, res) => {
     db_helper.edit_user(req.body, () => {
         return res.status(200).send("Ok")
     })
+})
+
+main.app.post("/users/test", async (req, res) => {
+    var user: main.bodyType = {
+        fields: {
+            "name": "string",
+            "hash": "string"
+        },
+        required: ["name", "hash"]
+    }
+	var type: main.bodyType = {
+		fields: {
+            "id": "string",
+            "user": user,
+            "display_name": "string"
+        },
+        required: ["id"]
+	}
+
+    if (!(await main.check_request(type, PERMS.EditUsrs, req.body, req.headers, res)))
+        return
+    res.send("ok")
 })
