@@ -17,14 +17,19 @@
 									<router-link v-for="t in cat.types" :key="t" :to="`/inventory/${cat.name}/${t}`" 
 										class="fs-6 text-break d-block text-truncate">{{ t }}</router-link>
 								</div>
-								<router-link :to="`/inventory/${cat.name}/`" class="btn btn-outline-primary mt-2">Open Category</router-link>
-								<br>
-    							<button v-b-modal.deleteCategoryModal @click="deleteCategoryName = cat.name" class="btn btn-danger" style="max-height: 6vh">
-									<font-awesome-icon icon="trash-can"/>
+								<router-link :to="`/inventory/${cat.name}/`" class="btn btn-outline-primary mt-2">Open Category</router-link> <br>
+
+								<button :id="'menu-popover-'+cat.name" class="btn btn-dark login-status mt-2" href="#" tabindex="0">
+									<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 								</button>
-    							<button @click="editCategory = cat" v-b-modal.editCategoryModal class="btn btn-info" style="max-height: 6vh">
-									<font-awesome-icon icon="pen"/>
-								</button>
+								<b-popover :target="'menu-popover-'+cat.name" triggers="focus">
+									<button v-b-modal.deleteCategoryModal @click="deleteCategoryName = cat.name" class="btn btn-danger" style="max-height: 6vh">
+										<font-awesome-icon icon="trash-can"/> Delete Category
+									</button>
+									<button @click="editCategory = cat" v-b-modal.editCategoryModal class="btn btn-info" style="max-height: 6vh">
+										<font-awesome-icon icon="pen"/> Edit Category
+									</button>
+								</b-popover>
 							</div>
 						</div>
 					</div>

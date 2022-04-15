@@ -30,13 +30,18 @@
 									<b>ID:</b> {{ item.id }}
 								</div>
 								<router-link :to="`/inventory/item/byId/${item.id}?category=${item.category}&type=${item.type}`" class="btn btn-outline-primary mt-2">Open Item</router-link>
-								<br>
-    							<button v-b-modal.deleteItemModal @click="deleteItemId = item.id" class="btn btn-danger" style="max-height: 6vh">
-									<font-awesome-icon icon="trash-can"/>
+
+								<button :id="'menu-popover-'+item.id" class="btn btn-dark login-status mt-2" href="#" tabindex="0">
+									<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 								</button>
-    							<button @click="editItem = item" v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
-									<font-awesome-icon icon="pen"/>
-								</button>
+								<b-popover :target="'menu-popover-'+item.id" triggers="focus">
+									<button v-b-modal.deleteItemModal @click="deleteItemId = item.id" class="btn btn-danger" style="max-height: 6vh">
+										<font-awesome-icon icon="trash-can"/> Delete Item
+									</button><br>
+									<button @click="editItem = item" v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
+										<font-awesome-icon icon="pen"/> Edit Item
+									</button>
+								</b-popover>
 							</div>
 						</div>
 					</div>

@@ -18,13 +18,18 @@
 								<router-link v-for="i in t.items" :key="i.name" :to="`/inventory/item/byId/${i.id}?category=${i.category}&type=${i.type}`"
 									class="fs-6 text-break d-block text-truncate">{{ i.name }}</router-link>
 								<router-link :to="`/inventory/${catName}/${t.name}`" class="btn btn-outline-primary mt-2">Open Type</router-link>
-								<br>
-    							<button v-b-modal.deleteTypeModal @click="deleteTypeName = t.name" class="btn btn-danger" style="max-height: 6vh">
-									<font-awesome-icon icon="trash-can"/>
+
+								<button :id="'menu-popover-'+t.name" class="btn btn-dark login-status" href="#" tabindex="0">
+									<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 								</button>
-    							<button @click="editType = t" v-b-modal.editTypeModal class="btn btn-info" style="max-height: 6vh">
-									<font-awesome-icon icon="pen"/>
-								</button>
+								<b-popover :target="'menu-popover-'+t.name" triggers="focus">
+									<button v-b-modal.deleteTypeModal @click="deleteTypeName = t.name" class="btn btn-danger" style="max-height: 6vh">
+										<font-awesome-icon icon="trash-can"/> Delete Type
+									</button><br>
+									<button @click="editType = t" v-b-modal.editTypeModal class="btn btn-info" style="max-height: 6vh">
+										<font-awesome-icon icon="pen"/> Edit Type
+									</button>
+								</b-popover>
 							</div>
 						</div>
 					</div>

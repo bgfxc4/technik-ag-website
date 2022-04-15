@@ -29,12 +29,18 @@
 					<b>ID:</b> {{ item.id }}
 				</div>
 				<ShowQrBarCode :toShow="item.id"></ShowQrBarCode>
-				<button v-b-modal.deleteItemModal class="btn btn-danger" style="max-height: 6vh">
-					<font-awesome-icon icon="trash-can"/>
+
+				<button id="menu-popover" class="btn btn-dark login-status mt-2" href="#" tabindex="0">
+					<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 				</button>
-				<button v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
-					<font-awesome-icon icon="pen"/>
-				</button>
+				<b-popover target="menu-popover" triggers="focus">
+					<button v-b-modal.deleteItemModal class="btn btn-danger" style="max-height: 6vh">
+						<font-awesome-icon icon="trash-can"/> Delete Item
+					</button><br>
+					<button v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
+						<font-awesome-icon icon="pen"/> Edit Item
+					</button>
+				</b-popover>
 			</div>
 		</div>
 		<delete-item :categoryName="item.category" :typeName="item.type" :itemId="item.id" @onDelete="itemDeleted"/>
