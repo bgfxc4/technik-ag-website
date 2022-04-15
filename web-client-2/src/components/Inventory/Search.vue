@@ -16,6 +16,9 @@
 								<h5 class="card-title">{{ item.name }}</h5>
 								<p>
 									<b>Description:</b> {{ item.description }} <br>
+									<div v-for="f of Object.keys(item.custom_fields)" :key="f">
+										<b>{{f}}:</b> {{ item.custom_fields[f] }} <br>
+									</div>
 									<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
 									<b>ID:</b> {{ item.id }}
 								</p>

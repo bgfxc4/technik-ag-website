@@ -4,8 +4,16 @@
             <label for="edit-item-name">Name:</label><br/><input id="edit-item-name" v-model="itemName" placeholder="Enter a name..."><br/>
             <label for="edit-item-description">Description:</label><br/><input id="edit-item-description" v-model="itemDescription" placeholder="Enter a description..."><br/>
             <br>
-            <div v-for="f of customFieldsLoaded" :key="f">
-                <label :for="'custom-field-'+f">{{f}}:</label><input :id="'custom-field-'+f" v-model="customFields[f]" :placeholder="'Enter a value for '+f"/>
+            <div v-for="f of customFieldsLoaded" :key="f.name">
+                <label :for="'custom-field-'+f.name">{{f.name}}:</label><br/>
+
+                <input v-if="f.type == 'text'" :id="'custom-field-'+f.name" v-model="customFields[f.name]" :placeholder="'Enter a value for '+f.name"/>
+
+                <input class="form-check-input" v-if="f.type == 'boolean'" type="checkbox" :id="'custom-field-'+f.name" v-model="customFields[f.name]"/>
+
+                <select v-if="f.type == 'list'"  :id="'custom-field-'+f.name" v-model="customFields[f.name]" class="form-select bg-light text-dark">
+                    <option v-for="o of f.options" :key="o" :value="o">{{o}}</option>
+                </select>
             </div>
             <br>
             <div class="form-horizontal row row-cols-1 row-cols-lg-3">

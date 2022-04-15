@@ -7,8 +7,16 @@
                         <label for="create-item-name">Name:</label><br/><input id="create-item-name" v-model="itemName" placeholder="Enter a name..."><br/>
                         <label for="create-item-description">Description:</label><br/><input id="create-item-description" v-model="itemDescription" placeholder="Enter a description..."><br/>
                         <br>
-                        <div v-for="f of customFieldsLoaded" :key="f">
-                            <label :for="'custom-field-'+f">{{f}}:</label><input :id="'custom-field-'+f" v-model="customFields[f]" :placeholder="'Enter a value for '+f"/>
+                        <div v-for="f of customFieldsLoaded" :key="f.name">
+                            <label :for="'custom-field-'+f.name">{{f.name}}:</label><br/>
+
+                            <input v-if="f.type == 'text'" :id="'custom-field-'+f.name" v-model="customFields[f.name]" :placeholder="'Enter a value for '+f.name"/>
+
+                            <input class="form-check-input" v-if="f.type == 'boolean'" type="checkbox" :id="'custom-field-'+f.name" v-model="customFields[f.name]"/>
+
+                            <select v-if="f.type == 'list'"  :id="'custom-field-'+f.name" v-model="customFields[f.name]" class="form-select bg-light text-dark">
+                                <option v-for="o of f.options" :key="o" :value="o">{{o}}</option>
+                            </select>
                         </div>
                         <br>
                         <div class="form-horizontal row row-cols-1 row-cols-lg-3">
@@ -66,7 +74,7 @@
     import LoadingIcon from "../../helpers/LoadingIcon.vue"
 
     export default {
-        name: "CreateCategory",
+        name: "CreateItem",
         emits: ['onCreate'],
         components: {
             ImageUploadPreview,
@@ -152,10 +160,10 @@
                 this.$refs['image-upload']._url = this.$store.state.apiUrl + '/equipment/getimg/' + item.id
 
                 for (var f of Object.keys(item.custom_fields)) {
-                    if (this.customFieldsLoaded.indexOf(f) == -1)
+                    if (this.customFieldsLoaded.indexOf(f.name) == -1)
                         continue
                     
-                    this.customFields[f] = item.custom_fields[f]
+                    this.customFields[f.name] = item.custom_fields[f.name]
                 }
             },
             openCreateItem () {
@@ -168,7 +176,7 @@
                         if (cat.name == this.categoryName) {
                             this.customFieldsLoaded = cat.custom_fields
                             for (var f of this.customFieldsLoaded) {
-                                this.customFields[f] = ""
+                                this.customFields[f.name] = ""
                             }
                             return
                         }

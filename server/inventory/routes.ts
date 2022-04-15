@@ -66,7 +66,8 @@ main.app.post("/equipment/new", async (req, res) => {
 main.app.post("/category/new", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {
-			"name": "string"
+			"name": "string",
+			"custom_fields": "object"
 		},
 		required: ["name"]
 	}

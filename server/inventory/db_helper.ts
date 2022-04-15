@@ -12,7 +12,7 @@ export function add_equipment_to_db(body: any, callback: () => void) {
 			throw err
 		
 		var custom_fields: {
-			[key: string]: string;
+			[key: string]: object;
 		} = {}
 		if (data)
 			for (var f in body.custom_fields) {
@@ -92,7 +92,7 @@ export function edit_equipment_in_db(body: any, callback: () => void) {
 			throw err
 		
 		var custom_fields: {
-			[key: string]: string;
+			[key: string]: object;
 		} = {}
 		if (data)
 			for (var f in body.custom_fields) {
@@ -152,7 +152,8 @@ export function edit_category_in_db(body: any, callback: () => void) {
 				if (body.custom_fields) {
 					update.$set.custom_fields = {}
 					for (var field in item.custom_fields) {
-						if (body.custom_fields.includes(field)) {
+						if (body.custom_fields.filter((f:any) => f.name == field).length != 0) {
+							console.log("lol")
 							update.$set.custom_fields[field] = item.custom_fields[field]
 						}
 					}

@@ -15,7 +15,7 @@
     import LoadingIcon from "../../helpers/LoadingIcon.vue"
 
     export default {
-        name: "DeleteType",
+        name: "DeleteItem",
         emits: ['onDelete'],
         components: {
             ErrorText,
