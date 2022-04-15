@@ -1,22 +1,24 @@
 <template>
 	<div id="login">
-		<div id="login-panel">
+		<div :id="isMobile() ? 'login-panel-mobile' : 'login-panel-desktop'" class="login-panel">
 			<div id="center">
 				<h1>Login</h1>
 				<form @submit.prevent="submit">
 					<input id="usernameInput" type="text" placeholder="Please enter your username" v-model="usernameInput">
 					<input id="passwordInput" type="password" placeholder="Please enter your password" v-model="passwordInput">
-					<button id="login-btn" class="btn btn-light" type="button" v-on:click=tryLogin >Login</button>
-					<button class="btn btn-outline-light" type="button" v-on:click=openHome >Cancel</button>
+					<button id="login-btn" class="btn btn-light m-2" type="button" v-on:click=tryLogin >Login</button>
+					<button class="btn btn-outline-light m-2" type="button" v-on:click=openHome >Cancel</button>
 				</form>
 				<loading-icon v-if="isLoading" size="3x"/>
 				<error-text v-if="!!errorText" v-bind:msg="errorText" />
 			</div>
 		</div>
-		<div id="divider-panel"></div>
-		<div id="logo-panel">
-			<img :src='require("../assets/imgs/logo.png")'>
-		</div>
+		<template v-if="!isMobile()">
+			<div id="divider-panel"></div>
+			<div id="logo-panel">
+				<img :src='require("../assets/imgs/logo.png")'>
+			</div>
+		</template>
 	</div>
 </template>
 
@@ -60,7 +62,15 @@
 			},
 			openHome() {
 				this.$router.push("/")
-			}
+			},
+			isMobile() {
+				console.log("asd")
+				if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+					return true
+				} else {
+					return false
+				}
+ 			}
 		},
 		mounted () {
 			$('#passwordInput').keydown(e => {
@@ -80,18 +90,25 @@
 		height: 100vh;
 	}
 
-	#login-panel {
-		z-index: 400;
+	.login-panel {
 		background: var(--secondary-background-color);
-		width: 40%;
 		height: 100%;
+	}
+
+	#login-panel-mobile {
+		width: 100%;
+	}
+
+	#login-panel-desktop {
+		z-index: 400;
+		width: 40%;
 		float: left;
 		clip-path: polygon(0 0, 100% 0%, 75% 100%, 0% 100%);
 		text-align: center;
 		position: relative;
 	}
 
-	#login-panel #center {
+	.login-panel #center {
 		margin: 0;
 		position: absolute;
 		top: 50%;
@@ -99,13 +116,13 @@
 		transform: translate(-50%, -60%);
 	}
 
-	#login-panel #center h1 {
+	.login-panel #center h1 {
 		margin-top: 0;
 		padding: 0;
 		display: block;
 	}
 
-	#login-panel #center input {
+	.login-panel #center input {
 		display: block;
 		margin-left: auto;
 		margin-right: auto;
