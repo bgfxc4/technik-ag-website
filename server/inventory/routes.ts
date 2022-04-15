@@ -355,7 +355,7 @@ main.app.post("/equipment/search", async (req, res) => {
 	db_helper.get_equipment_from_db(list => {
 		var ret:any[] = []
 		for (var item of list) {
-			if (fits_search(item.name, req.body.keywords))
+			if (fits_search(item.name, req.body.keywords.split(" ")))
 				ret.push(item)
 		}
 		res.send(JSON.stringify(ret))

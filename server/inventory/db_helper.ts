@@ -153,7 +153,6 @@ export function edit_category_in_db(body: any, callback: () => void) {
 					update.$set.custom_fields = {}
 					for (var field in item.custom_fields) {
 						if (body.custom_fields.filter((f:any) => f.name == field).length != 0) {
-							console.log("lol")
 							update.$set.custom_fields[field] = item.custom_fields[field]
 						}
 					}
