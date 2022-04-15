@@ -12,9 +12,14 @@
 						<edit-shelf v-if="editMode" @onClick="roomName=r.name; shelfName=s.name;" :room="roomName" :shelf="shelfName" @onEdit="getStorage" />
 						<ul>
 							<li v-for="c of s.compartments" :key="c.name">
-								<a class="item-template text-light" href="#">{{c.name}}</a>
+								<a class="item-template text-light" @click="clickTreeLink" href="#">{{c.name}}</a>
 								<delete-comp v-if="deleteMode" @onClick="roomName=r.name; shelfName=s.name; compName=c.name" :room="roomName" :shelf="shelfName" :comp="compName" @onDelete="getStorage" />
 								<edit-comp v-if="editMode" @onClick="roomName=r.name; shelfName=s.name; compName=c.name" :room="roomName" :shelf="shelfName" :comp="compName" @onEdit="getStorage" />
+								<ul>
+									<li v-for="i of c.items" :key="i.id"> 
+										<router-link :to="`/inventory/item/byId/${i.id}`">{{i.name}}</router-link> 
+									</li>
+								</ul>
 							</li>
 							<create-comp :room="roomName" :shelf="shelfName" @onClick="shelfName=s.name;roomName=r.name" @onCreate="getStorage" />
 						</ul>

@@ -64,7 +64,6 @@
 				this.$router.push("/")
 			},
 			isMobile() {
-				console.log("asd")
 				if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
 					return true
 				} else {

@@ -2,9 +2,23 @@ import * as main from "../main"
 import * as storage from "./routes"
 
 export function get_storage_from_db(callback: (res: any) => void) {
-	main.db.collection("storage").find().toArray((err, data) => {
+	main.db.collection("storage").find().toArray( async (err, data) => {
 		if (err)
 			throw err
+
+		if (!data)
+			return callback(data)
+
+		for (var r of data) {
+			for (var s of r.shelfs) {
+				for (var c of s.compartments) {
+					c.items = []
+					var items = await main.db.collection("equipment").find({room: r.name, shelf: s.name, compartment: c.name}).project({name: 1, id: 1}).toArray()
+					c.items = c.items.concat(items)
+				}
+			}
+		}
+		
 		callback(data)
 	})
 }
