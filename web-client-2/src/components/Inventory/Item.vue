@@ -28,9 +28,8 @@
 					<b>Amount:</b> {{item.amount}}<br>
 					<b>ID:</b> {{ item.id }}
 				</div>
-				<ShowQrBarCode :toShow="item.id"></ShowQrBarCode>
 
-				<button id="menu-popover" class="btn btn-dark login-status mt-2" href="#" tabindex="0">
+				<button id="menu-popover" class="btn btn-dark mt-2" href="#" tabindex="0">
 					<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 				</button>
 				<b-popover target="menu-popover" triggers="focus">
@@ -39,7 +38,9 @@
 					</button><br>
 					<button v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
 						<font-awesome-icon icon="pen"/> Edit Item
-					</button>
+					</button><br>
+
+					<ShowQrBarCode :toShow="item.id"></ShowQrBarCode>
 				</b-popover>
 			</div>
 		</div>

@@ -14,12 +14,12 @@
 				<div class="card mb-3 bg-secondary" style="padding: 10px">
 			  		<div class="row g-0" style="height: 100%">
     					<div class="col-4 my-auto">
-							<img v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + item.id" class="card-img" 
+							<img @click="openItem(item.id, item.category, item.type)" role="button" v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + item.id" class="card-img" 
 								style="max-width: 30vw; max-height: 30vh; width: auto; height: auto; margin-left: 10px">
 						</div>
     					<div class="col-8 my-auto">
 							<div class="card-body">
-								<h5 class="card-title">{{ item.name }}</h5>
+								<h5 @click="openItem(item.id, item.category, item.type)" role="button" class="card-title">{{ item.name }}</h5>
 								<div>
 									<b>Description:</b> {{ item.description }} <br>
 									<div v-for="f of Object.keys(item.custom_fields)" :key="f">
@@ -29,9 +29,9 @@
 									<b>Amount:</b> {{item.amount}}<br>
 									<b>ID:</b> {{ item.id }}
 								</div>
-								<router-link :to="`/inventory/item/byId/${item.id}?category=${item.category}&type=${item.type}`" class="btn btn-outline-primary mt-2">Open Item</router-link>
+								<button @click="openItem(item.id, item.category, item.type)" class="btn btn-outline-primary mt-2">Open Item</button>
 
-								<button :id="'menu-popover-'+item.id" class="btn btn-dark login-status mt-2" href="#" tabindex="0">
+								<button :id="'menu-popover-'+item.id" class="btn btn-dark mt-2 mx-2" href="#" tabindex="0">
 									<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 								</button>
 								<b-popover :target="'menu-popover-'+item.id" triggers="focus">
@@ -82,6 +82,9 @@
 			EditItem
 		},
 		methods: {
+			openItem(id, cat, type) {
+				this.$router.push(`/inventory/item/byId/${id}?category=${cat}&type=${type}`)
+			},
 			loadItems () {
 				this.isLoading = true
 				this.errorText = ""

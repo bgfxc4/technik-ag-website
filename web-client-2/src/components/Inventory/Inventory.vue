@@ -7,19 +7,19 @@
 				<div class="card mb-3 bg-secondary" style="height: 32vh">
 			  		<div class="row g-0" style="height: 100%">
     					<div class="col-6 my-auto">
-							<img v-bind:src="$store.state.apiUrl + '/category/getimg/' + cat.name" class="card-img" 
+							<img @click="openCategory(cat.name)" role="button" v-bind:src="$store.state.apiUrl + '/category/getimg/' + cat.name" class="card-img" 
 								style="max-width: 30vw; max-height: 30vh; height: auto; margin-left: 10px">
 						</div>
     					<div class="col-6 my-auto" style="max-height: 30vh">
 							<div class="card-body" style="max-height: 30vh">
-								<h5 class="card-title">{{ cat.name }}</h5>
+								<h5 @click="openCategory(cat.name)" role="button" class="card-title">{{ cat.name }}</h5>
 								<div style="max-height: 15vh; overflow: hidden;">
 									<router-link v-for="t in cat.types" :key="t" :to="`/inventory/${cat.name}/${t}`" 
 										class="fs-6 text-break d-block text-truncate">{{ t }}</router-link>
 								</div>
-								<router-link :to="`/inventory/${cat.name}/`" class="btn btn-outline-primary mt-2">Open Category</router-link> <br>
+								<button @click="openCategory(cat.name)" class="btn btn-outline-primary mt-2">Open Category</button> <br>
 
-								<button :id="'menu-popover-'+cat.name" class="btn btn-dark login-status mt-2" href="#" tabindex="0">
+								<button :id="'menu-popover-'+cat.name" class="btn btn-dark mt-2" href="#" tabindex="0">
 									<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 								</button>
 								<b-popover :target="'menu-popover-'+cat.name" triggers="focus">
@@ -68,6 +68,9 @@
 			}
 		},
 		methods: {
+			openCategory(name) {
+				this.$router.push(`/inventory/${name}/`)
+			},
 			async loadCategoryList () {
 				this.isLoading = true
 				this.$store.dispatch("getCategories", (answ, err) => {

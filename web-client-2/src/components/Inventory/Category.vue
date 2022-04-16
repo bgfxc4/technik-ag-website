@@ -14,12 +14,12 @@
 			  		<div class="row g-0" style="height: 100%">
     					<div class="col-12 my-auto">
 							<div class="card-body">
-								<h5 class="card-title">{{ t.name }}</h5>
+								<h5 @click="openType(catName, t.name)" role="button" class="card-title">{{ t.name }}</h5>
 								<router-link v-for="i in t.items" :key="i.name" :to="`/inventory/item/byId/${i.id}?category=${i.category}&type=${i.type}`"
 									class="fs-6 text-break d-block text-truncate">{{ i.name }}</router-link>
-								<router-link :to="`/inventory/${catName}/${t.name}`" class="btn btn-outline-primary mt-2">Open Type</router-link>
+								<button @click="openType(catName, t.name)" class="btn btn-outline-primary mt-2">Open Type</button>
 
-								<button :id="'menu-popover-'+t.name" class="btn btn-dark login-status" href="#" tabindex="0">
+								<button :id="'menu-popover-'+t.name" class="btn btn-dark mt-2 mx-2" href="#" tabindex="0">
 									<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 								</button>
 								<b-popover :target="'menu-popover-'+t.name" triggers="focus">
@@ -69,6 +69,9 @@
 			EditType
 		},
 		methods: {
+			openType(cat, type) {
+				this.$router.push(`/inventory/${cat}/${type}/`)
+			},
 			loadItemsForTypes: async function (list) {
 				for (var t of list) {
 					this.typeList.push({ name: t, items: [] })
