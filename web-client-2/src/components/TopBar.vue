@@ -51,7 +51,13 @@
 			}
 		},
 		computed: {
-			isLoggedIn: function () {return this.$store.getters.isAuthenticated}
+			isLoggedIn: function () {
+				if (!this.$store.getters.isAuthenticated) {
+					this.$router.push("/login")
+					return false
+				}
+				return true
+			}
 		},
 		methods: {
 			logout: async function () {
