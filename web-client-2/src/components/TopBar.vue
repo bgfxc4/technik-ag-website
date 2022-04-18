@@ -14,7 +14,7 @@
 						<router-link to="/storage" class="nav-link" v-bind:class="{ active: ($route.path.startsWith('/storage'))}">Storage</router-link>
 					</li>
 					<li class="nav-item">
-						<router-link to="/appointments" class="nav-link disabled">Appointments</router-link>
+						<router-link to="/appointments" class="nav-link" v-bind:class="{ active: ($route.path.startsWith('/appointments'))}">Appointments</router-link>
 					</li>
 					<li class="nav-item">
 						<router-link to="/scan" class="nav-link" v-bind:class="{ active: ($route.path.startsWith('/scan'))}">Scan Code</router-link>

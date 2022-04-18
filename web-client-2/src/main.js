@@ -23,6 +23,9 @@ window.$ = jQuery
 
 import "./assets/css/general.css"
 
+import { SetupCalendar } from 'v-calendar';
+import 'v-calendar/dist/style.css';
+
 // Make BootstrapVue available throughout your project
 
 var app = createApp(App)
@@ -31,6 +34,7 @@ app.use(router)
 app.use(store)
 app.use(BootstrapVue3)
 
+app.use(SetupCalendar, {})
 app.component("font-awesome-icon", FontAwesomeIcon)
 
 app.mount('#app')

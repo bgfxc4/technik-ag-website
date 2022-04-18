@@ -19,7 +19,7 @@ export function add_equipment_to_db(body: any, callback: () => void) {
 				custom_fields[f] = body.custom_fields[f]
 			}
 		var equ: inventory.Equipment = {
-			id: uuid.v4(),
+			id: "I"+uuid.v4(),
 			name: body.name,
 			description: body.description,
 			room: body.room,

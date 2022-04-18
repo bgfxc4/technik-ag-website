@@ -16,7 +16,7 @@ main.app.get("/users/list", async (req, res) => {
 
     if (!(await main.check_request(type, PERMS.ViewUsrs, req.body, req.headers, res)))
         return
-    db_helper.get_users_from_db(l => res.send(l))
+    db_helper.get_users_from_db().then(l => res.send(l))
 })
 
 main.app.post("/users/new", async (req, res) => {

@@ -4,13 +4,15 @@ import auth from './modules/auth'
 import inventoryApi from "./modules/api/inventory"
 import storageApi from "./modules/api/storage"
 import usersApi from "./modules/api/users"
+import appointmentApi from "./modules/api/appointments"
 
 export const store = createStore({
 	modules: {
 		auth,
 		inventoryApi,
 		storageApi,
-		usersApi
+		usersApi,
+		appointmentApi
 	},
 	state: {
 		isLoading: false,

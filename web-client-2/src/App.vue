@@ -1,5 +1,5 @@
 <template>
-	<div id="app">
+	<div id="app-vue">
 		<TopBar v-if="$route.name != 'Login'"/>
 		<router-view />
 	</div>

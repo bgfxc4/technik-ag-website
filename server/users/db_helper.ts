@@ -3,11 +3,9 @@ import {sha512} from "js-sha512"
 import * as storage from "./routes"
 import * as uuid from "uuid"
 
-export function get_users_from_db(callback: (res: any) => void, with_login_hash=false) {
+export async function get_users_from_db(with_login_hash=false) {
     var projection = with_login_hash ? {} : {login_hash: 0}
-	main.db.collection("users").find().project(projection).toArray((err, data) => {
-		if (err)
-			throw err
+	return await main.db.collection("users").find().project(projection).toArray().then(data => {
 		for (var u of main.config.users) {
 			var user = {
 				display_name: u.display_name,
@@ -19,15 +17,15 @@ export function get_users_from_db(callback: (res: any) => void, with_login_hash=
 				user.login_hash = u.login_hash
 			data?.push(u)
 		}
-		callback(data)
-	})
+		return data
+	}).catch(err => {throw err})
 }
 
 export async function add_user_to_db(user: any, callback: () => void) {
 	var u: storage.User = {
 		display_name: user.display_name,
 		login_hash: sha512(user.login_hash),
-		id: uuid.v4(),
+		id: "U"+uuid.v4(),
 		permissions: 0
 	}
 	await main.db.collection("users").insertOne(u)

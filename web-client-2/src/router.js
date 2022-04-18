@@ -12,7 +12,7 @@ import Item from "./components/Inventory/Item.vue"
 import Search from "./components/Inventory/Search.vue"
 import Storage from "./components/storage/Storage.vue"
 
-import Appointments from "./components/Appointments.vue"
+import Appointments from "./components/appointments/Appointments.vue"
 import Scan from "./components/Scan.vue"
 
 import SettingsPanel from "./components/settings/SettingsPanel.vue"

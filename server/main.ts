@@ -16,19 +16,17 @@ app.use(body_parser.json({limit: "50mb"}))
 app.use(cors())
 
 export async function authorized(req_headers:any) {
-	return new Promise((resolve, _reject) => {
-		if (req_headers.authorization == undefined) resolve(undefined)
-		user_db.get_users_from_db(users => {
-			for (var user of users) {
-				if (sha512(req_headers.authorization) == user.login_hash) {
-					resolve({
-						permissions: user.permissions,
-						display_name: user.display_name
-					})
+	if (req_headers.authorization == undefined) return undefined
+	return await user_db.get_users_from_db(true).then((users: any) => {
+		for (var user of users) {
+			if (sha512(req_headers.authorization) == user.login_hash) {
+				return {
+					permissions: user.permissions,
+					display_name: user.display_name
 				}
 			}
-			resolve(undefined)
-		}, true)
+		}
+		return undefined
 	})
 }
 
@@ -121,5 +119,6 @@ app.get("/authorize", async (req, res) => {
 })
 
 import "./inventory/routes"
+import "./appointments/routes"
 import "./storage/routes"
 import "./users/routes"
