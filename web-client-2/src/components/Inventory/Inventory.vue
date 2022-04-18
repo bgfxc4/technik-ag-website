@@ -73,14 +73,12 @@
 			},
 			async loadCategoryList () {
 				this.isLoading = true
-				this.$store.dispatch("getCategories", (answ, err) => {
-					this.isLoading = false
-					if (!answ) {
-						this.errorText = err
-						return
-					}
+				this.$store.dispatch("getCategories").then(answ => {
 					this.categoryList = answ.data
-				});
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
+				})
 			}
 		},
 		async created () {

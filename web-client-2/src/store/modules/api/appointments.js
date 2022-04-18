@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const actions = {
-	async getRequestList({rootState}, callback) {
+	async getRequestList({rootState}) {
         var headers = {'Authorization': rootState.auth.loginHash}
         return await axios.get('appointments/list/requested', {headers}).then(res => {
             return res

@@ -44,15 +44,14 @@
                 }
                 this.errorText = ""
                 this.isLoading = true
-                this.$store.dispatch("deleteCategory", {category, callback: (_answ, err) => {
+                this.$store.dispatch("deleteCategory", category).then(_answ => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     this.$emit("onDelete")
                     this.closeModal()
-                }})
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
             }
         }
     }

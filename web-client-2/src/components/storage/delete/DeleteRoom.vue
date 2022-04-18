@@ -38,15 +38,15 @@
             },
 			deleteRoom () {
 				this.isLoading = true
-				this.$store.dispatch("deleteRoom", {room: {name: this.room}, callback: (res, err) => {
+                this.errorText = ""
+				this.$store.dispatch("deleteRoom", {name: this.room}).then(_res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
                     this.closeModal()
 					this.$emit("onDelete")
-				}})
+				}).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
 			},
         }
     }

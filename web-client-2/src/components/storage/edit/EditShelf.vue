@@ -46,15 +46,15 @@
                     old_name: this.shelf,
                     name: this.name
                 }
-				this.$store.dispatch("editShelf", {shelf, callback: (_res, err) => {
+                this.errorText = ""
+				this.$store.commit("editShelf", shelf).then(_res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
                     this.closeModal()
 					this.$emit('onEdit')
-				}})
+				}).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
 			},
         }
     }

@@ -44,15 +44,15 @@
                     old_name: this.room,
                     name: this.name
                 }
-				this.$store.dispatch("editRoom", {room, callback: (_res, err) => {
+                this.errorText = ""
+				this.$store.dispatch("editRoom", room).then(_res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
                     this.closeModal()
 					this.$emit('onEdit')
-				}})
+				}).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
 			},
         }
     }

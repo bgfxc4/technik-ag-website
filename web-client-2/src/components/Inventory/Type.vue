@@ -88,14 +88,13 @@
 			loadItems () {
 				this.isLoading = true
 				this.errorText = ""
-				this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: this.typeName, callback: (answ, err, _t) => {
+				this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: this.typeName}).then(answ => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
 					this.itemList = answ.data
-				}})
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
+				})
 			}
 		},
 		async created () {

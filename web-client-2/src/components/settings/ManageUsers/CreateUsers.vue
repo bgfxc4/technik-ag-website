@@ -49,18 +49,16 @@
                     display_name: this.userName,
                     login_hash: ("login_hash", sha512("technikag" + this.userName + ":" + this.userPassword))
                 }
-                this.$store.dispatch("createUser", {user, callback: (_res, err) => {
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
+                this.$store.dispatch("createUser", user).then(_res => {
                     $('#createUserModalButton').click()
                     this.userPassword = ""
                     this.userName = ""
                     this.userPassword = ""
                     this.userPassword2 = ""
                     this.$emit("loadUsers")
-                }})
+                }).catch(err => {
+                    this.errorText = err
+                })
             },
         }
 	}

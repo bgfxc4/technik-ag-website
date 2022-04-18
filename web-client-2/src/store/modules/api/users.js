@@ -1,49 +1,49 @@
 import axios from "axios"
 
 const actions = {
-	async getUsers({rootState}, callback) {
+	async getUsers({rootState}) {
         var headers = {'Authorization': rootState.auth.loginHash}
         axios.get('users/list', {headers}).then(res => {
-            callback(res)
+            return res
         }).catch(err => {
             console.log(err)
-            callback(undefined, err)
+            throw err
         })
     },
-    async createUser({rootState}, params) {
+    async createUser({rootState}, user) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post('users/new', params["user"], {headers}).then(res => {
-            params['callback'](res)
+        axios.post('users/new', user, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params['callback'](undefined, err)
+            throw err
         })
     },
-    async deleteUser({rootState}, params) {
+    async deleteUser({rootState}, user) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post('users/delete', params["user"], {headers}).then(res => {
-            params['callback'](res)
+        axios.post('users/delete', user, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params['callback'](undefined, err)
+            throw err
         })
     },
-    async editPermUser({rootState}, params) {
+    async editPermUser({rootState}, user) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("users/permedit", params["user"], {headers}).then(res => {
-            params['callback'](res)
+        axios.post("users/permedit", user, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params['callback'](undefined, err)
+            throw err
         })
     },
-    async editUser({rootState}, params) {
+    async editUser({rootState}, user) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("users/edit", params["user"], {headers}).then(res => {
-            params['callback'](res)
+        axios.post("users/edit", user, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params['callback'](undefined, err)
+            throw err
         })
     }
 }

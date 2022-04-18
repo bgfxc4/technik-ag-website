@@ -45,16 +45,16 @@
 					shelf: this.shelf,
 					name: this.name
 				}
-				this.$store.dispatch("createComp", {comp: comp, callback: (_res, err) => {
+                this.errorText = ""
+				this.$store.dispatch("createComp", comp).then(_res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
 					this.name = ""
                     this.closeModal()
 					this.$emit("onCreate")
-				}})
+				}).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
 			},
         }
     }

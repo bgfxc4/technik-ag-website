@@ -72,36 +72,39 @@
 			openType(cat, type) {
 				this.$router.push(`/inventory/${cat}/${type}/`)
 			},
-			loadItemsForTypes: async function (list) {
+			loadItemsForTypes: function (list) {
 				for (var t of list) {
 					this.typeList.push({ name: t, items: [] })
 					this.isLoading = true
-					this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: t, callback: (answ, err, _t) => {
+					this.errorText = ""
+					this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: t}).then(answ => {
 						this.isLoading = false
-						if (!answ)
+						if (!answ.res)
 							return
 						for (var i in this.typeList) {
-							if (this.typeList[i].name == _t) {
-								this.typeList[i].items = answ.data
+							if (this.typeList[i].name == answ.typeName) {
+								this.typeList[i].items = answ.res.data
 							}
 						}
-					}})
+					}).catch(err => {
+						this.errorText = err
+						this.isLoading = false
+					})
 				}
 			},
 			loadTypeList () {
 				this.isLoading = true
 				this.typeList = []
-				this.$store.dispatch("getCategories", (answ, err) => {
+				this.$store.dispatch("getCategories").then(answ => {
 					this.isLoading = false
-					if (!answ) {
-						this.errorText = err
-						return
-					}
 					for (var cat of answ.data) {
 						if (cat.name == this.catName) {
 							this.loadItemsForTypes(cat.types)
 						}
 					}
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
 				})
 			}
 		},

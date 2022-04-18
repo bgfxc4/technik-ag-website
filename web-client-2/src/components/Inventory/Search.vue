@@ -56,14 +56,13 @@
 				this.itemList = []
 				this.isLoading = true
 				this.errortext = ""
-				this.$store.dispatch("getItemsBySearch", {keyword: this.keyword, callback: (answ, err) => {
+				this.$store.dispatch("getItemsBySearch", this.keyword).then(answ => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
 					this.itemList = answ.data
-				}})
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
+				})
 			}
 		},
 		async created () {

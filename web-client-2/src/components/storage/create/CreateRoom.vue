@@ -36,15 +36,15 @@
             },
 			createRoom () {
 				this.isLoading = true
-				this.$store.dispatch("createRoom", {room: {name: this.name}, callback: (_res, err) => {
+                this.errorText = ""
+				this.$store.dispatch("createRoom", {name: this.name}).then(_res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
                     this.closeModal()
 					this.$emit('onCreate')
-				}})
+				}).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
 			},
         }
     }

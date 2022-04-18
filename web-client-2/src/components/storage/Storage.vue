@@ -95,13 +95,12 @@
             },
 			getStorage () {
 				this.isLoading = true
-				this.$store.dispatch("getStorage", (res, err) => {
+				this.$store.dispatch("getStorage").then(res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
 					this.storage = res.data
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
 				})
 			},
 		},

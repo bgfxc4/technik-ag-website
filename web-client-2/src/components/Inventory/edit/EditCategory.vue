@@ -135,18 +135,16 @@
                 }
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("editCategory", {category, callback: (_answ, err) => {
+                this.$store.dispatch("editCategory", category).then(_answ => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     this.$emit("onEdit")
                     this.closeModal()
-                }})
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
             },
             fillInCategory () {
-                console.log(this.category)
                 this.categoryName = this.category.name
                 this.customFields = this.category.custom_fields
                 this.$refs['image-upload']._url = this.$store.state.apiUrl + '/category/getimg/' + this.category.name

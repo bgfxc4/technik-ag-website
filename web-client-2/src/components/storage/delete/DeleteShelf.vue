@@ -43,15 +43,15 @@
 					room: this.room,
 					name: this.shelf
 				}
-				this.$store.dispatch("deleteShelf", {shelf: shelf, callback: (res, err) => {
+                this.errorText = ""
+				this.$store.dispatch("deleteShelf", shelf).then(_res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
                     this.closeModal()
 					this.$emit("onDelete")
-				}})
+				}).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
 			},
         }
     }

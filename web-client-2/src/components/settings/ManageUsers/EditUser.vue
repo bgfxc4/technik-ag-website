@@ -62,15 +62,14 @@
 
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("editUser", {user: u, callback: (_res, err) => {
+                this.$store.dispatch("editUser", u).then(_res => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     this.$emit("loadUsers")
                     $('#userEditModalButton').click()
-                }})
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
             },
         }
 	}

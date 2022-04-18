@@ -110,15 +110,14 @@
                 }
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("editItem", {item, callback: (_answ, err) => {
+                this.$store.dispatch("editItem", item).then(_answ => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     this.$emit("onEdit")
                     this.closeModal()
-                }})
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
             },
             fillInItem () {
                 console.log(this.item)
@@ -128,27 +127,23 @@
                 this.itemAmount = this.item.amount
                 this.$refs['image-upload']._url = this.$store.state.apiUrl + '/equipment/getimg/' + this.item.id
 
-                this.$store.dispatch("getStorage", (res, err) => {
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
+                this.$store.dispatch("getStorage").then(res => {
                     this.storage = res.data
                     this.roomIndex = this.storage.findIndex(r => r.name == this.item.room)
                     this.shelfIndex = this.storage[this.roomIndex].shelfs.findIndex(s => s.name == this.item.shelf)
                     this.compIndex = this.storage[this.roomIndex].shelfs[this.shelfIndex].compartments.findIndex(c => c.name == this.item.compartment)
+                }).catch(err => {
+                    this.errorText = err
                 })
 
-                this.$store.dispatch("getCategories", (res, err) => {
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
+                this.$store.dispatch("getCategories").then(res => {
                     for (var cat of res.data) {
                         if (cat.name == this.item.category) {
                             this.customFieldsLoaded = cat.custom_fields
                         }
                     }
+                }).catch(err => {
+                    this.errorText = err
                 })
             }
         }

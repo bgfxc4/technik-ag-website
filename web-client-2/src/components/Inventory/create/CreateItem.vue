@@ -140,15 +140,14 @@
                 }
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("createItem", {item, callback: (_answ, err) => {
+                this.$store.dispatch("createItem", item).then(_answ => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     this.$emit("onCreate")
                     this.closeModal()
-                }})
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
             },
             fillInItem (item) {
                 this.itemName = item.name + " - copy"
@@ -167,11 +166,7 @@
                 }
             },
             openCreateItem () {
-                this.$store.dispatch("getCategories", (res, err) => {
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
+                this.$store.dispatch("getCategories").then(res => {
                     for (var cat of res.data) {
                         if (cat.name == this.categoryName) {
                             this.customFieldsLoaded = cat.custom_fields
@@ -181,21 +176,18 @@
                             return
                         }
                     }
+                }).catch(err => {
+                    this.errorText = err
                 })
-                this.$store.dispatch("getStorage", (res, err) => {
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
+                this.$store.dispatch("getStorage").then(res => {
                     this.storage = res.data
-                    console.log(this.storage)
+                }).catch(err => {
+                    this.errorText = err
                 })
-                this.$store.dispatch("getEquipment", (res, err) => {
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
+                this.$store.dispatch("getEquipment").then(res => {
                     this.templateList = res.data
+                }).catch(err => {
+                    this.errorText = err
                 })
             }
         },

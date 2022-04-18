@@ -1,134 +1,133 @@
 import axios from "axios"
 
 const actions = {
-	async getEquipment({rootState}, callback) {
+	async getEquipment({rootState}) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.get('equipment/list', {headers}).then(res => {
-            callback(res)
+        return await axios.get('equipment/list', {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            callback(undefined, err)
+            throw err
         })
     },
-    async getCategories({rootState}, callback) {
+    async getCategories({rootState}) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.get('categories/list', {headers}).then(res => {
-            callback(res)
+        return await axios.get('categories/list', {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            callback(undefined, err)
+            throw err
         })
     },
     async getItemsByType({rootState}, params) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.get(`equipment/bytype/${params["catName"]}/${params["typeName"]}`, {headers}).then(res => {
-            params["callback"](res, undefined, params["typeName"])
+        return await axios.get(`equipment/bytype/${params["catName"]}/${params["typeName"]}`, {headers}).then(res => {
+            return {res, typeName: params["typeName"]}
         }).catch(err => {
             console.log(err)
-            params["callback"](undefined, err)
+            throw err
         })
     },
-    async getItemByID({rootState}, params) {
+    async getItemByID({rootState}, itemID) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.get(`equipment/byid/${params["itemID"]}`, {headers}).then(res => {
-            params["callback"](res, undefined)
+        return await axios.get(`equipment/byid/${itemID}`, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params["callback"](undefined, err)
+            throw err
         })
     },
-    async getItemsBySearch({rootState}, params) {
+    async getItemsBySearch({rootState}, keyword) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("equipment/search", {keywords: params["keyword"]}, {headers}).then(res => {
-            params["callback"](res, undefined)
-        }).catch(err => {
-            console.log("search err")
-
-            params["callback"](undefined, err)
-        })
-    },
-
-    async createCategory({rootState}, params) {
-        var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("category/new", params['category'], {headers}).then(res => {
-            params["callback"](res, undefined)
+        return await axios.post("equipment/search", {keywords: keyword}, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params["callback"](undefined, err)
-        })
-    },
-    async createType({rootState}, params) {
-        var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("type/new", params['type'], {headers}).then(res => {
-            params["callback"](res, undefined)
-        }).catch(err => {
-            console.log(err)
-            params["callback"](undefined, err)
-        })
-    },
-    async createItem({rootState}, params) {
-        var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("equipment/new", params['item'], {headers}).then(res => {
-            params["callback"](res, undefined)
-        }).catch(err => {
-            console.log(err)
-            params["callback"](undefined, err)
+            throw err
         })
     },
 
-    async deleteCategory({rootState}, params) {
+    async createCategory({rootState}, category) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("category/delete", params['category'], {headers}).then(res => {
-            params["callback"](res, undefined)
+        return await axios.post("category/new", category, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params["callback"](undefined, err)
+            throw err
         })
     },
-    async deleteType({rootState}, params) {
+    async createType({rootState}, type) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("type/delete", params['type'], {headers}).then(res => {
-            params["callback"](res, undefined)
+        return await axios.post("type/new", type, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params["callback"](undefined, err)
+            throw err
         })
     },
-    async deleteItem({rootState}, params) {
+    async createItem({rootState}, item) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("equipment/delete", params['item'], {headers}).then(res => {
-            params["callback"](res, undefined)
+        return await axios.post("equipment/new", item, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params["callback"](undefined, err)
+            throw err
         })
     },
 
-    async editCategory({rootState}, params) {
+    async deleteCategory({rootState}, category) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("category/edit", params['category'], {headers}).then(res => {
-            params["callback"](res, undefined)
+        return await axios.post("category/delete", category, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params["callback"](undefined, err)
+            throw err
         })
     },
-    async editType({rootState}, params) {
+    async deleteType({rootState}, type) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("type/edit", params['type'], {headers}).then(res => {
-            params["callback"](res, undefined)
+        return await axios.post("type/delete", type, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params["callback"](undefined, err)
+            throw err
         })
     },
-    async editItem({rootState}, params) {
+    async deleteItem({rootState}, item) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        axios.post("equipment/edit", params['item'], {headers}).then(res => {
-            params["callback"](res, undefined)
+        return await axios.post("equipment/delete", item, {headers}).then(res => {
+            return res
         }).catch(err => {
             console.log(err)
-            params["callback"](undefined, err)
+            throw err
+        })
+    },
+
+    async editCategory({rootState}, category) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post("category/edit", category, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
+    async editType({rootState}, type) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post("type/edit", type, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
+    async editItem({rootState}, item) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post("equipment/edit", item, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
         })
     },
 }

@@ -50,15 +50,14 @@
                 }
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("editType", {type, callback: (_answ, err) => {
+                this.$store.dispatch("editType", type).then(_answ => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     this.$emit("onEdit")
                     this.closeModal()
-                }})
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
             },
             fillInType () {
                 console.log(this.type)

@@ -42,15 +42,14 @@
                 }
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("deleteType", {type, callback: (_answ, err) => {
+                this.$store.dispatch("deleteType", type).then(_answ => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     this.$emit("onDelete")
                     this.closeModal()
-                }})
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
             }
         }
     }

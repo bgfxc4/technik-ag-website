@@ -83,15 +83,13 @@
 			loadItem () {
 				this.isLoading = true
 				this.errorText = ""
-				this.$store.dispatch("getItemByID", {itemID: this.itemID, callback: (answ, err) => {
+				this.$store.dispatch("getItemByID", this.itemID).then(answ => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
-					console.log(answ.data[0].equipment[0])
 					this.item = answ.data[0].equipment[0]
-				}})
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
+				})
 			}
 		},
 		async created () {

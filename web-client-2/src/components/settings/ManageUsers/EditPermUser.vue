@@ -76,15 +76,14 @@
                     permissions
                 }
                 this.isLoading = true
-                this.$store.dispatch("editPermUser", {user, callback: (_res, err) => {
+                this.$store.dispatch("editPermUser", user).then(_res => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     $('#userPermissionsModalButton').click()
                     this.$emit("loadUsers")
-                }})
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
             },
         }
 	}

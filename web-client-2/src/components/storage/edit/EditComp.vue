@@ -48,15 +48,15 @@
                     old_name: this.comp,
                     name: this.name
                 }
-				this.$store.dispatch("editComp", {comp, callback: (_res, err) => {
+                this.errorText = ""
+				this.$store.dispatch("editComp", comp).then(_res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
                     this.closeModal()
 					this.$emit('onEdit')
-				}})
+				}).catch(err => {
+					this.isLoading = false
+                    this.errorText = err
+                })
 			},
         }
     }

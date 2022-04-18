@@ -129,15 +129,14 @@
                 }
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("createCategory", {category, callback: (_answ, err) => {
+                this.$store.dispatch("createCategory", category).then(_answ => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     this.$emit("onCreate")
                     this.closeModal()
-                }})
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
             }
         }
     }

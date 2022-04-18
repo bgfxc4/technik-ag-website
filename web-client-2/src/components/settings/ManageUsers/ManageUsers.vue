@@ -70,26 +70,22 @@
         methods: {
             deleteUser () {
                 this.deleteUserErrorText = ""
-                this.$store.dispatch("deleteUser", { user: {id: this.deleteUserObject.id}, callback: (_res, err) => {
-                    if (err) {
-                        this.deleteUserErrorText = err
-                        return
-                    }
+                this.$store.dispatch("deleteUser", {id: this.deleteUserObject.id}).then(_res => {
                     $('#deleteUserModalButton').click()
-                    this.deleteUserErrorText = ""
                     this.loadUsers()
-                }})
+                }).catch(err => {
+                    this.deleteUserErrorText = err
+                })
             },
             loadUsers () {
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("getUsers", (res, err) => {
+                this.$store.dispatch("getUsers").then(res => {
                     this.isLoading = false
-                    if (err) {
-                        this.errorText = err
-                        return
-                    }
                     this.userList = res.data
+                }).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
                 })
             }
         },

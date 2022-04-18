@@ -43,16 +43,16 @@
 					room: this.room,
 					name: this.name
 				}
-				this.$store.dispatch("createShelf", {shelf, callback: (_res, err) => {
+                this.errorText = ""
+				this.$store.dispatch("createShelf", shelf).then(_res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
                     this.closeModal()
                     this.name = ""
 					this.$emit('onCreate')
-				}})
+				}).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
 			},
         }
     }

@@ -46,15 +46,14 @@
 					name: this.comp
 				}
 				this.errorText = ""
-				this.$store.dispatch("deleteComp", {comp: comp, callback: (_res, err) => {
+				this.$store.dispatch("deleteComp", comp).then(_res => {
 					this.isLoading = false
-					if (err) {
-						this.errorText = err
-						return
-					}
 					this.$emit("onDelete")
                     this.closeModal()
-				}})
+				}).catch(err => {
+                    this.isLoading = false
+                    this.errorText = err
+                })
 			},
         }
     }
