@@ -7,7 +7,7 @@
             </div>
             <div class="col-2"/>
             <div class="col-4 h-100">
-                <request-list ref="reqList"/>
+                <request-list @update="getAppointments" ref="reqList"/>
             </div>
         </div>
         <div class="row mt-4">

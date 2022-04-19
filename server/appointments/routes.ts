@@ -35,6 +35,40 @@ main.app.get("/appointments/list/requested", async (req, res) => {
 	})
 })
 
+main.app.post("/appointments/delete/approved", async (req, res) => {
+	var type: main.bodyType = {
+		fields: {
+			"id": "string"
+		},
+		required: ["id"]
+	}
+
+	if (!(await main.check_request(type, PERMS.EditAppmnts, req.body, req.headers, res)))
+		return
+	db_helper.delete_appointment_from_db(req.body).then(data => {
+		res.send(data)
+	}).catch(err => {
+		res.status(500).send(err)
+	})
+})
+
+main.app.post("/appointments/delete/request", async (req, res) => {
+	var type: main.bodyType = {
+		fields: {
+			"id": "string"
+		},
+		required: ["id"]
+	}
+
+	if (!(await main.check_request(type, PERMS.EditAppmnts, req.body, req.headers, res)))
+		return
+	db_helper.delete_requested_appointment_from_db(req.body).then(data => {
+		res.send(data)
+	}).catch(err => {
+		res.status(500).send(err)
+	})
+})
+
 main.app.post("/appointments/request", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {

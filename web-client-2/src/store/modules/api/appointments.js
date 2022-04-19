@@ -19,6 +19,24 @@ const actions = {
             throw err
         })
     },
+    async deleteAppointmentRequest({rootState}, request) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post('appointments/delete/request', request, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
+    async approveAppointmentRequest({rootState}, request) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post('appointments/approve', request, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
 }
 
 export default {

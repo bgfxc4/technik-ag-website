@@ -22,6 +22,26 @@ export async function get_requested_appointments_from_db() {
     })
 }
 
+export async function delete_appointment_from_db(body: any) {
+    return await main.db.collection("appointments").deleteOne({id: body.id}).then(() => {
+        return "ok"
+    }).catch(err => {
+        console.error("Error occured in 'delete_appointment':")
+        console.error(err)
+        throw err
+    })
+}
+
+export async function delete_requested_appointment_from_db(body: any) {
+    return await main.db.collection("requested_appointments").deleteOne({id: body.id}).then(() => {
+        return "ok"
+    }).catch(err => {
+        console.error("Error occured in 'delete_requested_appointment':")
+        console.error(err)
+        throw err
+    })
+} 
+
 export async function add_appointment_request_to_db(body: any) {
     var appmnt :appmnts.Appointment = {
         id: "A"+uuid.v4(),
