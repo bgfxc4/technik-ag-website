@@ -74,6 +74,7 @@
 			async loadCategoryList () {
 				this.isLoading = true
 				this.$store.dispatch("getCategories").then(answ => {
+					this.isLoading = false
 					this.categoryList = answ.data
 				}).catch(err => {
 					this.isLoading = false
