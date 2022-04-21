@@ -90,7 +90,8 @@
 				this.errorText = ""
 				this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: this.typeName}).then(answ => {
 					this.isLoading = false
-					this.itemList = answ.data
+					console.log(answ)
+					this.itemList = answ.res.data
 				}).catch(err => {
 					this.isLoading = false
 					this.errorText = err
