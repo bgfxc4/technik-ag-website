@@ -1,14 +1,49 @@
 <template>
-    <Calendar :first-day-of-week="2" :theme-styles="themeStyles" class="max-w-full" :masks="masks" is-expanded>
-    </Calendar>
+    <loading-icon v-if="isLoading" size="3x"/>
+    <div style="position: relative">
+        <div style="position: absolute; width: 100%" :class="(!!errorText) ?  'blur' : ''">
+            <Calendar :attributes="attributes" :first-day-of-week="2" :theme-styles="themeStyles" class="max-w-full bg-light" :masks="masks" is-expanded>
+                <template #day-popover="{ dayTitle, attributes }">
+                    <div>
+                        <div class="text-xs text-gray-300 font-semibold text-center">
+                            {{ dayTitle }}
+                        </div>
+                        <popover-row
+                            v-for="attr in attributes"
+                            :key="attr.key"
+                            :attribute="attr">
+                            <b>{{attr.customData.name}}:</b> {{ attr.customData.description }} <button class="btn btn-danger px-1 py-0 mx-2" style="font-size: 1em;" v-b-modal.deleteAppmntModal @click="selectedAppmnt=attr.key"><font-awesome-icon icon="trash-can"/></button>
+                        </popover-row>
+                    </div>
+                </template>
+            </Calendar>
+        </div>
+        <error-text v-if="!!errorText" v-bind:msg="errorText" style="position: absolute; top: 20px; right: 50%; transform: translate(50%, 0%);"/>
+    </div>
+    <b-modal size="lg" id="deleteAppmntModal" class="text-secondary" centered hide-footer hide-header-close title="Delete Appointment" header="test" header-class="justify-content-center">
+        <div class="modal-body text-center">
+            Do you really want to delete the appointment?
+            <loading-icon v-if="isLoading" size="3x"/>
+            <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/><br>
+            <b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.deleteAppmntModal>Cancel</b-button>
+            <button class="btn btn-outline-danger" @click="deleteAppmnt">Delete Appointment</button>
+        </div>
+    </b-modal>
 </template>
 
 <script>
-    import {Calendar} from "v-calendar"
+    import { sha512 } from "js-sha512"
+    import {Calendar, PopoverRow} from "v-calendar"
+    import ErrorText from "../helpers/ErrorText.vue"
+    import LoadingIcon from "../helpers/LoadingIcon.vue"
     export default {
         name: "AppointmentCalendar",
+        emits: ["update"],
         components: {
-            Calendar
+            Calendar,
+            ErrorText,
+            LoadingIcon,
+            PopoverRow
         },
         data() {
             const hSpacing = "0"
@@ -17,33 +52,100 @@
                     weekdays: 'WWW',
                 },
                 themeStyles: {
-        wrapper: {
-          background: 'linear-gradient(to bottom right, #ff5050, #ff66b3)',
-          color: '#fafafa',
-          border: '0',
-          boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.14), 0 6px 20px 0 rgba(0, 0, 0, 0.13)',
-          borderRadius: '5px',
+                    wrapper: {
+                        background: 'linear-gradient(to bottom right, #ff5050, #ff66b3)',
+                        color: '#fafafa',
+                        border: '0',
+                        boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.14), 0 6px 20px 0 rgba(0, 0, 0, 0.13)',
+                        borderRadius: '5px',
+                    },
+                        header: {
+                        padding: `0 ${hSpacing}`,
+                    },
+                        headerHorizontalDivider: {
+                        borderTop: 'solid rgba(255, 255, 255, 0.2) 1px',
+                        width: '80%',
+                    },
+                    weekdays: {
+                        padding: `0 ${hSpacing} 0 ${hSpacing}`,
+                    },
+                    weeks: {
+                        padding: `0 ${hSpacing} ${hSpacing} ${hSpacing}`,
+                    },
+                },
+                attributes: [],
+                colors: ['gray', 'red', 'orange', 'yellow', 'green', 'teal', 'blue', 'indigo', 'purple', 'pink'],
+                appointmentList: [],
+                isLoading: false,
+                errorText: "",
+                selectedAppmnt: ""
+            }
         },
-        header: {
-          padding: `0 ${hSpacing}`,
-        },
-        headerHorizontalDivider: {
-          borderTop: 'solid rgba(255, 255, 255, 0.2) 1px',
-          width: '80%',
-        },
-        weekdays: {
-          padding: `0 ${hSpacing} 0 ${hSpacing}`,
-        },
-        weeks: {
-          padding: `0 ${hSpacing} ${hSpacing} ${hSpacing}`,
-        },
-      }
+        methods: {
+            closeDeleteModal () {
+                $("#deleteAppmntModal div #closeModalButton").click()
+            },
+            loadAppointments () {
+                this.isLoading = true
+                this.errorText = ""
+                this.$store.dispatch("getAppointmentList").then(res => {
+                    this.isLoading = false
+                    this.appointmentList = res.data
+                    this.generateAttributes()
+                }).catch(err => {
+                    this.isLoading = false
+                    console.log(err)
+                    this.errorText = err
+                })
+            },
+            generateAttributes () {
+                this.attributes = []
+                for (var a of this.appointmentList) {
+                    var attr = {
+                        key: a.id,
+                        highlight: this.colors[this.idToColorIndex(sha512(a.id))],
+                        dates: {
+                            start: new Date(a.date),
+                            end: new Date(a.end_date)
+                        },
+                        popover: true,
+                        customData: {
+                            name: a.name,
+                            description: a.description
+                        }
+                        
+                    }
+                    this.attributes.push(attr)
+                }
+            },
+            idToColorIndex (id) {
+                var i = 0;
+                for (var j = 1; j < 9; j++)
+                    i += id.charCodeAt(j)
+                return i % this.colors.length
+            },
+            deleteAppmnt () {
+                this.isLoading = true
+                this.errorText = ""
+                this.$store.dispatch("deleteAppointment", {id: this.selectedAppmnt}).then(_ => {
+                    this.isLoading = false
+                    this.$emit("update")
+                    this.closeDeleteModal()
+                }).catch(err => {
+                    this.isLoading = false
+                    console.log(err)
+                    this.errorText = err
+                })
             }
         },
     }
 </script>
 
 <style lang="postcss" scoped>
+    .blur {
+        filter: blur(5px)
+    }
+
     ::-webkit-scrollbar {
         width: 0px;
     }

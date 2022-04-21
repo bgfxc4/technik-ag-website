@@ -3,7 +3,7 @@
         <div class="row mt-4 top-row">
             <div class="col-6">
                 <h4>Appointments:</h4>
-                <appointment-calendar />
+                <appointment-calendar @update="getAppointments" ref="calendar" />
             </div>
             <div class="col-2"/>
             <div class="col-4 h-100">
@@ -41,6 +41,7 @@
         methods: {
             getAppointments () {
                 this.$refs.reqList.getRequests()
+                this.$refs.calendar.loadAppointments()
             },
         },
         mounted () {

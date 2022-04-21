@@ -93,6 +93,7 @@
                 this.isLoading = true
                 this.errorText = ""
                 this.$store.dispatch("requestAppointment", request).then(_ => {
+                    this.isLoading = false
                     this.$emit("onCreate")
                     this.closeModal()
                 }).catch(err => {
