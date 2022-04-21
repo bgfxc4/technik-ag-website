@@ -118,7 +118,7 @@ main.app.post("/users/test", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {
             "id": "string",
-            "user": user,
+            "user": main.object(user),
             "display_name": "string"
         },
         required: ["id"]

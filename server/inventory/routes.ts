@@ -63,11 +63,20 @@ main.app.post("/equipment/new", async (req, res) => {
 	})
 })
 
+var custom_field_type: main.bodyType = {
+	fields: {
+		"name": "string",
+		"type": "string",
+		"options": main.array("string")
+	},
+	required: ["name", "type"]
+}
+
 main.app.post("/category/new", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {
 			"name": "string",
-			"custom_fields": "object",
+			"custom_fields": main.array(custom_field_type),
 			"image": "string"
 		},
 		required: ["name"]
@@ -171,7 +180,7 @@ main.app.post("/category/edit", async (req, res) => {
 			"old_name": "string",
 			"new_name": "string",
 			"image": "string",
-			"custom_fields": "object"
+			"custom_fields": main.array(custom_field_type)
 		},
 		required: ["old_name"]
 	}

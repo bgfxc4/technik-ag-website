@@ -43,9 +43,29 @@ app.listen(config.main_server_port, () => {
 	console.log(`[express] The server is listening on port ${config.main_server_port}`)
 })
 
+interface nestedBodyType {
+	type: string,
+	content: bodyType|string
+}
+
 export interface bodyType {
-	fields: { [key:string]: string|bodyType}
+	fields: { [key:string]: string|nestedBodyType}
 	required?: string[]
+} 
+
+export function array(type: bodyType|string) {
+	var ret: nestedBodyType = {
+		type: "array",
+		content: type
+	}
+	return  ret
+}
+
+export function object(type: bodyType) {
+	return {
+		type: "object",
+		content: type
+	}
 } 
 
 export async function check_request(type: bodyType, needs_auth: number, body: any, headers: any, res: any) {
@@ -67,46 +87,69 @@ export async function check_request(type: bodyType, needs_auth: number, body: an
 	return true
 }
 
-function check_request_type(obj: any, type: bodyType, res: any, pre: string) {
-	if (type.required) { // if there are required types, check them
-		for (var key of type.required) {
-			if (obj[key] === undefined) {
-				res.status(422).send(`The field '${pre+key}' is required!`)
-				return false
-			}
-		}
-	}
-
-	for (var key of Object.keys(obj)) {
-		if (type.fields[key] === undefined) {
-			res.status(422).send(`You are not supposed to specify the field ${pre+key}!`)
+function check_request_type(obj: any, type: bodyType|string, res: any, pre: string) {
+	if (typeof type == "string") {
+		if (!check_typeof_helper(type as string, obj)) {
+			res.status(422).send(`The request has to be of type '${type}'!`)
 			return false
 		}
-		switch (type.fields[key]) {
-			case "string":
-				if (typeof obj[key] !== "string") {
-					res.status(422).send(`The field ${pre+key} has to be of type 'string'!`)
+		return true
+	} else {
+		if (type.required) { // if there are required types, check them
+			for (var key of type.required) {
+				if (obj[key] === undefined) {
+					res.status(422).send(`The field '${pre+key}' is required!`)
 					return false
 				}
-				break
-			case "number":
-				if ( isNaN(obj[key])) {
-					res.status(422).send(`The field ${pre+key} has to be of type 'number'!`)
-					return false
-				}
-				break
-			case "object":
-				if (typeof obj[key] !== "object") {
-					res.status(422).send(`The field ${pre+key} has to be of type 'object'!`)
-					return false
-				}
-				break
-			default:
-				if (typeof type.fields[key] === "object") { // if there is a nested object in the body required => recursion
-					if (!check_request_type(obj[key], type.fields[key] as bodyType, res, pre+`${key}.`))
-						return false
-				}
+			}
 		}
+	
+		for (var key of Object.keys(obj)) {
+			if (type.fields[key] === undefined) {
+				res.status(422).send(`You are not supposed to specify the field ${pre+key}!`)
+				return false
+			}
+
+			if (typeof type.fields[key] === "object") { // if there is a nested object in the body required => recursion
+				switch ((type.fields[key] as nestedBodyType).type) { // check of what type the nested type is
+					case "object": // if it is a normal object, just do recursion
+						if (!check_request_type(obj[key], (type.fields[key] as nestedBodyType).content as bodyType, res, pre+`${key}.`))
+							return false
+						break
+					case "array": // if it is an array, iterate through it and check type of every item
+						for (var i in obj[key])
+							if (!check_request_type(obj[key][i], (type.fields[key] as nestedBodyType).content, res, pre+`${key}[${i}].`))
+								return false
+						break
+				}
+			} else if (typeof type.fields[key] === "string") { // if the type is just defined by a string, use the helper method to check the type
+				if (!check_typeof_helper(type.fields[key] as string, obj[key])) {
+					res.status(422).send(`The field ${pre+key} has to be of type '${type.fields[key]}'!`)
+					return false
+				}
+			}
+		}
+		return true
+	}
+}
+
+function check_typeof_helper(type: string, obj: any) {
+	switch (type) {
+		case "string":
+			if (typeof obj !== "string") {
+				return false
+			}
+			break
+		case "number":
+			if ( isNaN(obj)) {
+				return false
+			}
+			break
+		case "object":
+			if (typeof obj !== "object") {
+				return false
+			}
+			break
 	}
 	return true
 }
