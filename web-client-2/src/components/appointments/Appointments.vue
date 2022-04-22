@@ -1,17 +1,15 @@
 <template>
     <div id="appointments" class="container">
         <div class="row mt-4 top-row">
-            <div class="col-6">
+            <div class="col-md-6 col-12" style="height: 90%">
                 <h4>Appointments:</h4>
                 <appointment-calendar @update="getAppointments" ref="calendar" />
             </div>
-            <div class="col-2"/>
-            <div class="col-4 h-100">
+            <div class="col-md-2 col-12"/>
+            <div class="col-md-4 col-12" style="height: 100%">
                 <request-list @update="getAppointments" ref="reqList"/>
             </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col-3">
+            <div class="col-md-3 col-12 mt-4">
                 <h5>Select a date to request an appointment:</h5>
                 <date-picker :min-date='new Date()' :first-day-of-week="2" class="col-4" v-model="createDate" :model-config="{type: 'number'}"/>
                 <create-appmnt-request @onCreate="getAppointments" v-show="createDate" :date="createDate" />
