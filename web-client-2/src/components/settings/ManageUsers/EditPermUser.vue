@@ -1,27 +1,24 @@
 <template>
     <b-modal size="lg" id="userPermissionsModal" class="text-secondary" centered hide-footer hide-header-close title="Edit Permissions" header="test" header-class="justify-content-center">
         <div class="modal-body text-center">
-            <input class="form-check-input" type="checkbox" v-model="permViewInvChecked" id="permViewInv">
-            <label class="form-check-label" for="permViewInv">View Inventory</label>
-            <input class="form-check-input" type="checkbox" v-model="permEditInvChecked" id="permEditInv">
-            <label class="form-check-label" for="permEditInv">Edit Inventory</label><br>
+            <div class="card" v-for="p in Object.keys(perms)" :key="p">
+                <div class="card-header" :id="`heading${p}`">
+                    <h5 class="mb-0">
+                        <a class="btn btn-link" data-bs-toggle="collapse" :data-bs-target="`#collapse${p}`" aria-expanded="false" aria-controls="collapseOne">
+                            {{p}}
+                        </a>
+                    </h5>
+                </div>
 
-            <input class="form-check-input" type="checkbox" v-model="permViewStorChecked" id="permViewStor">
-            <label class="form-check-label" for="permViewStor">View Storage</label>
-            <input class="form-check-input" type="checkbox" v-model="permEditStorChecked" id="permEditStor">
-            <label class="form-check-label" for="permEditStor">Edit Storage</label><br>
-
-            <input class="form-check-input" type="checkbox" v-model="permViewUsrChecked" id="permViewUsr">
-            <label class="form-check-label" for="permViewUsr">View Users</label>
-            <input class="form-check-input" type="checkbox" v-model="permEditUsrChecked" id="permEditUsr">
-            <label class="form-check-label" for="permEditUsr">Edit Users</label>
-
-            <input class="form-check-input" type="checkbox" v-model="permRequestAppmntsChecked" id="permRequestAppmnt">
-            <label class="form-check-label" for="permRequestAppmnt">Request Appointments</label>
-            <input class="form-check-input" type="checkbox" v-model="permViewAppmntChecked" id="permViewAppmnt">
-            <label class="form-check-label" for="permViewAppmnt">View Appointments </label>
-            <input class="form-check-input" type="checkbox" v-model="permEditAppmntsChecked" id="permEditAppmnt">
-            <label class="form-check-label" for="permEditAppmnt">Edit Appointments</label>
+                <div :id="`collapse${p}`" class="collapse" :aria-labelledby="`heading${p}`">
+                    <div class="card-body">
+                        <template v-for="i in Object.keys(perms[p])" :key="i">
+                            <input class="form-check-input" type="checkbox" v-model="perms[p][i].checked" :id="`perm-${p}-${i}`">
+                            <label class="form-check-label" :for="`perm-${p}-${i}`">{{perms[p][i].desc}}</label><br>
+                        </template>
+                    </div>
+                </div>
+            </div>
 
             <loading-icon v-if="isLoading" size="3x"/>
             <error-text v-if="errorText != ''" :msg="errorText"/><br>
@@ -44,18 +41,61 @@
         emits: ["loadUsers"],
 		data () {
 			return {
-                permViewInvChecked: false,
-                permEditInvChecked: false,
-
-                permViewStorChecked: false,
-                permEditStorChecked: false,
-
-                permViewUsrChecked: false,
-                permEditUsrChecked: false,
-
-                permRequestAppmntsChecked: false,
-                permViewAppmntChecked: false,
-                permEditAppmntsChecked: false,
+                perms: {
+                    Inventory: {
+                        ViewInv: {
+                            checked: false,
+                            shift: 1,
+                            desc: "View Inventory"
+                        },
+                        EditInv: {
+                            checked: false,
+                            shift: 2,
+                            desc: "Edit Inventory"
+                        }
+                    },
+                    Storage: {
+                        ViewStor: {
+                            checked: false,
+                            shift: 3,
+                            desc: "View Storage"
+                        },
+                        EditStor: {
+                            checked: false,
+                            shift: 4,
+                            desc: "Edit Storage"
+                        }
+                    },
+                    Users: {
+                        ViewUsr: {
+                            checked: false,
+                            shift: 5,
+                            desc: "View Users"
+                        },
+                        EditUsr: {
+                            checked: false,
+                            shift: 6,
+                            desc: "Edit Users"
+                        }
+                    },
+                    Appointments: {
+                        RequestAppmnts: {
+                            checked: false,
+                            shift: 7,
+                            desc: "Request Appointments"
+                        },
+                        ViewAppmnts: {
+                            checked: false,
+                            shift: 8,
+                            desc: "View Appointments"
+                        },
+                        EditAppmnts: {
+                            checked: false,
+                            shift: 9,
+                            desc: "Edit Appointments"
+                        }
+                    },
+                },
 
                 errorText: "",
                 isLoading: false,
@@ -65,34 +105,22 @@
         methods: {
             editPermUserClicked (u) {
                 this.user = u
-                this.permViewInvChecked = (this.user.permissions & (1 << 1)) != 0
-                this.permEditInvChecked = (this.user.permissions & (1 << 2)) != 0
-
-                this.permViewStorChecked = (this.user.permissions & (1 << 3)) != 0
-                this.permEditStorChecked = (this.user.permissions & (1 << 4)) != 0
-
-                this.permViewUsrChecked = (this.user.permissions & (1 << 5)) != 0
-                this.permEditUsrChecked = (this.user.permissions & (1 << 6)) != 0
-
-                this.permRequestAppmntsChecked = (this.user.permissions & (1 << 7)) != 0
-                this.permViewAppmntChecked = (this.user.permissions & (1 << 8)) != 0
-                this.permEditAppmntsChecked = (this.user.permissions & (1 << 9)) != 0
+                for (var i of Object.keys(this.perms)) {
+                    for (var j of Object.keys(this.perms[i])) {
+                        this.perms[i][j].checked = (this.user.permissions & (1 << this.perms[i][j].shift)) != 0
+                    }
+                }
             },
             editPermUser () {
                 this.errorText = ""
                 var permissions = 0;
-                if (this.permViewInvChecked) permissions += (1 << 1)
-                if (this.permEditInvChecked) permissions += (1 << 2)
+                for (var i of Object.keys(this.perms)) {
+                    for (var j of Object.keys(this.perms[i])) {
+                        if (this.perms[i][j].checked)
+                            permissions += (1 << this.perms[i][j].shift)
+                    }
+                }
 
-                if (this.permViewStorChecked) permissions += (1 << 3)
-                if (this.permEditStorChecked) permissions += (1 << 4)
-
-                if (this.permViewUsrChecked) permissions += (1 << 5)
-                if (this.permEditUsrChecked) permissions += (1 << 6)
-
-                if (this.permRequestAppmntsChecked) permissions += (1 << 7)
-                if (this.permViewAppmntChecked) permissions += (1 << 8)
-                if (this.permEditAppmntsChecked) permissions += (1 << 9)
                 var user = {
                     id: this.user.id,
                     permissions
