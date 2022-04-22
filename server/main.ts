@@ -117,6 +117,10 @@ function check_request_type(obj: any, type: bodyType|string, res: any, pre: stri
 							return false
 						break
 					case "array": // if it is an array, iterate through it and check type of every item
+						if (!Array.isArray(obj[key])){
+							res.status(422).send(`The field '${pre+key}' has to be an array!`)
+							return false
+						}
 						for (var i in obj[key])
 							if (!check_request_type(obj[key][i], (type.fields[key] as nestedBodyType).content, res, pre+`${key}[${i}].`))
 								return false
