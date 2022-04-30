@@ -12,7 +12,7 @@
                             v-for="attr in attributes"
                             :key="attr.key"
                             :attribute="attr">
-                            <b>{{attr.customData.name}}:</b> {{ attr.customData.description }} <button class="btn btn-danger px-1 py-0 mx-2" style="font-size: 1em;" v-b-modal.deleteAppmntModal @click="selectedAppmnt=attr.key"><font-awesome-icon icon="trash-can"/></button>
+                            <b>{{attr.customData.name}}:</b> {{ attr.customData.description }} <button class="btn btn-info px-1 py-0 mx-2" style="font-size: 1em;" v-b-modal.appmntInfoModal @click="selectedAppmnt=attr.customData">Open</button>
                         </popover-row>
                     </div>
                 </template>
@@ -20,15 +20,7 @@
         </div>
         <error-text v-if="!!errorText" v-bind:msg="errorText" style="position: absolute; top: 20px; right: 50%; transform: translate(50%, 0%);"/>
     </div>
-    <b-modal size="lg" id="deleteAppmntModal" class="text-secondary" centered hide-footer hide-header-close title="Delete Appointment" header="test" header-class="justify-content-center">
-        <div class="modal-body text-center">
-            Do you really want to delete the appointment?
-            <loading-icon v-if="isLoading" size="3x"/>
-            <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/><br>
-            <b-button id="closeModalButton" class="btn btn-secondary" v-b-modal.deleteAppmntModal>Cancel</b-button>
-            <button class="btn btn-outline-danger" @click="deleteAppmnt">Delete Appointment</button>
-        </div>
-    </b-modal>
+    <appmnt-info @onChange="loadAppointments" :appointment="selectedAppmnt" />
 </template>
 
 <script>
@@ -36,6 +28,7 @@
     import {Calendar, PopoverRow} from "v-calendar"
     import ErrorText from "../helpers/ErrorText.vue"
     import LoadingIcon from "../helpers/LoadingIcon.vue"
+    import AppmntInfo from "./AppmntInfo.vue"
     export default {
         name: "AppointmentCalendar",
         emits: ["update"],
@@ -43,7 +36,8 @@
             Calendar,
             ErrorText,
             LoadingIcon,
-            PopoverRow
+            PopoverRow,
+            AppmntInfo
         },
         data() {
             const hSpacing = "0"
@@ -78,13 +72,10 @@
                 appointmentList: [],
                 isLoading: false,
                 errorText: "",
-                selectedAppmnt: ""
+                selectedAppmnt: {}
             }
         },
         methods: {
-            closeDeleteModal () {
-                $("#deleteAppmntModal div #closeModalButton").click()
-            },
             loadAppointments () {
                 this.isLoading = true
                 this.errorText = ""
@@ -109,10 +100,7 @@
                             end: new Date(a.end_date)
                         },
                         popover: true,
-                        customData: {
-                            name: a.name,
-                            description: a.description
-                        }
+                        customData: a
                         
                     }
                     this.attributes.push(attr)
@@ -124,19 +112,6 @@
                     i += id.charCodeAt(j)
                 return i % this.colors.length
             },
-            deleteAppmnt () {
-                this.isLoading = true
-                this.errorText = ""
-                this.$store.dispatch("deleteAppointment", {id: this.selectedAppmnt}).then(_ => {
-                    this.isLoading = false
-                    this.$emit("update")
-                    this.closeDeleteModal()
-                }).catch(err => {
-                    this.isLoading = false
-                    console.log(err)
-                    this.errorText = err
-                })
-            }
         },
     }
 </script>

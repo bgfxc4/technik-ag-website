@@ -1,26 +1,17 @@
 <template>
-    <b-button v-b-modal.createRequestModal style="max-height: 6vh">Create Appointment Request
+    <b-button @click="open" v-b-modal.createRequestModal style="max-height: 6vh">Create Appointment Request
         <b-modal size="lg" id="createRequestModal" class="text-secondary" centered hide-footer hide-header-close title="Create Appointment Request" header="test" header-class="justify-content-center">
             <div class="modal-body text-center">
                 <label for="create-req-name">Name:</label><br/><input id="create-req-name" v-model="reqName" placeholder="Enter a name..."><br/>
                 <label for="create-req-desc">Description:</label><br/><input id="create-req-desc" v-model="reqDesc" placeholder="Enter a description..."><br/>
+                <label for="create-req-cont">Contact Information:</label><br/><input id="create-req-cont" v-model="reqContact" placeholder="Enter your contact information..."><br/>
+                <label for="create-req-needed">Needed Items (optional):</label><br/><input id="create-req-needed" v-model="reqNeededItems" placeholder="Enter a list of items you need..."><br/>
 
-                <input id="create-req-multiple-d" type="checkbox" v-model="multipleDays" class="form-switch"><label for="create-req-multiple-d"> Multiple Days</label><br/>
-
-                <date-picker v-if="!multipleDays" v-model="dateRange.start" :min-date='new Date()' :first-day-of-week="2" :masks="masks" :model-config="{type: 'number'}">
-                    <template v-slot="{ inputValue, inputEvents }">
-                        <input
-                        class="px-2 py-1 border rounded focus:outline-none focus:border-blue-300"
-                        :value="inputValue"
-                        v-on="inputEvents"
-                        />
-                    </template>
-                </date-picker>
-
-                <date-picker v-else v-model="dateRange" is-range :min-date='new Date()' :first-day-of-week="2" :masks="masks" :model-config="{type: 'number'}">
+                <date-picker ref="picker" mode="dateTime" v-model="dateRange" is-range :min-date='new Date()' is24hr :first-day-of-week="2" :masks="masks" :model-config="{type: 'number'}" is-required>
                     <template v-slot="{ inputValue, inputEvents }">
                         <div class="flex justify-center items-center">
                         <input
+                            id="dateTimeInputStart"
                             :value="inputValue.start"
                             v-on="inputEvents.start"
                             class="border px-2 py-1 w-32 rounded focus:outline-none focus:border-indigo-300"
@@ -62,14 +53,14 @@
         },
         data: function () {
             return  {
-                reqName: "",
-                reqDesc: "",
+                reqName: undefined,
+                reqDesc: undefined,
+                reqContact: undefined,
+                reqNeededItems: undefined,
                 dateRange: {
-                    start: 0,
-                    end: 0,
+                    start: null,
+                    end: null,
                 },
-
-                multipleDays: false,
 
                 masks: {
                     input: ['DD.MM.YYYY'],
@@ -87,8 +78,10 @@
                 var request = {
                     name: this.reqName,
                     description: this.reqDesc,
+                    contact: this.reqContact,
+                    needed_items: this.reqNeededItems,
                     date: this.dateRange.start,
-                    end_date: this.multipleDays ? this.dateRange.end : this.dateRange.start 
+                    end_date: this.dateRange.end
                 }
                 this.isLoading = true
                 this.errorText = ""
@@ -101,11 +94,11 @@
                     this.errorText = err
                     return
                 })
-            }
-        },
-        watch: {
-            date (newDate) {
-                this.dateRange.start = newDate
+            },
+            open () {
+                this.dateRange.start = this.date
+                this.dateRange.end = this.date
+                this.$refs["picker"].updateValue(this.dateRange)
             }
         }
     }

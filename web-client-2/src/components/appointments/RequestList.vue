@@ -6,7 +6,9 @@
             <div class="request-item bg-dark" v-for="r of list" :key="r.id">
                 <b>Name:</b> {{r.name}}
                 <b>Description:</b> {{r.description}} <br>
-                <b>Date:</b> {{new Date(r.date).toLocaleDateString('de-DE', dateOptions)}} - {{new Date(r.end_date).toLocaleDateString('de-DE', dateOptions)}}<br>
+                <b>Contact:</b> {{r.contact}} <br>
+                <template v-if="r.needed_items"><b>Needed Items:</b> {{r.needed_items}} <br></template>
+                <b>Date:</b> {{new Date(r.date).toLocaleString('de-DE', dateOptions)}} - {{new Date(r.end_date).toLocaleString('de-DE', dateOptions)}}<br>
                 <b-button class="btn btn-danger" v-b-modal.deleteRequestModal @click="selectedRequest = r.id"><font-awesome-icon icon="trash-can"/></b-button>
                 <b-button class="btn btn-info mx-2" v-b-modal.approveRequestModal @click="selectedRequest = r.id"><font-awesome-icon icon="check"/></b-button>
             </div>
@@ -51,7 +53,7 @@
                 isLoading: false,
                 errorText: "",
                 selectedRequest: "", // used to cache the id of the appointment to delete/approve ...
-                dateOptions: {weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric'}
+                dateOptions: {weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric'}
             }
         },
         methods: {

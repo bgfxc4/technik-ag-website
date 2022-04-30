@@ -6,6 +6,8 @@ export interface Appointment {
     id: string
     name: string
     description: string
+	contact: string
+	needed_items: string
     date: number
     end_date: number
     items: string[] // array of IDs
@@ -76,8 +78,10 @@ main.app.post("/appointments/request", async (req, res) => {
 			description: "string",
 			date: "number",
 			end_date: "number",
+			needed_items: "string",
+			contact: "string",
 		},
-		required: ["name", "description", "date", "end_date"]
+		required: ["name", "description", "date", "end_date", "contact"]
 	}
 
 	if (!(await main.check_request(type, PERMS.RequestAppmnts, req.body, req.headers, res)))

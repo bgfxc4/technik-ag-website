@@ -9,9 +9,9 @@
             <div class="col-md-4 col-12" style="height: 100%">
                 <request-list @update="getAppointments" ref="reqList"/>
             </div>
-            <div class="col-md-3 col-12 mt-4">
+            <div class="col-md-3 col-12 mt-4 pb-4">
                 <h5>Select a date to request an appointment:</h5>
-                <date-picker :min-date='new Date()' :first-day-of-week="2" class="col-4" v-model="createDate" :model-config="{type: 'number'}"/>
+                <date-picker :min-date='new Date()' :first-day-of-week="2" class="col-4" v-model="createDate" mode="dateTime" :model-config="{type: 'number'}" is24hr is-expanded/>
                 <create-appmnt-request @onCreate="getAppointments" v-show="createDate" :date="createDate" />
             </div>
         </div>

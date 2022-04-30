@@ -49,6 +49,8 @@ export async function add_appointment_request_to_db(body: any) {
         description: body.description,
         date: body.date,
         end_date: body.end_date,
+        contact: body.contact,
+        needed_items: body.needed_items,
         items: []
     }
     return await main.db.collection("requested_appointments").insertOne(appmnt).then(() => {
