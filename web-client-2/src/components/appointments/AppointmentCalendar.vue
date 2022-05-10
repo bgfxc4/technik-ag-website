@@ -90,21 +90,40 @@
                 })
             },
             generateAttributes () {
+                this.appointmentList.sort((a, b) => {return new Date(a.date) - new Date(b.date)})
                 this.attributes = []
                 for (var a of this.appointmentList) {
                     var attr = {
                         key: a.id,
-                        highlight: this.colors[this.idToColorIndex(sha512(a.id))],
                         dates: {
                             start: new Date(a.date),
                             end: new Date(a.end_date)
                         },
                         popover: true,
-                        customData: a
-                        
+                        customData: a,
+                        order: this.areSameDate(new Date(a.date), new Date(a.end_date)) ? 1 : 0
                     }
+                    
+                    if (this.useDot(a.date, a.end_date)) {
+                        attr.dot = this.colors[this.idToColorIndex(sha512(a.id))]
+                    } else {
+                        attr.highlight = this.colors[this.idToColorIndex(sha512(a.id))]
+                    }
+
                     this.attributes.push(attr)
                 }
+            },
+            useDot (date, end_date) { // check if appointment needs to be represented by dot because there is already an appointment on that date
+                for (var i of this.attributes) {
+                    if (this.areSameDate(new Date(date), i.dates.start) || this.areSameDate(new Date(end_date), i.dates.end))
+                        return true
+                    if (i.dates.start < date && i.dates.end > end_date)
+                        return true
+                }
+                return false
+            },
+            areSameDate (dateA, dateB) {
+                return dateA.toDateString() == dateB.toDateString()
             },
             idToColorIndex (id) {
                 var i = 0;
