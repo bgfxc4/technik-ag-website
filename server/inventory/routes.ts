@@ -36,7 +36,8 @@ main.app.post("/equipment/new", async (req, res) => {
 			"type": "string",
 			"amount": "number",
 			"custom_fields": "object",
-			"image": "string"
+			"image": "string",
+			"id": "string"
 		},
 		required: ["name", "description", "room", "shelf", "compartment", "category", "type", "amount"]
 	}

@@ -5,9 +5,21 @@ import * as inventory from "./routes"
 
 const item_image_placeholder = fs.readFileSync("./imgs/item-placeholder-img.png").toString('base64')
 
+async function isUnusedItemID (id: string): Promise<boolean> {
+	if (id[0] != 'I')
+		return false
+	if (!uuid.validate(id.substr(1)))
+		return false
+	
+	var data = await main.db.collection("equipment").find({id: id}).toArray()
+	if (data.length != 0)
+		return false
+
+	return true
+} 
 
 export function add_equipment_to_db(body: any, callback: () => void) {
-	main.db.collection("categories").findOne({name: body.category}, (err, data) => {
+	main.db.collection("categories").findOne({name: body.category}, async (err, data) => {
 		if (err)
 			throw err
 		
@@ -31,6 +43,11 @@ export function add_equipment_to_db(body: any, callback: () => void) {
 			image: (body.image) ? body.image : item_image_placeholder,
 			custom_fields: custom_fields
 		}
+
+		if (body.id && (await isUnusedItemID(body.id))) { // check if body.id is valid item id that is not yet used, if so, use it as ID
+			equ.id = body.id
+		}
+
 		main.db.collection("equipment").insertOne(equ, err2 => {
 			if (err2)
 				throw err

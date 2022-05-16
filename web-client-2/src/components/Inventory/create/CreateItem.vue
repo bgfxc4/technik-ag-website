@@ -1,5 +1,5 @@
 <template>
-    <b-button v-b-modal.createItemModal @click="openCreateItem" style="max-height: 6vh">Create Item
+    <b-button v-b-modal.createItemModal @click="openCreateItem" style="max-height: 6vh">Create Item <template v-if="useID">with this ID</template>
         <b-modal size="lg" id="createItemModal" class="text-secondary" centered hide-footer scrollable hide-header-close title="Create Item" header="test" header-class="justify-content-center">
             <div class="modal-body text-center">
                 <div class="row row-cols-10">
@@ -18,6 +18,23 @@
                                 <option v-for="o of f.options" :key="o" :value="o">{{o}}</option>
                             </select>
                         </div>
+                        <br>
+
+                        <div v-if="!categoryName || !typeName" class="form-horizontal row row-cols-1 row-cols-lg-3">
+                            <div class="col">
+                                Category:
+                                <select class="form-select bg-light text-dark" aria-label="Select Storage Room" @change="loadCustomFields()" v-model="categoryIndex" v-if="categories.length">
+                                    <option v-for="(c, i) in categories" :key="i" :value="i">{{c.name}}</option>
+                                </select>
+                            </div>
+                            <div>
+                                Type:
+                                <select class="form-select bg-light text-dark" aria-label="Select Storage Shelf" v-model="typeIndex" v-if="categories[categoryIndex]?.types.length">
+                                    <option v-for="(t, i) in categories[categoryIndex].types" :key="i" :value="i">{{t}}</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <br>
                         <div class="form-horizontal row row-cols-1 row-cols-lg-3">
                             <div class="col">
@@ -84,6 +101,7 @@
         props: {
             categoryName: String,
             typeName: String,
+            useID: String
         },
         data: function () {
             return  {
@@ -99,6 +117,10 @@
                 roomIndex: 0,
                 shelfIndex: 0,
                 compIndex: 0,
+
+                categories: [],
+                categoryIndex: 0,
+                typeIndex: 0,
 
                 templateList: [],
                 isLoading: false,
@@ -138,6 +160,16 @@
                     custom_fields: this.customFields,
                     image: (!!this.$refs['image-upload'].previewImage) ? this.$refs['image-upload'].previewImage.split('base64,')[1] : undefined
                 }
+
+                if (!item.category)
+                    item.category = this.categories[this.categoryIndex].name
+                    
+                if (!item.type)
+                    item.type = this.categories[this.categoryIndex].types[this.typeIndex]
+
+                if (this.useID)
+                    item.id = this.useID
+
                 this.isLoading = true
                 this.errorText = ""
                 this.$store.dispatch("createItem", item).then(_answ => {
@@ -167,15 +199,8 @@
             },
             openCreateItem () {
                 this.$store.dispatch("getCategories").then(res => {
-                    for (var cat of res.data) {
-                        if (cat.name == this.categoryName) {
-                            this.customFieldsLoaded = cat.custom_fields
-                            for (var f of this.customFieldsLoaded) {
-                                this.customFields[f.name] = ""
-                            }
-                            return
-                        }
-                    }
+                    this.categories = res.data
+                    this.loadCustomFields()
                 }).catch(err => {
                     this.errorText = err
                 })
@@ -189,6 +214,17 @@
                 }).catch(err => {
                     this.errorText = err
                 })
+            },
+            loadCustomFields () {                    
+                for (var cat of this.categories) {
+                    if (cat.name == this.categoryName || this.categories.indexOf(cat) == this.categoryIndex) {
+                        this.customFieldsLoaded = cat.custom_fields
+                        for (var f of this.customFieldsLoaded) {
+                            this.customFields[f.name] = ""
+                        }
+                        return
+                    }
+                }
             }
         },
     }
