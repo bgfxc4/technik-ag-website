@@ -1,6 +1,7 @@
 import * as db_helper from "./db_helper"
 import * as main from "../main"
 import * as storage_db_helper from "../storage/db_helper"
+import * as appmnt_db_helper from "../appointments/db_helper"
 import {PERMS} from "../permissions"
 
 export interface Equipment {
@@ -255,6 +256,43 @@ main.app.post("/type/delete", async (req, res) => {
 	})
 })
 
+async function get_appointment_list(during_appointment?: undefined|string): Promise<any[]> {
+	var list = await db_helper.get_equipment_from_db()
+	var cats = await db_helper.get_categories_from_db()
+	var result: any[] = []
+
+	var item_use_during_appmnt = (during_appointment) ? await appmnt_db_helper.get_item_use_during_appointment(during_appointment).catch(err => {throw err}) : {}
+
+	for (var cat of cats) {
+		var types = []
+		
+		for (var t of cat.types)
+			types.push({name: t, equipment: []})
+
+		result.push({name: cat.name, types: types, custom_fields: cat.custom_fields})
+	}
+
+	for (var equ of list) {
+		for (var i = 0; i < result.length; i++) {
+			if (result[i].name == equ.category) {
+				for (var j = 0; j < result[i].types.length; j++) {
+					if (result[i].types[j].name == equ.type) {
+
+						if (during_appointment) {
+							equ.available_amount = equ.amount - item_use_during_appmnt[(equ.id as string)]
+						}
+
+						result[i].types[j].equipment.push(equ)
+						continue
+					}
+				}
+				continue
+			}
+		}
+	}
+	return result
+}
+
 main.app.get("/equipment/list", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {}
@@ -262,35 +300,20 @@ main.app.get("/equipment/list", async (req, res) => {
 
 	if (!(await main.check_request(type, PERMS.ViewInv, req.body, req.headers, res)))
 		return
-	db_helper.get_equipment_from_db(list => {
-		db_helper.get_categories_from_db(cats => {
-			var result: any[] = []
+	get_appointment_list().then(list => res.send(JSON.stringify(list))).catch(err => res.status(500).send(err))
+})
 
-			for (var cat of cats) {
-				var types = []
-				
-				for (var t of cat.types)
-					types.push({name: t, equipment: []})
+main.app.post("/equipment/list/duringappointment", async (req, res) => {
+	var type: main.bodyType = {
+		fields: {
+			"appointment": "string"
+		},
+		required: ["appointment"]
+	}
 
-				result.push({name: cat.name, types: types, custom_fields: cat.custom_fields})
-			}
-
-			for (var equ of list) {
-				for (var i = 0; i < result.length; i++) {
-					if (result[i].name == equ.category) {
-						for (var j = 0; j < result[i].types.length; j++) {
-							if (result[i].types[j].name == equ.type) {
-								result[i].types[j].equipment.push(equ)
-								continue
-							}
-						}
-						continue
-					}
-				}
-			}
-			res.send(JSON.stringify(result))
-		})
-	})
+	if (!(await main.check_request(type, PERMS.ViewInv | PERMS.ViewAppmnts, req.body, req.headers, res)))
+		return
+	get_appointment_list(req.body.appointment).then(list => res.send(JSON.stringify(list))).catch(err => res.status(500).send(err))
 })
 
 main.app.get("/category/getimg/:name", async (req, res) => {
@@ -363,14 +386,13 @@ main.app.post("/equipment/search", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.ViewInv, req.body, req.headers, res)))
 		return
 
-	db_helper.get_equipment_from_db(list => {
-		var ret:any[] = []
-		for (var item of list) {
-			if (fits_search(item.name, req.body.keywords.split(" ")))
-				ret.push(item)
-		}
-		res.send(JSON.stringify(ret))
-	})
+	var list = await db_helper.get_equipment_from_db()
+	var ret:any[] = []
+	for (var item of list) {
+		if (fits_search(item.name, req.body.keywords.split(" ")))
+			ret.push(item)
+	}
+	res.send(JSON.stringify(ret))
 })
 
 main.app.get("/categories/list", async (req, res) => {
@@ -380,9 +402,8 @@ main.app.get("/categories/list", async (req, res) => {
 
 	if (!(await main.check_request(type, PERMS.ViewInv, req.params, req.headers, res)))
 		return
-	db_helper.get_categories_from_db(list => {
-		res.send(JSON.stringify(list))
-	})
+	var list = await db_helper.get_categories_from_db()
+	res.send(JSON.stringify(list))
 })
 
 main.app.get("/equipment/byid/:id", async (req, res) => {

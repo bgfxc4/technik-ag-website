@@ -10,7 +10,7 @@ export interface Appointment {
 	needed_items: string
     date: number
     end_date: number
-    items: string[] // array of IDs
+    items: {id: string, amount: number}[]
 }
 
 main.app.get("/appointments/list/approved", async (req, res) => {
@@ -105,6 +105,30 @@ main.app.post("/appointments/approve", async (req, res) => {
 		return
 	db_helper.approve_appmnt_in_db(req.body).then(data => {
 		res.send(JSON.stringify(data))
+	}).catch(err => {
+		res.status(500).send(err)
+	})
+})
+
+main.app.post("/appointments/updateitems", async (req, res) => {
+	var item:main.bodyType = {
+		fields: {
+			"id": "string",
+			"amount": "number"
+		},
+		required: ["id", "amount"]
+	}
+	var type: main.bodyType = {
+		fields: {
+			id: "string",
+			items: main.array(item)
+		},
+		required: ["id", "items"]
+	}
+	if (!(await main.check_request(type, PERMS.EditAppmnts, req.body, req.headers, res)))
+		return
+	db_helper.update_appmnt_items_in_db(req.body).then(() => {
+		res.send("ok")
 	}).catch(err => {
 		res.status(500).send(err)
 	})

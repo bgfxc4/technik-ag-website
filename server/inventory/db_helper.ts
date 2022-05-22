@@ -250,20 +250,12 @@ export function delete_type_from_db(body: any, callback: () => void) {
 	})
 }
 
-export function get_equipment_from_db(callback: (res: any) => void, project={image: 0}) {
-	main.db.collection("equipment").find().project(project).toArray((err, data) => {
-		if (err)
-			throw err
-		callback(data)
-	})
+export async function get_equipment_from_db(project={image: 0}): Promise<any[]> {
+	return await main.db.collection("equipment").find().project(project).toArray()
 }
 
-export function get_categories_from_db(callback: (res: any) => void, project={image:0}) {
-	main.db.collection("categories").find().project(project).toArray((err, data) => {
-		if (err)
-			throw err
-		callback(data)
-	})
+export async function get_categories_from_db(project={image:0}): Promise<any[]> {
+	return await main.db.collection("categories").find().project(project).toArray()
 }
 
 export function get_equipment_by_id_from_db(id: string, callback: (res: any) => void, project:any={image:0}) {
