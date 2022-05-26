@@ -161,10 +161,10 @@
                     image: (!!this.$refs['image-upload'].previewImage) ? this.$refs['image-upload'].previewImage.split('base64,')[1] : undefined
                 }
 
-                if (!item.category)
+                if (!item.category && !this.categoryName)
                     item.category = this.categories[this.categoryIndex].name
                     
-                if (!item.type)
+                if (!item.type && !this.typeName)
                     item.type = this.categories[this.categoryIndex].types[this.typeIndex]
 
                 if (this.useID)
@@ -217,7 +217,7 @@
             },
             loadCustomFields () {                    
                 for (var cat of this.categories) {
-                    if (cat.name == this.categoryName || this.categories.indexOf(cat) == this.categoryIndex) {
+                    if (cat.name == this.categoryName || (this.categories.indexOf(cat) == this.categoryIndex && !this.categoryName)) {
                         this.customFieldsLoaded = cat.custom_fields
                         for (var f of this.customFieldsLoaded) {
                             this.customFields[f.name] = ""
