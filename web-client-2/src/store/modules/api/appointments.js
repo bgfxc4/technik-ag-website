@@ -55,6 +55,15 @@ const actions = {
             throw err
         })
     },
+    async updateAppmntItems({rootState}, items) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post('appointments/updateitems', items, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
 }
 
 export default {

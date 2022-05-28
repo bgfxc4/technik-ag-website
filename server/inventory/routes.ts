@@ -279,7 +279,11 @@ async function get_appointment_list(during_appointment?: undefined|string): Prom
 					if (result[i].types[j].name == equ.type) {
 
 						if (during_appointment) {
-							equ.available_amount = equ.amount - item_use_during_appmnt[(equ.id as string)]
+							if (item_use_during_appmnt[(equ.id as string)])
+								equ.available_amount = equ.amount - item_use_during_appmnt[(equ.id as string)]
+							else {
+								equ.available_amount = equ.amount	
+							}
 						}
 
 						result[i].types[j].equipment.push(equ)

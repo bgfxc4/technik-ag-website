@@ -86,7 +86,7 @@ export async function get_item_use_during_appointment(appmnt_id: string): Promis
     var orderd: {items: any[], time: number}[] = []
     for (var a of appmnts) {
         orderd.push({items: a.items, time: a.date})
-        orderd.push({items: a.items.map((i:any) => i.amount * -1), time: a.end_date})
+        orderd.push({items: a.items.map((i:any) => {return {amount: i.amount * -1, id: i.id}}), time: a.end_date})
     }
 
     orderd.sort((a, b) => a.time - b.time)

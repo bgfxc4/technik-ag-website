@@ -6,6 +6,16 @@
             <b>Contact:</b> {{appointment.contact}} <br>
             <template v-if="appointment.needed_items"><b>Needed Items:</b> {{appointment.needed_items}} <br></template>
             <b>Date:</b> {{new Date(appointment.date).toLocaleString('de-DE', dateOptions)}} - {{new Date(appointment.end_date).toLocaleString('de-DE', dateOptions)}}<br>
+
+            <b>Booked Items:</b><br>
+            <template v-for="i of items" :key="i.id">
+                <img v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + i.id" style="max-width: 5vw; max-height: 5vh; width: auto; height: auto; margin-left: 10px; border-radius: 3px">
+                {{i.name}} - Amount: {{i.amount}}<br>
+            </template>
+            <template v-if="!items.length">none</template>
+            <br>
+            <button class="btn btn-sm btn-info" v-b-modal.appmntEditItemsModal>Edit Booked Items</button><br><br>
+
             <loading-icon v-if="isLoading" size="3x"/>
             <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
             <button id="closeModalButton" class="btn btn-outline-primary" v-b-modal.appmntInfoModal>Close</button>
@@ -21,18 +31,21 @@
             <button class="btn btn-outline-danger" @click="deleteAppmnt">Delete Appointment</button>
         </div>
     </b-modal>
+    <edit-booked-items @onChange="$emit('onChange')" :items="items" :appmntID="appointment.id"/>
 </template>
 
 <script>
     import ErrorText from "../helpers/ErrorText.vue"
     import LoadingIcon from "../helpers/LoadingIcon.vue"
+    import EditBookedItems from "./AppmntEditItems.vue"
 
     export default {
         name: "AppmntInfo",
         emits: ['onChange'],
         components: {
             ErrorText,
-            LoadingIcon
+            LoadingIcon,
+            EditBookedItems
         },
         props: {
             appointment: Object
@@ -41,7 +54,8 @@
             return  {
                 errorText: "",
                 isLoading: false,
-                dateOptions: {weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric'}
+                dateOptions: {weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric'},
+                items: [],
             }
         },
         methods: {
@@ -60,9 +74,27 @@
                     this.closeDeleteModal()
                 }).catch(err => {
                     this.isLoading = false
-                    console.log(err)
                     this.errorText = err
                 })
+            }
+        },
+        watch: {
+            appointment(newAppmnt) {
+                if (!newAppmnt)
+                    return
+                this.items = []
+                for (var i of newAppmnt.items) {
+                    this.$store.dispatch("getItemByID", i.id).then(answ => {
+                        this.isLoading = false
+                        var i_now = newAppmnt.items.find(el => el.id == answ.data[0].equipment[0].id)
+
+                        answ.data[0].equipment[0].amount = i_now.amount
+                        this.items.push(answ.data[0].equipment[0])
+                    }).catch(err => {
+                        this.isLoading = false
+                        this.errorText = err
+                    })
+                }
             }
         }
     }
