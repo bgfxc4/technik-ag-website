@@ -6,17 +6,39 @@
             <loading-icon v-if="isLoading" size="3x"/>
             <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 
-            <template v-for="c of items" :key="c.name">
-                <template v-for="t of c.types" :key="t.name">
-                    <template v-for="i of t.equipment" :key="i.id">
-                        <template v-if="!ignoreIDs || !ignoreIDs.includes(i.id)">
-                            <img v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + i.id" style="max-width: 5vw; max-height: 5vh; width: auto; height: auto; margin-left: 10px; border-radius: 3px">
-                            {{i.name}} - Max. Amount: {{i.available_amount}}
-                            <button :disabled="onlyIfAvailable && i.available_amount <= 0" class="btn btn-outline-primary" @click="$emit('selected', i); close()"><font-awesome-icon icon="plus"/></button><br>
+            <div style="margin-left: 20px">
+                <b-tabs class="" content-class="mt-3">
+                    <b-tab title="By Category">
+                        
+                        <tree-view
+                        v-for="c of items"
+                        :data="c"
+                        :key="c.name"
+                        :label="c.name"
+                        :nodes="c.types"
+                        :depth="0"
+                        :itemAtBottom="true"
+                        :ignoreItemIDs="ignoreIDs"
+                        @event="handleTreeEvent"
+                        >
+                        </tree-view>
+
+                    </b-tab>
+                    <b-tab title="List All" active>
+                        <template v-for="c of items" :key="c.name">
+                            <template v-for="t of c.types" :key="t.name">
+                                <template v-for="i of t.equipment" :key="i.id">
+                                    <template v-if="!ignoreIDs || !ignoreIDs.includes(i.id)">
+                                        <img v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + i.id" style="max-width: 5vw; max-height: 5vh; width: auto; height: auto; margin-left: 10px; border-radius: 3px">
+                                        {{i.name}} - Max. Amount: {{i.available_amount}}
+                                        <button :disabled="onlyIfAvailable && i.available_amount <= 0" class="btn btn-outline-primary" @click="$emit('selected', i); close()"><font-awesome-icon icon="plus"/></button><br>
+                                    </template>
+                                </template>
+                            </template>
                         </template>
-                    </template>
-                </template>
-            </template>
+                    </b-tab>
+                </b-tabs>
+            </div>
             <br>
             <br>
             <button class="btn btn-secondary mb-5" @click="close">Cancel</button>
@@ -25,6 +47,7 @@
 </template>
 
 <script>
+    import TreeView from "./TreeView.vue"
     import ErrorText from "./ErrorText.vue"
     import LoadingIcon from "./LoadingIcon.vue"
 
@@ -33,7 +56,8 @@
         emits: ["selected"],
         components: {
             ErrorText,
-            LoadingIcon
+            LoadingIcon,
+            TreeView
         },
         props: {
             duringAppointment: String,
@@ -71,11 +95,23 @@
                 this.isLoading = false
                 this.errorText = ""
                 this.items = res
+            },
+            handleTreeEvent (ev) {
+                if (ev.selected) {
+                    this.$emit('selected', ev.selected)
+                    this.close()
+                }
             }
         }
     }
 </script>
 
 <style>
-
+    .nav .nav-item .nav-link {
+        background-color: #eee !important;
+        color: var(--bs-dark) !important
+    }
+    .nav .nav-item .nav-link.active {
+        background-color: #fff !important
+    }
 </style>

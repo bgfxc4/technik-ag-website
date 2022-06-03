@@ -86,7 +86,7 @@
                 for (var i of newAppmnt.items) {
                     this.$store.dispatch("getItemByID", i.id).then(answ => {
                         this.isLoading = false
-                        var i_now = newAppmnt.items.find(el => el.id == answ.data[0].equipment[0].id)
+                        var i_now = newAppmnt.items.find(el => el.id == answ.data[0].equipment[0].id) 
 
                         answ.data[0].equipment[0].amount = i_now.amount
                         this.items.push(answ.data[0].equipment[0])
