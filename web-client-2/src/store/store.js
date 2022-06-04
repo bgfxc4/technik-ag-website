@@ -16,7 +16,7 @@ export const store = createStore({
 	},
 	state: {
 		isLoading: false,
-		apiUrl: process.env.VUE_APP_ApiServerUrl
+		apiUrl: import.meta.env.VITE_APP_APISERVERURL
 	},
 	plugins: [createPersistedState({ paths: ['auth'] })]
 })

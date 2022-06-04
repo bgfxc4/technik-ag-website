@@ -2,9 +2,9 @@
   "name": "web-client-2",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vue-cli-service serve --https true",
-    "dev-http": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
     "@chenfengyuan/vue-barcode": "^2.0.0",
@@ -21,7 +21,6 @@
     "jsbarcode": "^3.11.5",
     "qrcode.vue": "^3.3.3",
     "sass": "^1.49.9",
-    "sass-loader": "^12.6.0",
     "v-calendar": "^3.0.0-alpha.8",
     "vue": "^3.2.31",
     "vue-barcode-reader": "^1.0.2",
@@ -30,6 +29,7 @@
     "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
-    "@vue/cli-service": "^5.0.1"
+    "@vitejs/plugin-vue": "^1.6.1",
+    "vite": "^2.5.4"
   }
 }
