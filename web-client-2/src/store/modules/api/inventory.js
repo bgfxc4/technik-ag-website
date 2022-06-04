@@ -19,6 +19,15 @@ const actions = {
             throw err
         })
     },
+    async getOneEquipmentDuringAppointment({rootState}, appointment) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post('equipment/get/duringappointment', appointment, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
     async getCategories({rootState}) {
         var headers = {'Authorization': rootState.auth.loginHash}
         return await axios.get('categories/list', {headers}).then(res => {

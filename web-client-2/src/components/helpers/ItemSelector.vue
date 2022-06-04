@@ -24,6 +24,7 @@
                         </tree-view>
 
                     </b-tab>
+
                     <b-tab title="List All" active>
                         <template v-for="c of items" :key="c.name">
                             <template v-for="t of c.types" :key="t.name">
@@ -36,6 +37,10 @@
                                 </template>
                             </template>
                         </template>
+                    </b-tab>
+
+                    <b-tab title="Scan Code">
+		                <StreamBarcodeReader @decode="onDecode"/>
                     </b-tab>
                 </b-tabs>
             </div>
@@ -50,6 +55,7 @@
     import TreeView from "./TreeView.vue"
     import ErrorText from "./ErrorText.vue"
     import LoadingIcon from "./LoadingIcon.vue"
+	import { StreamBarcodeReader } from "vue-barcode-reader"
 
     export default {
         name: "ItemSelector",
@@ -57,7 +63,8 @@
         components: {
             ErrorText,
             LoadingIcon,
-            TreeView
+            TreeView,
+            StreamBarcodeReader
         },
         props: {
             duringAppointment: String,
@@ -101,6 +108,24 @@
                     this.$emit('selected', ev.selected)
                     this.close()
                 }
+            },
+            onDecode (a, b, c) {
+				this.errorText = ""
+				this.isLoading = false
+				this.createItem = undefined
+				this.$store.dispatch("getItemByID", a).then(res => {
+					this.isLoading = false
+					if (res.data.length != 0) {
+                        this.errorText = JSON.stringify(res.data)
+                        this.$emit('selected', res.data[0].equipment[0])
+                        this.close()
+						return
+					}
+                    this.errorText = "The Code you scanned does not belong to any item in the database!"
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
+				})
             }
         }
     }

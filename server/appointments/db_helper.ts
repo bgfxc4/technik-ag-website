@@ -111,7 +111,7 @@ export async function get_item_use_during_appointment(appmnt_id: string): Promis
     return max_amounts
 }
 
-async function get_max_amount_of_item_for_appmnt(appmnt_id: string, item: any, date: number, end_date: number): Promise<number> {
+export async function get_max_amount_of_item_for_appmnt(appmnt_id: string, item: any, date: number, end_date: number): Promise<number> {
     var appmnts = await main.db.collection("appointments").find({items: {$elemMatch: {id: item.id}}, date: {$lt: end_date}, end_date: {$gt: date}, id: {$ne: appmnt_id}}).toArray() // get all appmnts that have the item booked that are during the appmnt to check, but not itself
 
     for (var a of appmnts) {

@@ -320,6 +320,31 @@ main.app.post("/equipment/list/duringappointment", async (req, res) => {
 	get_appointment_list(req.body.appointment).then(list => res.send(JSON.stringify(list))).catch(err => res.status(500).send(err))
 })
 
+main.app.post("/equipment/get/duringappointment", async (req, res) => {
+	var type: main.bodyType = {
+		fields: {
+			"appointment": "string",
+			"id": "string"
+		},
+		required: ["id", "appointment"]
+	}
+
+	if (!(await main.check_request(type, PERMS.ViewInv | PERMS.ViewAppmnts, req.body, req.headers, res)))
+		return
+
+	var appmnt = await main.db.collection("appointments").findOne({id: req.body.appointment})
+	if (!appmnt)
+		return res.status(400).send(`The appointment with the ID ${req.body.appointment} was not found.`)
+
+	var item = await main.db.collection("equipment").findOne({id: req.body.id})
+	if (!item)
+		return res.status(400).send(`The item with the ID ${req.body.id} was not found.`)
+	
+	var amount = await appmnt_db_helper.get_max_amount_of_item_for_appmnt(req.body.appointment, item, appmnt.date, appmnt.end_date)
+	item.available_amount = amount
+	res.send(JSON.stringify(item))
+})
+
 main.app.get("/category/getimg/:name", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {
