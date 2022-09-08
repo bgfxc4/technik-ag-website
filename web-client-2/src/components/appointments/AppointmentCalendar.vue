@@ -84,7 +84,7 @@
                     this.appointmentList = res.data
                     this.generateAttributes()
 
-                    if (Object.keys(this.selectedAppmnt).length != 0) { // if an appmnt is selected this.selectedAppmnt is not {}, so it has more than 0 keys
+                    if (typeof this.selectedAppmnt == "object" && Object.keys(this.selectedAppmnt).length != 0) { // if an appmnt is selected this.selectedAppmnt is not {}, so it has more than 0 keys
                         this.selectedAppmnt = this.appointmentList.find(el => el.id == this.selectedAppmnt.id)
                     }
                 }).catch(err => {

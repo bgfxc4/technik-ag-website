@@ -19,9 +19,9 @@
 								</div>
 								<button @click="openCategory(cat.name)" class="btn btn-outline-primary mt-2">Open Category</button> <br>
 
-								<button :id="'menu-popover-'+cat.name" class="btn btn-dark mt-2" href="#" tabindex="0">
+								<a :id="'menu-popover-'+cat.name" class="menu-popover" tabindex="0">
 									<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
-								</button>
+								</a>
 								<b-popover :target="'menu-popover-'+cat.name" triggers="focus">
 									<button v-b-modal.deleteCategoryModal @click="deleteCategoryName = cat.name" class="btn btn-danger" style="max-height: 6vh">
 										<font-awesome-icon icon="trash-can"/> Delete Category
@@ -89,4 +89,16 @@
 </script>
 
 <style>
+.menu-popover {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	border: none;
+	color: var(--bt-white)
+}
+
+.menu-popover:hover {
+	border: none;
+	color: var(--bt-white)
+}
 </style>

@@ -66,7 +66,7 @@
             deleteRequest() {                
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("deleteAppointmentRequest", {id: this.selectedRequest}).then(_res => {
+                this.$store.dispatch("deleteAppointmentRequest", {id: this.selectedRequest, from_google_calendar: this.list.find(el => el.id == this.selectedRequest).from_google_calendar}).then(_res => {
                     this.isLoading = false
                     this.$emit("update")
                     this.closeDeleteModal()
@@ -79,7 +79,7 @@
             approveRequest() {
                 this.isLoading = true
                 this.errorText = ""
-                this.$store.dispatch("approveAppointmentRequest", {id: this.selectedRequest}).then(_res => {
+                this.$store.dispatch("approveAppointmentRequest", {id: this.selectedRequest, from_google_calendar: this.list.find(el => el.id == this.selectedRequest).from_google_calendar}).then(_res => {
                     this.isLoading = false
                     this.$emit("update")
                     this.closeApproveModal()

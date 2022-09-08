@@ -1,6 +1,7 @@
 import * as db_helper from "./db_helper"
 import * as main from "../main"
 import {PERMS} from "../permissions"
+import * as google_cal from "./google_calender_api"
 
 export interface Appointment {
     id: string
@@ -10,7 +11,8 @@ export interface Appointment {
 	needed_items: string
     date: number
     end_date: number
-    items: {id: string, amount: number}[]
+    items: {id: string, amount: number}[],
+	from_google_calendar?: boolean
 }
 
 main.app.get("/appointments/list/approved", async (req, res) => {
@@ -32,8 +34,12 @@ main.app.get("/appointments/list/requested", async (req, res) => {
 
 	if (!(await main.check_request(type, PERMS.ViewAppmnts, req.body, req.headers, res)))
 		return
-	db_helper.get_requested_appointments_from_db().then(data => {
-		res.send(JSON.stringify(data))
+
+	Promise.all([
+		db_helper.get_requested_appointments_from_db(),
+		google_cal.get_all_request_events()
+	]).then(vals => {
+		res.send(JSON.stringify(vals.flat()))
 	})
 })
 
@@ -57,18 +63,28 @@ main.app.post("/appointments/delete/approved", async (req, res) => {
 main.app.post("/appointments/delete/request", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {
-			"id": "string"
+			"id": "string",
+			"from_google_calendar": "boolean"
 		},
 		required: ["id"]
 	}
 
 	if (!(await main.check_request(type, PERMS.EditAppmnts, req.body, req.headers, res)))
 		return
-	db_helper.delete_requested_appointment_from_db(req.body).then(data => {
-		res.send(data)
-	}).catch(err => {
-		res.status(500).send(err)
-	})
+
+	if (req.body.from_google_calendar) {
+		google_cal.delete_request_event(req.body.id).then(() => {
+			res.send("ok")
+		}).catch(err => {
+			res.status(500).send(err)
+		})
+	} else {
+		db_helper.delete_requested_appointment_from_db(req.body).then(data => {
+			res.send(data)
+		}).catch(err => {
+			res.status(500).send(err)
+		})
+	}
 })
 
 main.app.post("/appointments/request", async (req, res) => {
@@ -97,17 +113,31 @@ main.app.post("/appointments/approve", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {
 			id: "string",
+			from_google_calendar: "boolean"
 		},
 		required: ["id"]
 	}
 
 	if (!(await main.check_request(type, PERMS.EditAppmnts, req.body, req.headers, res)))
 		return
-	db_helper.approve_appmnt_in_db(req.body).then(data => {
-		res.send(JSON.stringify(data))
-	}).catch(err => {
-		res.status(500).send(err)
-	})
+
+	if (req.body.from_google_calendar) {
+		google_cal.approve_request_to_db(req.body.id).then(() => {
+			google_cal.delete_request_event(req.body.id).then(() => {
+				res.send("ok")
+			}).catch(err => {
+				res.status(500).send(err)
+			})
+		}).catch(err => {
+			res.status(500).send(err)
+		})
+	} else {
+		db_helper.approve_appmnt_in_db(req.body).then(data => {
+			res.send(JSON.stringify(data))
+		}).catch(err => {
+			res.status(500).send(err)
+		})
+	}
 })
 
 main.app.post("/appointments/updateitems", async (req, res) => {

@@ -9,5 +9,11 @@
 			"permissions": 1,
 			"id": 0
 		}
-	]
+	],
+	"google_calendar": {
+		"private_key": "",
+		"client_email": "",
+		"project_number": "",
+		"calendar_id": ""
+	}
 }

@@ -15,6 +15,8 @@ export const app = express()
 app.use(body_parser.json({limit: "50mb"}))
 app.use(cors())
 
+console.log("start")
+
 export async function authorized(req_headers:any) {
 	if (req_headers.authorization == undefined) return undefined
 	return await user_db.get_users_from_db(true).then((users: any) => {

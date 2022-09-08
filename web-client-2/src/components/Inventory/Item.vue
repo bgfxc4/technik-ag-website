@@ -10,7 +10,7 @@
 		</nav>
 		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
-		<div class="row container m-3">
+		<div class="row container m-3" style="position: relative">
 			<div class="col-5">
 				<img v-if="item.id" v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + item.id" class="card-img" 
 									style="max-width: 30vw; max-height: 30vh; width: auto; height: auto; margin-left: 10px">
@@ -29,9 +29,9 @@
 					<b>ID:</b> {{ item.id }}
 				</div>
 
-				<button id="menu-popover" class="btn btn-dark mt-2" href="#" tabindex="0">
+				<a id="menu-popover" class="menu-popover" tabindex="0">
 					<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
-				</button>
+				</a>
 				<b-popover target="menu-popover" triggers="focus">
 					<button v-b-modal.deleteItemModal class="btn btn-danger" style="max-height: 6vh">
 						<font-awesome-icon icon="trash-can"/> Delete Item
@@ -101,5 +101,17 @@
 	}
 </script>
 
-<style>
+<style scoped>
+.menu-popover {
+	position: absolute;
+	top: 0;
+	right: 8px;
+	border: none;
+	color: var(--bt-white)
+}
+
+.menu-popover:hover {
+	border: none;
+	color: var(--bt-white)
+}
 </style>

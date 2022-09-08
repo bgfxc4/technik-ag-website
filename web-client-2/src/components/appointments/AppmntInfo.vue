@@ -1,11 +1,11 @@
 <template>
     <b-modal size="lg" id="appmntInfoModal" class="text-secondary" centered hide-footer hide-header-close title="Appointment Info" header="test" header-class="justify-content-center">
         <div class="modal-body text-center">
-            <b>Name:</b> {{appointment.name}} <br>
-            <b>Description:</b> {{appointment.description}} <br>
-            <b>Contact:</b> {{appointment.contact}} <br>
-            <template v-if="appointment.needed_items"><b>Needed Items:</b> {{appointment.needed_items}} <br></template>
-            <b>Date:</b> {{new Date(appointment.date).toLocaleString('de-DE', dateOptions)}} - {{new Date(appointment.end_date).toLocaleString('de-DE', dateOptions)}}<br>
+            <b>Name:</b> {{appointment?.name}} <br>
+            <b>Description:</b> {{appointment?.description}} <br>
+            <b>Contact:</b> {{appointment?.contact}} <br>
+            <template v-if="appointment?.needed_items"><b>Needed Items:</b> {{appointment?.needed_items}} <br></template>
+            <b>Date:</b> {{new Date(appointment?.date).toLocaleString('de-DE', dateOptions)}} - {{new Date(appointment?.end_date).toLocaleString('de-DE', dateOptions)}}<br>
 
             <b>Booked Items:</b><br>
             <template v-for="i of items" :key="i.id">
@@ -31,7 +31,7 @@
             <button class="btn btn-outline-danger" @click="deleteAppmnt">Delete Appointment</button>
         </div>
     </b-modal>
-    <edit-booked-items @onChange="$emit('onChange')" :items="items" :appmntID="appointment.id"/>
+    <edit-booked-items @onChange="$emit('onChange')" :items="items" :appmntID="appointment?.id"/>
 </template>
 
 <script>

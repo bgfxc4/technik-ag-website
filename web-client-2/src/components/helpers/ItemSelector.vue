@@ -11,6 +11,7 @@
                     <b-tab title="By Category">
                         
                         <tree-view
+                        @click="showCamComp = false" 
                         v-for="c of items"
                         :data="c"
                         :key="c.name"
@@ -25,7 +26,7 @@
 
                     </b-tab>
 
-                    <b-tab title="List All" active>
+                    <b-tab @click="showCamComp = false" title="List All" active>
                         <template v-for="c of items" :key="c.name">
                             <template v-for="t of c.types" :key="t.name">
                                 <template v-for="i of t.equipment" :key="i.id">
@@ -39,8 +40,8 @@
                         </template>
                     </b-tab>
 
-                    <b-tab title="Scan Code">
-		                <StreamBarcodeReader @decode="onDecode"/>
+                    <b-tab @click="showCamComp = true" title="Scan Code">
+		                <StreamBarcodeReader v-if="showCamComp" @decode="onDecode"/>
                     </b-tab>
                 </b-tabs>
             </div>
@@ -76,7 +77,8 @@
                 errorText: "",
                 isLoading: false,
                 hidden: true,
-                items: []
+                items: [],
+                showCamComp: false
             }
         },
         methods: {

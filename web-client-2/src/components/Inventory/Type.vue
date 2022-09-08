@@ -31,9 +31,9 @@
 								</div>
 								<button @click="openItem(item.id, item.category, item.type)" class="btn btn-outline-primary mt-2">Open Item</button>
 
-								<button :id="'menu-popover-'+item.id" class="btn btn-dark mt-2 mx-2" href="#" tabindex="0">
+								<a :id="'menu-popover-'+item.id" class="menu-popover" tabindex="0">
 									<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
-								</button>
+								</a>
 								<b-popover :target="'menu-popover-'+item.id" triggers="focus">
 									<button v-b-modal.deleteItemModal @click="deleteItemId = item.id" class="btn btn-danger" style="max-height: 6vh">
 										<font-awesome-icon icon="trash-can"/> Delete Item
@@ -41,6 +41,8 @@
 									<button @click="editItem = item" v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
 										<font-awesome-icon icon="pen"/> Edit Item
 									</button>
+
+									<ShowQrBarCode :toShow="item.id"></ShowQrBarCode>
 								</b-popover>
 							</div>
 						</div>
@@ -55,6 +57,7 @@
 </template>
 
 <script>
+	import ShowQrBarCode from "../helpers/ShowQrBarCode.vue"	
 	import ErrorText from "../helpers/ErrorText.vue"
 	import LoadingIcon from "../helpers/LoadingIcon.vue"
 	import createItem from "./create/CreateItem.vue"
@@ -79,7 +82,8 @@
 			LoadingIcon,
 			createItem,
 			DeleteItem,
-			EditItem
+			EditItem,
+			ShowQrBarCode
 		},
 		methods: {
 			openItem(id, cat, type) {
@@ -107,4 +111,16 @@
 </script>
 
 <style>
+.menu-popover {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	border: none;
+	color: var(--bt-white)
+}
+
+.menu-popover:hover {
+	border: none;
+	color: var(--bt-white)
+}
 </style>

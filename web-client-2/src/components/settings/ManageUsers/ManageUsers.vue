@@ -7,20 +7,22 @@
         <ul class="list-group" style="width: 80%; margin-left: 10%">
             <li v-for="u in userList" style="margin: 0; position: relative" :key="u.display_name" class="list-group-item">
                 <b>Name: </b>{{u.display_name}}
-                <button v-if="u.permissions != 1" :id="`trigger-menu-popover-${u.id}`" class="btn btn-dark" href="#" tabindex="0" style="position: absolute; right: 10px; top: 3px">
-                    <font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
-                </button>
-                <b-popover :target="`trigger-menu-popover-${u.id}`" triggers="focus">
-                    <button v-b-modal.deleteUserModal @click="deleteUserObject = u" class="btn btn-danger">
-                        Delete User
-                    </button><br>
-                    <button v-b-modal.userPermissionsModal @click="$refs.permModal.editPermUserClicked(u)" class="btn btn-primary">
-                        Edit Permissions
-                    </button><br>
-                    <button v-b-modal.userEditModal @click="$refs.editModal.editUserClicked(u)" class="btn btn-primary">
-                        Edit User
-                    </button>
-                </b-popover>
+                <template v-if="u.permissions != 1">
+                    <a :id="`trigger-menu-popover-${u.id}`" class="text-dark" tabindex="0" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%)">
+                        <font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
+                    </a>
+                    <b-popover :target="`trigger-menu-popover-${u.id}`" triggers="focus">
+                        <button v-b-modal.deleteUserModal @click="deleteUserObject = u" class="btn btn-danger">
+                            Delete User
+                        </button><br>
+                        <button v-b-modal.userPermissionsModal @click="$refs.permModal.editPermUserClicked(u)" class="btn btn-primary">
+                            Edit Permissions
+                        </button><br>
+                        <button v-b-modal.userEditModal @click="$refs.editModal.editUserClicked(u)" class="btn btn-primary">
+                            Edit User
+                        </button>
+                    </b-popover>
+                </template>
             </li>
         </ul>
         <button class="btn btn-secondary" style="margin-left: 11%" v-b-modal.createUserModal>Create new user</button>
