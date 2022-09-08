@@ -71,7 +71,7 @@ export async function approve_appmnt_in_db(body: any) {
         var insProm = main.db.collection("appointments").insertOne(data)
         await Promise.all([delProm, insProm])
 
-        return "ok"
+        return data as appmnts.Appointment
     }).catch(err => {
         throw err
     })
