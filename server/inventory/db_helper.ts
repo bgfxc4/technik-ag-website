@@ -10,316 +10,294 @@ async function isUnusedItemID (id: string): Promise<boolean> {
 		return false
 	if (!uuid.validate(id.substr(1)))
 		return false
-	
-	var data = await main.db.collection("equipment").find({id: id}).toArray()
-	if (data.length != 0)
-		return false
 
-	return true
+	return main.db_pool.query("SELECT id from item_list WHERE id = $1", [id]).then(res => {
+		return res.rowCount == 0
+	}).catch(err => {
+		throw err
+	})
 } 
 
-export function add_equipment_to_db(body: any, callback: () => void) {
-	main.db.collection("categories").findOne({name: body.category}, async (err, data) => {
-		if (err)
-			throw err
-		
-		var custom_fields: {
-			[key: string]: object;
-		} = {}
-		if (data)
-			for (var f in body.custom_fields) {
-				custom_fields[f] = body.custom_fields[f]
-			}
-		var equ: inventory.Equipment = {
-			id: "I"+uuid.v4(),
-			name: body.name,
-			description: body.description,
-			room: body.room,
-			shelf: body.shelf,
-			compartment: body.compartment,
-			category: body.category,
-			type: body.type,
-			amount: body.amount,
-			image: (body.image) ? body.image : item_image_placeholder,
-			custom_fields: custom_fields
-		}
-
-		if (body.id && (await isUnusedItemID(body.id))) { // check if body.id is valid item id that is not yet used, if so, use it as ID
-			equ.id = body.id
-		}
-
-		main.db.collection("equipment").insertOne(equ, err2 => {
-			if (err2)
-				throw err
-			callback()
-		})
-	})
-}
-
-export function add_category_to_db(body: any, callback: (exists: boolean) => void) {
-	var cat: inventory.Category = {
-		name: body.name,
-		image: (body.image) ? body.image : item_image_placeholder,
-		types: [],
-		custom_fields: body.custom_fields,
+export async function add_equipment_to_db(body: any): Promise<void> {
+	var custom_fields: {
+		[key: string]: object;
+	} = {}
+	for (var f in body.custom_fields) {
+		custom_fields[f] = body.custom_fields[f]
 	}
-	var query = { name: cat.name}
-	main.db.collection("categories").find(query).toArray((err, data) => {
-		if (err)
-			throw err
+	let item_id = "I"+uuid.v4()
+	if (body.id && (await isUnusedItemID(body.id))) { // check if body.id is valid item id that is not yet used, if so, use it as ID
+		item_id = body.id
+	}
+	let room_id = await main.db_pool.query("SELECT id FROM room_list WHERE name = $1", [body.room]).then(res => res.rows[0].id)
+	let shelf_id = await main.db_pool.query("SELECT id FROM shelf_list WHERE name = $1 AND room_id = $2", [body.shelf, room_id]).then(res => res.rows[0].id)
+	let comp_id = await main.db_pool.query("SELECT id FROM compartment_list WHERE name = $1 AND shelf_id = $2", [body.compartment, shelf_id]).then(res => res.rows[0].id)
 
-		if (data == undefined || data.length != 0)
-			return callback(true)
-		
-		main.db.collection("categories").insertOne(cat, err => {
-			if (err)
-				throw err
-			callback(false)
-		})
+	let cat_id = await main.db_pool.query("SELECT id FROM category_list WHERE name = $1", [body.category]).then(res => res.rows[0].id)
+	let type_id = await main.db_pool.query("SELECT id FROM type_list WHERE name = $1 AND category_id = $2", [body.type, cat_id]).then(res => res.rows[0].id)
+
+	return main.db_pool.query("INSERT INTO item_list (id, type_id, compartment_id, name, description, amount, image, custom_fields) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+		[item_id, type_id, comp_id, body.name, body.description, body.amount, (body.image) ? body.image : item_image_placeholder, custom_fields]
+	).then(_ => {
+		return
+	}).catch(err => {
+		throw err
 	})
 }
 
-export function add_type_to_db(body: any, callback: (code: number) => void) {
-	var query = { name: body.category}
-	main.db.collection("categories").find(query).toArray((err, data) => {
-		if (err)
-			throw err
+export async function add_category_to_db(body: any): Promise<boolean> {
+	if (await main.db_pool.query("SELECT id FROM category_list WHERE name = $1", [body.name]).then(res => res.rowCount) != 0)
+		return true
+	let cat_id = "C"+uuid.v4()
+	await main.db_pool.query("INSERT INTO category_list (id, name, image) VALUES ($1, $2, $3)", [cat_id, body.name, (body.image) ? body.image : item_image_placeholder]).catch(err => {
+		throw err
+	})
 
-		if (data == undefined || data.length == 0)
-			return callback(1)
-		
-		for (var t of data[0].types) {
-			if (t == body.name) {
-				callback(2)
-				return
-			}
-		}
-		data[0].types.push(body.name)
-		main.db.collection("categories").updateOne({name: body.category}, {$set: {types: data[0].types}}, err => {
-			if (err)
-				throw err
-			callback(0)
-		})
+	let all_promises: Promise<any>[] = []
+	for (var c of body.custom_fields) {
+		all_promises.push(main.db_pool.query("INSERT INTO custom_field_list (category_id, name, type, options) VALUES ($1, $2, $3, $4)", 
+			[cat_id, c.name, c.type, c.options]
+		))
+	}
+	return Promise.all(all_promises).then(_ => {
+		return false
+	}).catch(err => {
+		throw err
 	})
 }
 
-export function edit_equipment_in_db(body: any, callback: () => void) {
-	main.db.collection("categories").findOne({name: body.category}, (err, data) => {
-		if (err)
-			throw err
-		
-		var custom_fields: {
-			[key: string]: object;
-		} = {}
-		if (data)
-			for (var f in body.custom_fields) {
-				custom_fields[f] = body.custom_fields[f]
-			}
-		var query = { id: body.id}
-		var update = {
-			$set: {
-				name: body.name,
-				description: body.description,
-				room: body.room,
-				shelf: body.shelf,
-				compartment: body.compartment,
-				category: body.category,
-				type: body.type,
-				amount: body.amount,
-				custom_fields: custom_fields,
-				image: (body.image) ? body.image : item_image_placeholder
-			}
-		}
-		main.db.collection("equipment").updateOne(query, update, err => {
-			if (err)
-				throw err
-			callback()
-		})
-	})
-}
-
-export function edit_category_in_db(body: any, callback: () => void) {
-	var query = { name: body.old_name }
-	var update: any = {$set: {}}
-	if (body.new_name)
-		update.$set.name = body.new_name
-	if (body.custom_fields)
-		update.$set.custom_fields = body.custom_fields
-	if (body.image)
-		update.$set.image = body.image
-
-	main.db.collection("categories").updateOne(query, update, err => {
-		if (err)
-			throw err
-		if (!body.new_name && !body.custom_fields)
-			return callback()
-		
-		// edit all the equipment of the category
-		main.db.collection("equipment").find({category: body.old_name}).toArray(async (err, data) => {
-			if (err)
-				throw err
-			if (!data)
-				return callback()
-			
-			for (var item of data) {
-				var update: any = {$set: {}}
-
-				// if the users wants to set new custom field, loop through custom fields 
-				// and only add the ones, that are in the request body
-				if (body.custom_fields) {
-					update.$set.custom_fields = {}
-					for (var field in item.custom_fields) {
-						if (body.custom_fields.filter((f:any) => f.name == field).length != 0) {
-							update.$set.custom_fields[field] = item.custom_fields[field]
-						}
-					}
-				}
-				
-				if (body.new_name) {
-					update.$set.category = body.new_name
-				}
-				await main.db.collection("equipment").updateMany({category: body.old_name}, update)
-			}
-			callback()
-		})
-	})
-}
-
-export function edit_type_in_db(body: any, callback: () => void) {
-	var query: any = { name: body.category }
+export async function add_type_to_db(body: any): Promise<number> {
+	let cats = await main.db_pool.query("SELECT id FROM category_list WHERE name = $1", [body.category]).catch(err => { throw err })
+	if (cats.rowCount == 0)
+		return 1
+	let types = await main.db_pool.query("SELECT id FROM type_list WHERE name = $1 AND category_id = $2", [body.name, cats.rows[0].id]).catch(err => { throw err })
+	if (types.rowCount != 0)
+		return 2
 	
-	main.db.collection("categories").findOne(query, async (err, data) => {
-		if (err)
-			throw err
-		
-		if (!data)
-			return
-
-		data.types[data.types.indexOf(body.old_name)] = body.new_name
-		var update: any = {
-			$set: { types: data.types }
-		}
-		await main.db.collection("categories").updateOne(query, update)
-		
-		query = { category: body.category, type: body.old_name}
-		update = {
-			$set: { type: body.new_name }
-		}
-		await main.db.collection("equipment").updateMany(query, update)
-		callback()
+	let type_id = "T"+uuid.v4()
+	return main.db_pool.query("INSERT INTO type_list (id, category_id, name) VALUES ($1, $2, $3)", [type_id, cats.rows[0].id, body.name]).then(_ => {
+		return 0
+	}).catch(err => {
+		console.log(err, cats.rows[0].id)
+		throw err
 	})
 }
 
-export function delete_equipment_from_db(body: any, callback: () => void) {
-	var query = {id: body.id}
-	main.db.collection("equipment").deleteOne(query, err => {
-		if (err)
-			throw err
-		callback()
+export async function edit_equipment_in_db(body: any): Promise<void> {
+	let room_id = await main.db_pool.query("SELECT id FROM room_list WHERE name = $1", [body.room]).then(res => res.rows[0].id)
+	let shelf_id = await main.db_pool.query("SELECT id FROM shelf_list WHERE name = $1 AND room_id = $2", [body.shelf, room_id]).then(res => res.rows[0].id)
+	let comp_id = await main.db_pool.query("SELECT id FROM compartment_list WHERE name = $1 AND shelf_id = $2", [body.compartment, shelf_id]).then(res => res.rows[0].id)
+
+	let cat_id = await main.db_pool.query("SELECT id FROM category_list WHERE name = $1", [body.category]).then(res => res.rows[0].id)
+	let type_id = await main.db_pool.query("SELECT id FROM type_list WHERE name = $1 AND category_id = $2", [body.type, cat_id]).then(res => res.rows[0].id)
+
+	return main.db_pool.query("UPDATE item_list SET type_id = $2, compartment_id = $3, name = $4, description = $5, amount = $6, image = $7, custom_fields = $8 WHERE id = $1",
+		[body.id, type_id, comp_id, body.name, body.description, body.amount, (body.image) ? body.image : item_image_placeholder, body.custom_fields]
+	).then(_ => {
+		return
+	}).catch(err => {
+		throw err
 	})
 }
 
-export function delete_category_from_db(body: any, callback: () => void) {
-	main.db.collection("categories").deleteOne({name: body.name}, err => {
-		if (err)
+export async function edit_category_in_db(body: any): Promise<void> {
+	let query = "UPDATE category_list SET"
+	let idx = 1
+	let params = []
+	if (body.new_name) {
+		query += ` name = $${idx++},`
+		params.push(body.new_name)
+	}
+	if (body.image) {
+		query += ` image = $${idx++},`
+		params.push(body.image)
+	}
+
+	if (body.custom_fields) {
+		let cat_id = await main.db_pool.query("SELECT id FROM category_list WHERE name = $1", [body.old_name]).then(res => res.rows[0].id)
+		await main.db_pool.query("DELETE FROM custom_field_list WHERE category_id = $1", [cat_id]).catch(err => {throw err})
+
+		let all_promises: Promise<any>[] = []
+		for (var c of body.custom_fields) {
+			all_promises.push(main.db_pool.query("INSERT INTO custom_field_list (category_id, name, type, options) VALUES ($1, $2, $3, $4)", 
+				[cat_id, c.name, c.type, c.options]
+			))
+		}
+		await Promise.all(all_promises).then(_ => {
+			return true
+		}).catch(err => {
 			throw err
-		main.db.collection("equipment").deleteMany({category: body.name}, err2 => {
-			if (err2)
-				throw err2
-			callback()
 		})
+	}
+	query = query.slice(0, -1) // remove trailing , at the end
+	query += ` WHERE name = $${idx++}`
+	params.push(body.old_name)
+	return main.db_pool.query(query, params).then(_ => {
+		return
+	}).catch(err => {
+		throw err
 	})
 }
 
-export function delete_type_from_db(body: any, callback: () => void) {
-	main.db.collection("categories").findOne({name: body.category}, (err, data) => {
-		if (err)
-			throw err
-		if (!data)
-			return
-		data.types.splice(data.types.indexOf(body.name), 1)
-		main.db.collection("categories").updateOne({name: body.category}, {$set: {types: data.types}}, err2 => {
-			if (err2)
-				throw err2
-			main.db.collection("equipment").deleteMany({category: body.category, type: body.name}, err3 => {
-				if (err3)
-					throw err3
-				callback()
-			})
-		})
+export async function edit_type_in_db(body: any): Promise<void> {
+	let cat_id = await main.db_pool.query("SELECT id FROM category_list where name = $1", [body.category]).then(res => res.rows[0].id)
+	return main.db_pool.query("UPDATE category_list SET name = $1 WHERE name = $2 AND category_id = $3", [body.new_name, body.old_name, cat_id]).then(_ => {
+		return
+	}).catch(err => {throw err})
+}
+
+export function delete_equipment_from_db(body: any): Promise<void> {
+	return main.db_pool.query("DELETE FROM item_list WHERE id = $1", [body.id]).then(_ => {
+		return
+	}).catch(err => {
+		throw err
 	})
 }
 
-export async function get_equipment_from_db(project={image: 0}): Promise<any[]> {
-	return await main.db.collection("equipment").find().project(project).toArray()
-}
-
-export async function get_categories_from_db(project={image:0}): Promise<any[]> {
-	return await main.db.collection("categories").find().project(project).toArray()
-}
-
-export function get_equipment_by_id_from_db(id: string, callback: (res: any) => void, project:any={image:0}) {
-	main.db.collection("equipment").find().project(project).toArray((err, data) => {
-		if (err) 
-			throw err
-		if (!data) {
-			callback([])
-			return
-		}
-		var ret = []
-		for (var d of data) {
-			if (d.id.startsWith(id))
-				ret.push(d)
-		}
-		callback(ret)
+export function delete_category_from_db(body: any): Promise<void> {
+	return main.db_pool.query("DELETE FROM category_list WHERE name = $1", [body.name]).then(_ => {
+		return
+	}).catch(err => {
+		throw err
 	})
 }
 
-export function get_category_by_name(name: string, callback: (category: any) => void) {
-	main.db.collection("categories").findOne({name: name}, (err, data) => {
-		if (err)
-			throw err
-		if (data == undefined)
-			return callback(undefined)
-		callback(data)
+export async function delete_type_from_db(body: any): Promise<void> {
+	let cat_id = await main.db_pool.query("SELECT id FROM category_list where name = $1", [body.category]).then(res => res.rows[0].id)
+	return main.db_pool.query("DELETE FROM type_list WHERE name = $1 AND category_id = $2", [body.name, cat_id]).then(_ => {
+		return
+	}).catch(err => {throw err})
+}
+
+export function get_equipment_from_db(withImage=false): Promise<any[]> {
+	const query = `SELECT item_list.id "id", room_list.name "room", shelf_list.name "shelf", compartment_list.name "compartment",
+					item_list.name "name", description, amount, ${withImage ? 'item_list.image "image", ' : ""}custom_fields,
+					category_list.name "category", type_list.name "type"
+				FROM item_list
+				LEFT JOIN type_list
+				ON type_list.id = item_list.type_id
+				LEFT JOIN category_list
+				ON category_list.id = type_list.category_id
+				LEFT JOIN compartment_list
+				ON compartment_list.id = item_list.compartment_id
+				LEFT JOIN shelf_list
+				ON shelf_list.id = compartment_list.shelf_id
+				LEFT JOIN room_list
+				ON room_list.id = shelf_list.room_id`
+	return main.db_pool.query(query).then(res => res.rows)
+}
+
+export async function get_categories_from_db(withImage=false): Promise<any[]> {
+	const query = `
+		SELECT row_to_json(t) 
+			FROM (
+				SELECT id, name,${withImage ? "image, " : " "}
+					(
+						SELECT json_agg(s.name)
+						FROM (
+							SELECT name
+							FROM type_list
+							WHERE type_list.category_id = category_list.id
+						) s
+					) as types,
+					(
+						SELECT array_to_json(array_agg(row_to_json(f)))
+						FROM (
+							SELECT name, type, options FROM custom_field_list
+							WHERE custom_field_list.category_id = category_list.id
+						) f
+					) as custom_fields
+				FROM category_list
+			) t
+	`
+	return main.db_pool.query(query).then(res => res.rows.map(el => el.row_to_json)).catch(err => {
+		throw err
 	})
 }
 
-export function get_equipment_by_type_from_db(category: string, type: string, callback: (res: any) => void, project={image:0}) {
-	main.db.collection("equipment").find({category: category, type: type}).project(project).toArray((err, data) => {
-		if (err)
-			throw err
-		callback(data)
+export function get_equipment_by_id_from_db(id: string, withImage=false): Promise<any[]> {
+	const query = `SELECT item_list.id "id", room_list.name "room", shelf_list.name "shelf", compartment_list.name "compartment",
+					item_list.name "name", description, amount, ${withImage ? 'item_list.image "image", ' : ""}custom_fields,
+					category_list.name "category", type_list.name "type"
+				FROM item_list
+				LEFT JOIN type_list
+				ON type_list.id = item_list.type_id
+				LEFT JOIN category_list
+				ON category_list.id = type_list.category_id
+				LEFT JOIN compartment_list
+				ON compartment_list.id = item_list.compartment_id
+				LEFT JOIN shelf_list
+				ON shelf_list.id = compartment_list.shelf_id
+				LEFT JOIN room_list
+				ON room_list.id = shelf_list.room_id
+				WHERE item_list.id LIKE $1`
+	return main.db_pool.query(query, [`${id}%`]).then(res => res.rows)
+}
+
+export function get_category_by_name(name: string): Promise<any> {
+	const query = `
+	SELECT row_to_json(t) 
+		FROM (
+			SELECT id, name, image,
+				(
+					SELECT json_agg(s.name)
+					FROM (
+						SELECT name
+						FROM type_list
+						WHERE type_list.category_id = category_list.id
+					) s
+				) as types,
+                (
+                    SELECT array_to_json(array_agg(row_to_json(f)))
+                    FROM (
+                        SELECT name, type, options FROM custom_field_list
+                        WHERE custom_field_list.category_id = category_list.id
+                    ) f
+                ) as custom_fields
+			FROM category_list
+			WHERE category_list.name = $1
+		) t
+`
+	return main.db_pool.query(query, [name]).then(res => res.rows[0].row_to_json).catch(err => {
+		throw err
 	})
 }
 
-export function check_if_category_exists(name: string, callback: (exists: boolean) => void, project={image:0}) {
-	main.db.collection("categories").find({name: name}).project(project).toArray((err, data) => {
-		if (err)
-			throw err
-		if (data == undefined)
-			return callback(false)
-		if (data.length == 0)
-			return callback(false)
-		callback(true)
+export async function get_equipment_by_type_from_db(category: string, type: string, withImage=false): Promise<any[]> {
+	const query = `SELECT item_list.id "id", room_list.name "room", shelf_list.name "shelf", compartment_list.name "compartment",
+					item_list.name "name", description, amount${withImage ? ', item_list.image "image"' : ''}, custom_fields,
+					category_list.name "category", type_list.name "type"
+				FROM item_list
+				LEFT JOIN type_list
+				ON type_list.id = item_list.type_id
+				LEFT JOIN category_list
+				ON category_list.id = type_list.category_id
+				LEFT JOIN compartment_list
+				ON compartment_list.id = item_list.compartment_id
+				LEFT JOIN shelf_list
+				ON shelf_list.id = compartment_list.shelf_id
+				LEFT JOIN room_list
+				ON room_list.id = shelf_list.room_id
+				WHERE item_list.type_id = $1`
+
+	let cat_id = await main.db_pool.query("SELECT id FROM category_list WHERE name = $1", [category]).then(res => res.rows[0]?.id)
+	let type_id = await main.db_pool.query("SELECT id FROM type_list WHERE name = $1 AND category_id = $2", [type, cat_id]).then(res => res.rows[0]?.id)
+	return main.db_pool.query(query, [type_id]).then(res => res.rows)
+}
+
+export function check_if_category_exists(name: string): Promise<boolean> {
+	return main.db_pool.query("SELECT id FROM category_list WHERE name = $1", [name]).then(res => res.rowCount != 0).catch(err => {
+		throw err
 	})
 }
 
-export function check_if_type_exists(category: string, name: string, callback: (code: number) => void, project={image:0}) {
-	main.db.collection("categories").find({name: category}).project(project).toArray((err, data) => {
-		if (err)
-			throw err
-		if (data == undefined)
-			return callback(1)
-		if (data.length == 0)
-			return callback(1)
-		for (var t of data[0].types) {
-			if (t == name) {
-				callback(0)
-				return
-			}
-		}
-		callback(2)
+export async function check_if_type_exists(category: string, name: string): Promise<number> {
+	let cat_id = await main.db_pool.query("SELECT id FROM category_list WHERE name = $1", [category]).then(res => res.rows[0]?.id)
+	if (!cat_id) return 1
+	return main.db_pool.query("SELECT id FROM type_list WHERE name = $1 AND category_id = $2", [name, cat_id]).then(_ => {
+		return 0
+	}).catch(err => {
+		throw err
 	})
 }
 
