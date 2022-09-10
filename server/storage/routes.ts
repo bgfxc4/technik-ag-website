@@ -26,11 +26,10 @@ main.app.post("/room/new", async (req, res) => {
 
 	if (!(await main.check_request(type, PERMS.EditStor, req.body, req.headers, res)))
 		return
-	db_helper.add_room_to_db(req.body, exists => {
-		if (exists)
-			return res.status(400).send("The room you want to create exists already!")
-		else
-			res.status(200).send("ok")
+	db_helper.add_room_to_db(req.body).then(_ => {
+		res.send("The room you want to create exists already!")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -45,8 +44,10 @@ main.app.post("/room/delete", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditStor, req.body, req.headers, res)))
 		return
 
-	db_helper.delete_room_from_db(req.body, () => {
+	db_helper.delete_room_from_db(req.body).then(() => {
 		res.status(200).send("ok")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -62,8 +63,10 @@ main.app.post("/room/edit", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditStor, req.body, req.headers, res)))
 		return
 
-	db_helper.edit_room_in_db(req.body, () => {
+	db_helper.edit_room_in_db(req.body).then(() => {
 		res.status(200).send("ok")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -79,13 +82,15 @@ main.app.post("/shelf/new", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditStor, req.body, req.headers, res)))
 		return
 
-	db_helper.add_shelf_to_db(req.body, code => {
+	db_helper.add_shelf_to_db(req.body).then(code => {
 		if (code == 1)
 			return res.status(400).send("The room you want to create the shelf in does not exist!")
 		if (code == 2)
 			return res.status(400).send("The shelf you want to create does already exist!")
 		
 		res.status(200).send("ok")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -101,8 +106,10 @@ main.app.post("/shelf/delete", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditStor, req.body, req.headers, res)))
 		return
 
-	db_helper.delete_shelf_from_db(req.body, () => {
+	db_helper.delete_shelf_from_db(req.body).then(() => {
 		res.status(200).send("ok")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -119,8 +126,10 @@ main.app.post("/shelf/edit", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditStor, req.body, req.headers, res)))
 		return
 
-	db_helper.edit_shelf_in_db(req.body, () => {
+	db_helper.edit_shelf_in_db(req.body).then(() => {
 		res.status(200).send("ok")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -137,7 +146,7 @@ main.app.post("/compartment/new", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditStor, req.body, req.headers, res)))
 		return
 
-	db_helper.add_compartment_to_db(req.body, code => {
+	db_helper.add_compartment_to_db(req.body).then(code => {
 		if (code == 1)
 			return res.status(400).send("The room you want to create the compartment in does not exist!")
 		if (code == 2)
@@ -146,6 +155,8 @@ main.app.post("/compartment/new", async (req, res) => {
 			return res.status(400).send("The compartment you want to create does already exist!")
 		
 		res.status(200).send("ok")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -162,8 +173,10 @@ main.app.post("/compartment/delete", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditStor, req.body, req.headers, res)))
 		return
 
-	db_helper.delete_compartment_from_db(req.body, () => {
+	db_helper.delete_compartment_from_db(req.body).then(() => {
 		res.status(200).send("ok")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -181,8 +194,10 @@ main.app.post("/compartment/edit", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditStor, req.body, req.headers, res)))
 		return
 
-	db_helper.edit_compartment_in_db(req.body, () => {
+	db_helper.edit_compartment_in_db(req.body).then(() => {
 		res.status(200).send("ok")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -194,7 +209,9 @@ main.app.get("/storage/list", async (req, res) => {
 
 	if (!(await main.check_request(type, PERMS.ViewStor, req.body, req.headers, res)))
 		return
-	db_helper.get_storage_from_db(data => {
+	db_helper.get_storage_from_db().then(data => {
 		res.send(JSON.stringify(data))
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })

@@ -1,0 +1,118 @@
+room_list
+	id	name
+		CREATE TABLE room_list (
+			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+			name VARCHAR(64) NOT NULL,
+			UNIQUE(name)
+		)
+
+shelf_list
+	id	name	room_id
+		CREATE TABLE shelf_list (
+			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+			name VARCHAR(64) NOT NULL,
+			room_id INT REFERENCES room_list(id) ON DELETE CASCADE,
+			UNIQUE(name)
+		)
+
+compartment_list
+	id	name	shelf_id
+		CREATE TABLE compartment_list (
+			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+			name VARCHAR(64) NOT NULL,
+			shelf_id INT REFERENCES shelf_list(id) ON DELETE CASCADE,
+			UNIQUE(name)
+		)
+
+user_list
+	display_name	login_hash	id	permissions
+		CREATE TABLE user_list (
+			id VARCHAR(37) NOT NULL,
+			display_name VARCHAR(64) NOT NULL,
+			login_hash VARCHAR(128) NOT NULL,
+			permissions INT NOT NULL,
+			UNIQUE(display_name, id)
+		)
+
+category_list
+	name	id	image
+		CREATE TABLE category_list (
+			id VARCHAR(37) PRIMARY KEY NOT NULL,
+			name VARCHAR(64) NOT NULL,
+			image text NOT NULL,
+			UNIQUE(name, id)
+		)
+
+custom_field_list
+	id	category_id	name	type	options(only if type=list)
+		CREATE TABLE custom_field_list (
+			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+			category_id VARCHAR(37) REFERENCES category_list(id) ON DELETE CASCADE,
+			name VARCHAR(64) NOT NULL,
+			type CUSTOM_FIELD_TYPES NOT NULL,
+			options JSON
+		)
+
+type_list
+	id	name	category_id
+		CREATE TABLE type_list (
+			id VARCHAR(37) PRIMARY KEY NOT NULL,
+			category_id VARCHAR(37) REFERENCES category_list(id) ON DELETE CASCADE,
+			name VARCHAR(64) NOT NULL,
+			UNIQUE(id)
+		)
+
+item_list
+	id 	name	description	compartment_id	type_id	amount	custom_fields(string)
+		CREATE TABLE item_list (
+			id VARCHAR(37) PRIMARY KEY NOT NULL,
+			type_id VARCHAR(37) REFERENCES type_list(id) ON DELETE CASCADE,
+			compartment_id INT REFERENCES compartment_list(id) ON DELETE CASCADE,
+			
+			name VARCHAR(64) NOT NULL,
+			description VARCHAR(512),
+			amount INT NOT NULL,
+			image TEXT NOT NULL,
+			custom_fields JSON,
+			
+			UNIQUE(id, name)
+		)
+
+appointment_list
+	id 	name 	description		date end_date 	contact needed_items
+		CREATE TABLE appointment_list (
+			id VARCHAR(37) PRIMARY KEY NOT NULL,
+			name VARCHAR(64) NOT NULL,
+			description VARCHAR(512),
+			contact VARCHAR(64),
+			needed_items VARCHAR(64),
+			date INT8 NOT NULL,
+			end_date INT8 NOT NULL,
+			
+			UNIQUE(id, name)
+		)
+appointment_item_bookings
+	id 	appointment_id 	item_id	amount
+		CREATE TABLE appointment_item_bookings (
+			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+			appointment_id VARCHAR(37) REFERENCES appointment_list(id) ON DELETE CASCADE,
+			item_id VARCHAR(37) REFERENCES item_list(id) ON DELETE CASCADE,
+			amount INT NOT NULL
+		)
+
+appointment_request_list
+	id 	name 	description		date end_date 	contact needed_items
+		CREATE TABLE appointment_request_list (
+			id VARCHAR(37) PRIMARY KEY NOT NULL,
+			name VARCHAR(64) NOT NULL,
+			description VARCHAR(512),
+			contact VARCHAR(64),
+			needed_items VARCHAR(64),
+			date INT8 NOT NULL,
+			end_date INT8 NOT NULL,
+			
+			UNIQUE(id, name)
+		)
+
+
+CREATE TYPE CUSTOM_FIELD_TYPES as ENUM ('text', 'boolean', 'list')

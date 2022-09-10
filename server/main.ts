@@ -6,11 +6,13 @@ import body_parser from "body-parser"
 import {sha512} from "js-sha512"
 import {PERMS} from "./permissions"
 import * as user_db from "./users/db_helper"
+import {Pool} from "pg"
 
 export const config = JSON.parse(fs.readFileSync("./configs/config.json", "utf-8"))
 
 export var db:Db;
 export const app = express()
+export const db_pool = new Pool({ connectionString: config.postgres_connection_string})
 
 app.use(body_parser.json({limit: "50mb"}))
 app.use(cors())

@@ -46,11 +46,10 @@ main.app.post("/equipment/new", async (req, res) => {
 		return
 
 	var shelf_exists = false
-	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, exists => {
-		shelf_exists = exists
-		if (!exists)
-			res.status(400).send("The room, shelf or compartment you specified does not exist!")
-	})
+	let r = await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment)
+	shelf_exists = r
+	if (!r)
+		res.status(400).send("The room, shelf or compartment you specified does not exist!")
 	if (!shelf_exists)
 		return
 
@@ -136,11 +135,11 @@ main.app.post("/equipment/edit", async (req, res) => {
 		return
 
 	var storage_exists = false
-	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, exists => {
-		storage_exists = exists
-		if (!exists)
-			return res.status(400).send("The room, shelf or compartment you specified does not exist!")
-	})
+	let r = await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment)
+
+	storage_exists = r
+	if (!r)
+		return res.status(400).send("The room, shelf or compartment you specified does not exist!")
 	if (!storage_exists)
 		return
 
