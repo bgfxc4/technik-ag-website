@@ -55,6 +55,7 @@ export async function add_category_to_db(body: any): Promise<boolean> {
 
 	let all_promises: Promise<any>[] = []
 	for (var c of body.custom_fields) {
+		console.log(c)
 		all_promises.push(main.db_pool.query("INSERT INTO custom_field_list (category_id, name, type, options) VALUES ($1, $2, $3, $4)", 
 			[cat_id, c.name, c.type, c.options]
 		))

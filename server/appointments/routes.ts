@@ -54,11 +54,12 @@ main.app.post("/appointments/delete/approved", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditAppmnts, req.body, req.headers, res)))
 		return
 	Promise.all([db_helper.delete_appointment_from_db(req.body),
-	google_cal.delete_termin_event(req.body.id)]).then(() => {
-			res.send("ok")
-		}).catch(err => {
-			res.status(500).send(err)
-		})
+				google_cal.delete_termin_event(req.body.id)]).then(() => {
+		res.send("ok")
+	}).catch(err => {
+		console.log(err)
+		res.status(500).send(err)
+	})
 })
 
 main.app.post("/appointments/delete/request", async (req, res) => {
@@ -121,7 +122,6 @@ main.app.post("/appointments/approve", async (req, res) => {
 
 	if (!(await main.check_request(type, PERMS.EditAppmnts, req.body, req.headers, res)))
 		return
-
 	if (req.body.from_google_calendar) {
 		google_cal.approve_request_to_db(req.body.id).then(data => {
 			Promise.all([google_cal.delete_request_event(req.body.id),
@@ -162,6 +162,7 @@ main.app.post("/appointments/updateitems", async (req, res) => {
 	db_helper.update_appmnt_items_in_db(req.body).then(() => {
 		res.send("ok")
 	}).catch(err => {
+		console.log(err)
 		res.status(500).send(err)
 	})
 })

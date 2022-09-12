@@ -11,7 +11,15 @@ export function get_storage_from_db(): Promise<any> {
 						(
 							SELECT array_to_json(array_agg(row_to_json(c)))
 							FROM (
-								SELECT name, id
+								SELECT name, id, 
+                                    (
+                                        SELECT array_to_json(array_agg(row_to_json(i)))
+                                        FROM (
+                                            SELECT name, id
+                                            FROM item_list
+                                            WHERE item_list.compartment_id = compartment_list.id
+                                        ) i
+                                    ) as items
 								FROM compartment_list
 								WHERE shelf_list.id = compartment_list.shelf_id
 							) c

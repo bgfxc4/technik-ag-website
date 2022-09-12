@@ -361,11 +361,11 @@ main.app.post("/equipment/get/duringappointment", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.ViewInv | PERMS.ViewAppmnts, req.body, req.headers, res)))
 		return
 
-	var appmnt = await main.db.collection("appointments").findOne({id: req.body.appointment})
+	let appmnt = await main.db_pool.query("SELECT id, date, end_date FROM appointment_list WHERE id = $1", [req.body.appointment]).then(res => res.rows[0])
 	if (!appmnt)
 		return res.status(400).send(`The appointment with the ID ${req.body.appointment} was not found.`)
 
-	var item = await main.db.collection("equipment").findOne({id: req.body.id})
+	let item = await db_helper.get_equipment_by_id_from_db(req.body.id, true).then(res => res[0])
 	if (!item)
 		return res.status(400).send(`The item with the ID ${req.body.id} was not found.`)
 	

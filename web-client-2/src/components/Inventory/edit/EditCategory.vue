@@ -5,7 +5,7 @@
 
             <button class="btn btn-secondary" v-b-modal.editCategoryModal v-b-modal.editCreateFieldModal>Create Custom Field</button><br/>
 
-            <h6 v-if="customFields.length">Custom Fields:</h6>
+            <h6 v-if="customFields?.length">Custom Fields:</h6>
             <h6 v-for="f in customFields" :key="f.name"><b>Name:</b> {{f.name}} <b>Type:</b> {{f.type}} <button class="btn btn-danger btn-sm" @click="deleteCustomField(customFields.indexOf(f))">Delete</button></h6>
             
             <image-upload-preview ref="image-upload"/><br/>
@@ -32,7 +32,7 @@
                 <label for="create-option-name">Name:</label><input id="create-option-name" v-model="optionName" placeholder="Enter a name...">
                 <button class="btn btn-secondary" @click="createOption">Create Option</button><br/>
 
-                <h6 v-if="fieldOptions.length">Options:</h6>
+                <h6 v-if="fieldOptions?.length">Options:</h6>
                 <h6 v-for="f in fieldOptions" :key="f">-{{f}} <button class="btn btn-danger btn-sm" @click="deleteOption(fieldOptions.indexOf(f))">Delete</button></h6>
                 <p class="text-danger" v-if="optionsErrorText">{{ optionsErrorText }}</p>
             </template>
@@ -84,11 +84,13 @@
         },
         methods: {
             createCustomField () {
+                if (this.customFields == null) this.customFields = []
                 if (/^\s*$/.test(this.customFieldName)) { // checks if string is only whitespaces
                     this.customFieldErrorText = "The name can not be empty!"
                     return
                 }
-                if (this.customFields.filter(f => f.name == this.customFieldName).length != 0) {
+                let filtered = this.customFields?.filter(f => f.name == this.customFieldName)
+                if (filtered?.length != 0) {
                     this.customFieldErrorText = "A custom field with this name exists already!"
                     return
                 }
@@ -146,7 +148,7 @@
             },
             fillInCategory () {
                 this.categoryName = this.category.name
-                this.customFields = this.category.custom_fields
+                this.customFields = this.category.custom_fields || []
                 this.$refs['image-upload']._url = this.$store.state.apiUrl + '/category/getimg/' + this.category.name
             }
         }
