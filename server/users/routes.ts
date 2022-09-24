@@ -16,7 +16,9 @@ main.app.get("/users/list", async (req, res) => {
 
     if (!(await main.check_request(type, PERMS.ViewUsrs, req.body, req.headers, res)))
         return
-    db_helper.get_users_from_db().then(l => res.send(l))
+    db_helper.get_users_from_db().then(l => res.send(l)).catch(err => {
+        res.status(500).send(err)
+    })
 })
 
 main.app.post("/users/new", async (req, res) => {
@@ -36,8 +38,10 @@ main.app.post("/users/new", async (req, res) => {
         return
     }
 
-    db_helper.add_user_to_db(req.body, () => {
+    db_helper.add_user_to_db(req.body).then(() => {
             return res.status(200).send("Ok")
+    }).catch(err => {
+        res.status(500).send(err)
     })
 })
 
@@ -57,8 +61,10 @@ main.app.post("/users/delete", async (req, res) => {
         return
     }
 
-    db_helper.remove_user_from_db(req.body, () => {
-            return res.status(200).send("Ok")
+    db_helper.remove_user_from_db(req.body).then(() => {
+        res.status(200).send("Ok")
+    }).catch(err => {
+        res.status(500).send(err)
     })
 })
 
@@ -79,8 +85,10 @@ main.app.post("/users/permedit", async (req, res) => {
         return
     }
 
-    db_helper.set_user_perm(req.body, () => {
-            return res.status(200).send("Ok")
+    db_helper.set_user_perm(req.body).then(() => {
+        res.status(200).send("Ok")
+    }).catch(err => {
+        res.status(500).send(err)
     })
 })
 
@@ -102,8 +110,10 @@ main.app.post("/users/edit", async (req, res) => {
         return
     }
 
-    db_helper.edit_user(req.body, () => {
-        return res.status(200).send("Ok")
+    db_helper.edit_user(req.body).then(() => {
+        res.status(200).send("Ok")
+    }).catch(err => {
+        res.status(500).send(err)
     })
 })
 

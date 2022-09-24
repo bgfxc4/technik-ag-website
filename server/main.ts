@@ -1,16 +1,18 @@
 import express from "express"
-import {Db, MongoClient} from "mongodb"
 import cors from "cors"
 import * as fs from "fs"
 import body_parser from "body-parser"
 import {sha512} from "js-sha512"
 import {PERMS} from "./permissions"
 import * as user_db from "./users/db_helper"
+import {Pool, types} from "pg"
 
 export const config = JSON.parse(fs.readFileSync("./configs/config.json", "utf-8"))
 
-export var db:Db;
 export const app = express()
+
+types.setTypeParser(20, BigInt)
+export const db_pool = new Pool({ connectionString: config.postgres_connection_string})
 
 app.use(body_parser.json({limit: "50mb"}))
 app.use(cors())
@@ -32,15 +34,7 @@ export async function authorized(req_headers:any) {
 	})
 }
 
-function setup_mongodb() {
-	MongoClient.connect(config.mongo_url).then(client => {
-		db = client.db("technikag")
-		console.log("[Database] connected to database!")
-	})
-}
-
 process.title = "node technikag-website"
-setup_mongodb()
 app.listen(config.main_server_port, () => {
 	console.log(`[express] The server is listening on port ${config.main_server_port}`)
 })

@@ -69,11 +69,15 @@ export async function get_event_from_google_cal(id: string, calendar_id: string)
 	})
 }
 
-export async function approve_request_to_db(id: string) {
+export async function approve_request_to_db(id: string): Promise<Appointment> {
 	let app = await get_event_from_google_cal(id, config.google_calendar.request_calendar_id).catch(err => { throw err })
 	app.id = "A"+uuid.v4()
-	return main.db.collection("appointments").insertOne(app).then(() => {
+	const query = `INSERT INTO appointment_list (id, name, description, date, end_date, contact, needed_items)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	return main.db_pool.query(query, [app.id, app.name, app.description, app.date, app.end_date, app.contact, app.needed_items]).then(_ => {
 		return app
+	}).catch(err => {
+		throw err
 	})
 }
 
@@ -110,10 +114,10 @@ async function add_appointment_to_calendar(calendar_id: string, appointment: App
 			summary: appointment.name,
 			description: appointment.description,
 			start: {
-				dateTime: new Date(appointment.date).toISOString()
+				dateTime: new Date(appointment.date as any).toISOString()
 			},
 			end: {
-				dateTime: new Date(appointment.end_date).toISOString()
+				dateTime: new Date(appointment.end_date as any).toISOString()
 			},
 			id: appointment.id.split("-").join("").toLowerCase(),
 			organizer: {displayName: appointment.contact}

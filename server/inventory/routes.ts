@@ -46,22 +46,25 @@ main.app.post("/equipment/new", async (req, res) => {
 		return
 
 	var shelf_exists = false
-	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, exists => {
-		shelf_exists = exists
-		if (!exists)
-			res.status(400).send("The room, shelf or compartment you specified does not exist!")
-	})
+	let r = await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment)
+	shelf_exists = r
+	if (!r)
+		res.status(400).send("The room, shelf or compartment you specified does not exist!")
 	if (!shelf_exists)
 		return
 
-	db_helper.check_if_type_exists(req.body.category, req.body.type, code => {
+	db_helper.check_if_type_exists(req.body.category, req.body.type).then(code => {
 		if (code == 1)
 			return res.status(400).send("The category you specified does not exist!")
 		if (code == 2)
 			return res.status(400).send("The type you specified does not exist in the category you specified!")
-		db_helper.add_equipment_to_db(req.body, () => {
+		db_helper.add_equipment_to_db(req.body).then(() => {
 			res.status(200).send("ok")
+		}).catch(err => {
+			res.status(500).send(err)
 		})
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -86,11 +89,13 @@ main.app.post("/category/new", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditInv, req.body, req.headers, res)))
 		return
 
-	db_helper.add_category_to_db(req.body, exists => {
+	db_helper.add_category_to_db(req.body).then(exists => {
 		if (!exists)
 			res.status(200).send("ok")
 		else
 			res.status(400).send("A category with this name exists already!")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -105,13 +110,15 @@ main.app.post("/type/new", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditInv, req.body, req.headers, res)))
 		return
 
-	db_helper.add_type_to_db(req.body, code => {
+	db_helper.add_type_to_db(req.body).then(code => {
 		if (code == 0)
 			res.status(200).send("ok")
 		else if (code == 1)
 			res.status(400).send("The category you specified does not exist!")
 		else
 			res.status(400).send("A type with this name exists already in this category!")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -136,22 +143,26 @@ main.app.post("/equipment/edit", async (req, res) => {
 		return
 
 	var storage_exists = false
-	await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment, exists => {
-		storage_exists = exists
-		if (!exists)
-			return res.status(400).send("The room, shelf or compartment you specified does not exist!")
-	})
+	let r = await storage_db_helper.compartment_exists(req.body.room, req.body.shelf, req.body.compartment)
+
+	storage_exists = r
+	if (!r)
+		return res.status(400).send("The room, shelf or compartment you specified does not exist!")
 	if (!storage_exists)
 		return
 
-	db_helper.check_if_type_exists(req.body.category, req.body.type, code => {
+	db_helper.check_if_type_exists(req.body.category, req.body.type).then(code => {
 		if (code == 1)
 			return res.status(400).send("The category you specified does not exist!")
 		if (code == 2)
 			return res.status(400).send("The type you specified does not exist in the category you specified!")
-		db_helper.edit_equipment_in_db(req.body, () => {
+		db_helper.edit_equipment_in_db(req.body).then(() => {
 			res.status(200).send("ok")
+		}).catch(err => {
+			res.status(500).send(err)
 		})
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -167,12 +178,16 @@ main.app.post("/type/edit", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditInv, req.body, req.headers, res)))
 		return
 
-	db_helper.check_if_type_exists(req.body.category, req.body.old_name, exists => {
+	db_helper.check_if_type_exists(req.body.category, req.body.old_name).then(exists => {
 		if (exists != 0)
 			return res.status(400).send("A type with the old_name you specified does not exist in the category you specified!")
-		db_helper.edit_type_in_db(req.body, () => {
+		db_helper.edit_type_in_db(req.body).then(() => {
 			res.status(200).send("ok")
+		}).catch(err => {
+			res.status(500).send(err)
 		})
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -190,12 +205,16 @@ main.app.post("/category/edit", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditInv, req.body, req.headers, res)))
 		return
 
-	db_helper.check_if_category_exists(req.body.old_name, exists => {
+	db_helper.check_if_category_exists(req.body.old_name).then(exists => {
 		if (!exists)
 			return res.status(400).send("A category with the old_name you specified does not exist!")
-		db_helper.edit_category_in_db(req.body, () => {
+		db_helper.edit_category_in_db(req.body).then(() => {
 			res.status(200).send("ok")
+		}).catch(err => {
+			res.status(500).send(err)
 		})
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -210,8 +229,10 @@ main.app.post("/equipment/delete", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditInv, req.body, req.headers, res)))
 		return
 
-	db_helper.delete_equipment_from_db(req.body, () => {
+	db_helper.delete_equipment_from_db(req.body).then(() => {
 		res.status(200).send("ok")
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -226,12 +247,16 @@ main.app.post("/category/delete", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditInv, req.body, req.headers, res)))
 		return
 
-	db_helper.check_if_category_exists(req.body.name, exists => {
+	db_helper.check_if_category_exists(req.body.name).then(exists => {
 		if (!exists)
 			return res.status(400).send("The category you specified does not exist!")
-		db_helper.delete_category_from_db(req.body, () => {
+		db_helper.delete_category_from_db(req.body).then(() => {
 			res.status(200).send("ok")
+		}).catch(err => {
+			res.status(500).send(err)
 		})
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -247,12 +272,16 @@ main.app.post("/type/delete", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.EditInv, req.body, req.headers, res)))
 		return
 
-	db_helper.check_if_type_exists(req.body.category, req.body.name, code => {
+	db_helper.check_if_type_exists(req.body.category, req.body.name).then(code => {
 		if (code != 0)
 			return res.status(400).send("The type or category you specified does not exist!")
-		db_helper.delete_type_from_db(req.body, () => {
+		db_helper.delete_type_from_db(req.body).then(() => {
 			res.status(200).send("ok")
+		}).catch(err => {
+			res.status(500).send(err)
 		})
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -332,11 +361,11 @@ main.app.post("/equipment/get/duringappointment", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.ViewInv | PERMS.ViewAppmnts, req.body, req.headers, res)))
 		return
 
-	var appmnt = await main.db.collection("appointments").findOne({id: req.body.appointment})
+	let appmnt = await main.db_pool.query("SELECT id, date, end_date FROM appointment_list WHERE id = $1", [req.body.appointment]).then(res => res.rows[0])
 	if (!appmnt)
 		return res.status(400).send(`The appointment with the ID ${req.body.appointment} was not found.`)
 
-	var item = await main.db.collection("equipment").findOne({id: req.body.id})
+	let item = await db_helper.get_equipment_by_id_from_db(req.body.id, true).then(res => res[0])
 	if (!item)
 		return res.status(400).send(`The item with the ID ${req.body.id} was not found.`)
 	
@@ -356,7 +385,7 @@ main.app.get("/category/getimg/:name", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.None, req.params, req.headers, res)))
 		return
 
-	db_helper.get_category_by_name(req.params.name, cat => {
+	db_helper.get_category_by_name(req.params.name).then(cat => {
 		if (cat == undefined)
 			return res.status(400).send("A category with the name you provided does not exist!")
 		
@@ -368,6 +397,8 @@ main.app.get("/category/getimg/:name", async (req, res) => {
 		});
 
 		res.end(img)
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -382,7 +413,7 @@ main.app.get("/equipment/getimg/:id", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.None, req.params, req.headers, res)))
 		return
 
-	db_helper.get_equipment_by_id_from_db(req.params.id, equ => {
+	db_helper.get_equipment_by_id_from_db(req.params.id, true).then(equ => {
 		if (equ == undefined || equ.length == 0 || equ[0] == undefined)
 			return res.status(400).send("An item with the id you provided does not exist!")
 		var img = Buffer.from(equ[0].image, 'base64');
@@ -393,7 +424,9 @@ main.app.get("/equipment/getimg/:id", async (req, res) => {
 		});
 
 		res.end(img)
-	}, {})
+	}).catch(err => {
+		res.status(500).send(err)
+	})
 })
 
 function fits_search(name: string, keywords: any[]) {
@@ -446,7 +479,7 @@ main.app.get("/equipment/byid/:id", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.ViewInv, req.params, req.headers, res)))
 		return
 
-	db_helper.get_equipment_by_id_from_db(req.params.id, list => {
+	db_helper.get_equipment_by_id_from_db(req.params.id).then(list => {
 		var result: any[] = []
 		for (var equ of list) {
 			var category_exists = false
@@ -464,6 +497,8 @@ main.app.get("/equipment/byid/:id", async (req, res) => {
 			}
 		}
 		res.send(JSON.stringify(result))
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -479,7 +514,9 @@ main.app.get("/equipment/bytype/:category/:type", async (req, res) => {
 	if (!(await main.check_request(type, PERMS.ViewInv, req.params, req.headers, res)))
 		return
 
-	db_helper.get_equipment_by_type_from_db(req.params.category, req.params.type, equ => {
+	db_helper.get_equipment_by_type_from_db(req.params.category, req.params.type).then(equ => {
 		res.send(JSON.stringify(equ))
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })

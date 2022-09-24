@@ -82,6 +82,8 @@
             appointment(newAppmnt) {
                 if (!newAppmnt)
                     return
+                if (!newAppmnt.items)
+                    newAppmnt.items = []
                 this.items = []
                 for (var i of newAppmnt.items) {
                     this.$store.dispatch("getItemByID", i.id).then(answ => {
