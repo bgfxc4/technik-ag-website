@@ -16,7 +16,7 @@
 		<template v-if="!isMobile()">
 			<div id="divider-panel"></div>
 			<div id="logo-panel">
-				<img :src='getLogoUrl'>
+				<img src='/logo.png'>
 			</div>
 		</template>
 	</div>
@@ -32,11 +32,6 @@
 		components: {
 			ErrorText,
 			LoadingIcon
-		},
-		computed: {
-			getLogoUrl () {
-				return new URL("/src/assets/imgs/logo.png", import.meta.url).href
-			}
 		},
 		data() {
 			return {
