@@ -11,13 +11,14 @@ import Type from "./components/Inventory/Type.vue"
 import Item from "./components/Inventory/Item.vue"
 import Search from "./components/Inventory/Search.vue"
 import Storage from "./components/storage/Storage.vue"
+import Room from "./components/storage/Room.vue"
+import Shelf from "./components/storage/Shelf.vue"
+import Compartment from "./components/storage/Compartment.vue"
 
 import Appointments from "./components/appointments/Appointments.vue"
 import Scan from "./components/Scan.vue"
 
 import SettingsPanel from "./components/settings/SettingsPanel.vue"
-
-// to create and edit website add 'meta: {requiresAuth: true}'
 
 const routes = [
 	{
@@ -59,6 +60,21 @@ const routes = [
 		path: "/storage",
 		name: "Storage",
 		component: Storage
+	},
+	{
+		path: "/storage/:room",
+		name: "StorageRoom",
+		component: Room
+	},
+	{
+		path: "/storage/:room/:shelf",
+		name: "StorageShelf",
+		component: Shelf
+	},
+	{
+		path: "/storage/:room/:shelf/:compartment",
+		name: "StorageCompartment",
+		component: Compartment
 	},
 	{
 		path: "/scan",

@@ -2,151 +2,99 @@
 	<div id="storage">
 		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
-		<ul class="tree h3 m-4">
-			<li v-for="r of storage" :key="r.name"><a class="text-light" @click="clickTreeLink" href="#">{{r.name}}</a>
-				<delete-room v-if="deleteMode" @onClick="roomName=r.name;" :room="roomName" @onDelete="getStorage" />
-				<edit-room v-if="editMode" @onClick="roomName=r.name" :room="roomName" @onEdit="getStorage" />
-				<ul>
-					<li v-for="s of r.shelfs" :key="s.name"><a class="text-light" @click="clickTreeLink" href="#">{{s.name}}</a>
-						<delete-shelf v-if="deleteMode" @onClick="roomName=r.name; shelfName=s.name;" :room="roomName" :shelf="shelfName" @onDelete="getStorage" />
-						<edit-shelf v-if="editMode" @onClick="roomName=r.name; shelfName=s.name;" :room="roomName" :shelf="shelfName" @onEdit="getStorage" />
-						<ul>
-							<li v-for="c of s.compartments" :key="c.name">
-								<a class="item-template text-light" @click="clickTreeLink" href="#">{{c.name}}</a>
-								<delete-comp v-if="deleteMode" @onClick="roomName=r.name; shelfName=s.name; compName=c.name" :room="roomName" :shelf="shelfName" :comp="compName" @onDelete="getStorage" />
-								<edit-comp v-if="editMode" @onClick="roomName=r.name; shelfName=s.name; compName=c.name" :room="roomName" :shelf="shelfName" :comp="compName" @onEdit="getStorage" />
-								<ul>
-									<li v-for="i of c.items" :key="i.id"> 
-										<router-link :to="`/inventory/item/byId/${i.id}`">{{i.name}}</router-link> 
-									</li>
-								</ul>
-							</li>
-							<create-comp :room="roomName" :shelf="shelfName" @onClick="shelfName=s.name;roomName=r.name" @onCreate="getStorage" />
-						</ul>
-					</li>
-					<create-shelf :room="roomName" @onClick="roomName=r.name" @onCreate="getStorage" />
-				</ul>
-			</li>
-			<create-room @onCreate="getStorage" />
-			<button v-if="!deleteMode" @click="deleteMode=true" class="btn btn-danger btn-sm" type="button">Enter Delete Mode</button>
-			<button v-if="deleteMode" @click="deleteMode=false" class="btn btn-danger btn-sm" type="button">Exit Delete Mode</button>
+		<div class="row row-cols-1 row-cols-lg-3 g-4 m-3">
+			<div v-for="room in roomList" :key="room.name" class="col">
+				<div class="card mb-3 bg-secondary" style="height: 16vh">
+			  		<div class="row g-0" style="height: 100%">
+						<div class="card-body" style="max-height: 30vh">
+							<h5 @click="openRoom(room.name)" role="button" class="card-title">{{ room.name }}</h5>
+							<div style="max-height: 15vh; overflow: hidden;">
+								<router-link v-for="t in room.shelfs" :key="t" :to="`/storage/${room.name}/${t.name}`" 
+									class="fs-6 text-break d-block text-truncate">{{ t.name }}</router-link>
+							</div>
+							<button @click="openRoom(room.name)" class="btn btn-outline-primary mt-2">Open Room</button> <br>
 
-			<button v-if="!editMode" @click="editMode=true" class="btn btn-info btn-sm" type="button">Enter Edit Mode</button>
-			<button v-if="editMode" @click="editMode=false" class="btn btn-info btn-sm" type="button">Exit Edit Mode</button>
-		</ul>
+							<a :id="'menu-popover-'+room.name" class="menu-popover" tabindex="0">
+								<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
+							</a>
+							<b-popover :target="'menu-popover-'+room.name" triggers="focus">
+								<button v-b-modal.deleteRoomModal @click="deleteRoomName = room.name" class="btn btn-danger" style="max-height: 6vh">
+									<font-awesome-icon icon="trash-can"/> Delete Room
+								</button>
+								<button @click="editRoomName = room.name" v-b-modal.editRoomModal class="btn btn-info" style="max-height: 6vh">
+									<font-awesome-icon icon="pen"/> Edit Room
+								</button>
+							</b-popover>
+						</div>
+					</div>
+				</div>
+			</div>
+			<create-room @onCreate="loadRoomList" />
+		</div>
+
+		<delete-room :room="deleteRoomName" @onDelete="loadRoomList" />
+		<edit-room :room="editRoomName" @onEdit="loadRoomList" />
 	</div>
 </template>
 
 <script>
-	import LoadingIcon from "../helpers/LoadingIcon.vue"
 	import ErrorText from "../helpers/ErrorText.vue"
+	import LoadingIcon from '../helpers/LoadingIcon.vue'
 	import CreateRoom from "./create/CreateRoom.vue"
-	import CreateShelf from "./create/CreateShelf.vue"
-	import CreateComp from "./create/CreateCompartment.vue"
-	import DeleteComp from "./delete/DeleteCompartment.vue"
-	import DeleteShelf from "./delete/DeleteShelf.vue"
-	import DeleteRoom from "./delete/DeleteRoom.vue"
-	import EditRoom from "./edit/EditRoom.vue"
-	import EditShelf from "./edit/EditShelf.vue"
-	import EditComp from "./edit/EditComp.vue"
+	import DeleteRoom from './delete/DeleteRoom.vue'
+	import EditRoom from './edit/EditRoom.vue'
 
 	export default {
 		name: "Storage",
 		components: {
-			LoadingIcon,
 			ErrorText,
 			CreateRoom,
-			CreateShelf,
-			CreateComp,
-			DeleteComp,
-			DeleteShelf,
+			LoadingIcon,
 			DeleteRoom,
 			EditRoom,
-			EditShelf,
-			EditComp
 		},
-		data: function () {
+		data () {
 			return {
-				deleteMode: false,
-				editMode: false,
+				roomList: [],
 				errorText: "",
-				storage: [],
 				isLoading: false,
-
-				roomName: "", // for actions like edit, delete and create to pass down to trhe modals
-				shelfName: "",
-				compName: "",
+				deleteRoomName: undefined,
+				editRoomName: undefined
 			}
 		},
 		methods: {
-            clickTreeLink (e) {
-                var parent = e.target.parentElement;
-                var classList = parent.classList;
-                if(classList.contains("open")) {
-                    classList.remove('open');
-                    var opensubs = parent.querySelectorAll(':scope .open');
-                    for(var i = 0; i < opensubs.length; i++){
-                        opensubs[i].classList.remove('open');
-                    }
-                } else {
-                    classList.add('open');
-                }
-                e.preventDefault();
-            },
-			getStorage () {
+			openRoom(name) {
+				this.$router.push(`/storage/${name}/`)
+			},
+			async loadRoomList () {
 				this.isLoading = true
-				this.$store.dispatch("getStorage").then(res => {
+				this.roomList = []
+				this.$store.dispatch("getStorage").then(answ => {
 					this.isLoading = false
-					this.storage = res.data
+					this.roomList = answ.data
 				}).catch(err => {
 					this.isLoading = false
 					this.errorText = err
 				})
-			},
+			}
 		},
-		created () {
-			this.getStorage()
+		async created () {
+			this.loadRoomList()
 		}
 	}
 </script>
 
 <style>
-	li {
-		margin: 10px;
-	}
+.menu-popover {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	border: none;
+	color: var(--bt-white)
+}
 
-    ul.tree li {
-        list-style-type: none;
-        position: relative;
-    }
-
-    ul.tree li ul {
-        display: none;
-    }
-
-    ul.tree li.open > ul {
-        display: block;
-    }
-
-    ul.tree li a {
-        text-decoration: none;
-    }
-
-    ul.tree li a:before {
-        height: 1em;
-        padding:0 .1em;
-        font-size: .8em;
-        display: block;
-        position: absolute;
-        left: -1.3em;
-        top: .2em;
-    }
-
-    ul.tree li > a:not(:last-child):before {
-        content: '‣';
-    }
-
-    ul.tree li.open > a:not(:last-child):before {
-        content: '-';
-    }
+.menu-popover:hover {
+	border: none;
+	color: var(--bt-white)
+}
 </style>
