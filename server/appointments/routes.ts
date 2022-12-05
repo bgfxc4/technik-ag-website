@@ -36,8 +36,7 @@ main.app.get("/appointments/list/requested", async (req, res) => {
 		return
 
 	Promise.all([
-		db_helper.get_requested_appointments_from_db(),
-		google_cal.get_all_request_events()
+		db_helper.get_requested_appointments_from_db()
 	]).then(vals => {
 		res.send(JSON.stringify(vals.flat()))
 	})
@@ -122,24 +121,14 @@ main.app.post("/appointments/approve", async (req, res) => {
 
 	if (!(await main.check_request(type, PERMS.EditAppmnts, req.body, req.headers, res)))
 		return
-	if (req.body.from_google_calendar) {
-		google_cal.approve_request_to_db(req.body.id).then(data => {
-			Promise.all([google_cal.delete_request_event(req.body.id),
-					google_cal.add_appointment_to_appmnt_calendar(data)]).then(_ => {
-				res.send("ok")
-			})
-		}).catch(err => {
-			res.status(500).send(err)
+
+	db_helper.approve_appmnt_in_db(req.body).then(data => {
+		google_cal.add_appointment_to_appmnt_calendar(data).then(() => {
+			res.send("ok")
 		})
-	} else {
-		db_helper.approve_appmnt_in_db(req.body).then(data => {
-			google_cal.add_appointment_to_appmnt_calendar(data).then(() => {
-				res.send("ok")
-			})
-		}).catch(err => {
-			res.status(500).send(err)
-		})
-	}
+	}).catch(err => {
+		res.status(500).send(err)
+	})
 })
 
 main.app.post("/appointments/updateitems", async (req, res) => {

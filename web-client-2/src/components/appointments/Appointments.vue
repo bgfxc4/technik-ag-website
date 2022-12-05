@@ -1,5 +1,5 @@
 <template>
-    <div id="appointments" class="container">
+    <!-- <div id="appointments" class="container">
         <div class="row mt-4 top-row">
             <div class="col-md-6 col-12" style="height: 90%">
                 <h4>Appointments:</h4>
@@ -15,6 +15,30 @@
                 <create-appmnt-request @onCreate="getAppointments" v-show="createDate" :date="createDate" />
             </div>
         </div>
+    </div> -->
+
+    <div no-body id="appointments" class="container">
+        <b-tabs card>
+            <b-tab title="Appointments">
+                <b-card-title>All approved appointments:</b-card-title>
+                <b-card-text>
+                    <appointment-calendar @update="getAppointments" ref="calendar" />
+                </b-card-text>
+            </b-tab>
+            <b-tab title="Requests">
+                <b-card-title>All requests for appointments:</b-card-title>
+                <b-card-text>
+                    <request-list @update="getAppointments" ref="reqList"/>
+                </b-card-text>
+            </b-tab>
+            <b-tab title="Create Request">
+                <b-card-title>Select a date to request an appointment:</b-card-title>
+                <b-card-text>
+                    <date-picker :min-date='new Date()' :first-day-of-week="2" class="col-4" v-model="createDate" mode="dateTime" :model-config="{type: 'number'}" is24hr is-expanded/>
+                    <create-appmnt-request @onCreate="getAppointments" v-show="createDate" :date="createDate" />
+                </b-card-text>
+            </b-tab>
+        </b-tabs>
     </div>
 </template>
 
