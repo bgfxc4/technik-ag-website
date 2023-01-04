@@ -302,3 +302,11 @@ export async function check_if_type_exists(category: string, name: string): Prom
 	})
 }
 
+export async function get_appointments_of_item(id: string): Promise<any[]> {
+	const query = `SELECT name, appointment_list.id as "id", amount, date, end_date FROM appointment_item_bookings
+				LEFT JOIN appointment_list ON appointment_list.id = appointment_item_bookings.appointment_id
+				WHERE item_id = $1`
+	return main.db_pool.query(query, [id]).then(res => {
+		return res.rows.map(el => {el.date = Number(el.date); el.end_date = Number(el.end_date); return el})
+	}).catch(err => { throw err })
+}

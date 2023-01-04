@@ -68,6 +68,9 @@
         },
         mounted () {
             this.getAppointments()
+            if (this.$route.hash) {
+                this.$refs.calendar.openAppmntInfoModal(this.$route.hash)
+            }
         }
     }
 </script>

@@ -55,6 +55,15 @@ const actions = {
             throw err
         })
     },
+    async getItemAppointmentsByID({rootState}, itemID) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.get(`equipment/byid/${itemID}/appointmentbookings`, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
     async getItemsBySearch({rootState}, keyword) {
         var headers = {'Authorization': rootState.auth.loginHash}
         return await axios.post("equipment/search", {keywords: keyword}, {headers}).then(res => {

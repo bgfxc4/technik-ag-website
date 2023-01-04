@@ -12,7 +12,8 @@
                             v-for="attr in attributes"
                             :key="attr.key"
                             :attribute="attr">
-                            <b>{{attr.customData.name}}:</b> {{ attr.customData.description }} <button class="btn btn-info px-1 py-0 mx-2" style="font-size: 1em;" v-b-modal.appmntInfoModal @click="selectedAppmnt=attr.customData">Open</button>
+                            <b>{{attr.customData.name}}:</b> {{ attr.customData.description }} 
+                            <button class="btn btn-info px-1 py-0 mx-2" style="font-size: 1em;" v-b-modal.appmntInfoModal @click="selectedAppmnt=attr.customData">Open</button>
                         </popover-row>
                     </div>
                 </template>
@@ -20,6 +21,7 @@
         </div>
         <error-text v-if="!!errorText" v-bind:msg="errorText" style="position: absolute; top: 20px; right: 50%; transform: translate(50%, 0%);"/>
     </div>
+    <button id="appmntInfoModalOpen" style="display: none" v-b-modal.appmntInfoModal></button>
     <appmnt-info @onChange="loadAppointments" :appointment="selectedAppmnt" />
 </template>
 
@@ -72,11 +74,13 @@
                 appointmentList: [],
                 isLoading: false,
                 errorText: "",
-                selectedAppmnt: {}
+                selectedAppmnt: {},
+                appmntToOpenOnLoad: null,
             }
         },
         methods: {
             loadAppointments () {
+                console.log("loadddd")
                 this.isLoading = true
                 this.errorText = ""
                 this.$store.dispatch("getAppointmentList").then(res => {
@@ -86,6 +90,11 @@
 
                     if (typeof this.selectedAppmnt == "object" && Object.keys(this.selectedAppmnt).length != 0) { // if an appmnt is selected this.selectedAppmnt is not {}, so it has more than 0 keys
                         this.selectedAppmnt = this.appointmentList.find(el => el.id == this.selectedAppmnt.id)
+                    }
+                    if (this.appmntToOpenOnLoad) {
+                        this.selectedAppmnt = res.data.find(el => el.id == this.appmntToOpenOnLoad.replace("#", ""))
+                        $('#appmntInfoModalOpen').click()
+                        console.log(this.selectedAppmnt, this.appmntToOpenOnLoad, res.data)
                     }
                 }).catch(err => {
                     this.isLoading = false
@@ -135,6 +144,14 @@
                     i += id.charCodeAt(j)
                 return i % this.colors.length
             },
+            openAppmntInfoModal (id) {
+                if (this.appointmentList.length == 0) {
+                    this.appmntToOpenOnLoad = id
+                    return
+                }
+                this.selectedAppmnt = this.appointmentList.find(el => el.id == id)
+                $('#appmntInfoModalOpen').click()
+            }
         },
     }
 </script>

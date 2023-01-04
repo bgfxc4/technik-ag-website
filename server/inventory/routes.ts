@@ -502,6 +502,24 @@ main.app.get("/equipment/byid/:id", async (req, res) => {
 	})
 })
 
+main.app.get("/equipment/byid/:id/appointmentbookings", async (req, res) => {
+	var type: main.bodyType = {
+		fields: {
+			"id": "string",
+		},
+		required: ["id"]
+	}
+
+	if (!(await main.check_request(type, PERMS.ViewInv | PERMS.ViewAppmnts, req.params, req.headers, res)))
+		return
+
+	db_helper.get_appointments_of_item(req.params.id).then(list => {
+		res.send(JSON.stringify(list))
+	}).catch(err => {
+		res.status(500).send(err)
+	})
+})
+
 main.app.get("/equipment/bytype/:category/:type", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {

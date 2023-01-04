@@ -10,38 +10,56 @@
 		</nav>
 		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
-		<div class="row container m-3" style="position: relative">
-			<div class="col-5">
-				<img v-if="item.id" v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + item.id" class="card-img" 
-									style="max-width: 30vw; max-height: 30vh; width: auto; height: auto; margin-left: 10px">
-			</div>
-			<div class="col-7">
-				<h5 class="card-title">{{ item.name }}</h5>
-				<div>
-					<b>Description:</b> {{ item.description }} <br>
-					<div v-if="item.custom_fields">
-						<div v-for="f of Object.keys(item.custom_fields)" :key="f">
-							<b>{{f}}:</b> {{ item.custom_fields[f] }} <br>
-						</div>
-					</div>
-					<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
-					<b>Amount:</b> {{item.amount}}<br>
-					<b>ID:</b> {{ item.id }}
+		<div class="container m-3">
+			<div class="row" style="position: relative">
+				<div class="col-5">
+					<img v-if="item.id" v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + item.id" class="card-img" 
+										style="max-width: 30vw; max-height: 30vh; width: auto; height: auto; margin-left: 0px">
 				</div>
+				<div class="col-7">
+					<h5 class="card-title">{{ item.name }}</h5>
+					<div>
+						<b>Description:</b> {{ item.description }} <br>
+						<div v-if="item.custom_fields">
+							<div v-for="f of Object.keys(item.custom_fields)" :key="f">
+								<b>{{f}}:</b> {{ item.custom_fields[f] }} <br>
+							</div>
+						</div>
+						<b>Storage:</b> {{ item.room }} - {{ item.shelf }} - {{ item.compartment }}<br>
+						<b>Amount:</b> {{item.amount}}<br>
+						<b>ID:</b> {{ item.id }}
+					</div>
 
-				<a id="menu-popover" class="menu-popover" tabindex="0">
-					<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
-				</a>
-				<b-popover target="menu-popover" triggers="focus">
-					<button v-b-modal.deleteItemModal class="btn btn-danger" style="max-height: 6vh">
-						<font-awesome-icon icon="trash-can"/> Delete Item
-					</button><br>
-					<button v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
-						<font-awesome-icon icon="pen"/> Edit Item
-					</button><br>
+					<a id="menu-popover" class="menu-popover" tabindex="0">
+						<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
+					</a>
+					<b-popover target="menu-popover" triggers="focus">
+						<button v-b-modal.deleteItemModal class="btn btn-danger" style="max-height: 6vh">
+							<font-awesome-icon icon="trash-can"/> Delete Item
+						</button><br>
+						<button v-b-modal.editItemModal class="btn btn-info" style="max-height: 6vh">
+							<font-awesome-icon icon="pen"/> Edit Item
+						</button><br>
 
-					<ShowQrBarCode :toShow="item.id"></ShowQrBarCode>
-				</b-popover>
+						<ShowQrBarCode :toShow="item.id"></ShowQrBarCode>
+					</b-popover>
+				</div>
+			</div>
+			<div class="row mt-5">
+				<div class="col-5">
+					<h5>Current Appointments:</h5>
+					<div v-if="currentAppointments.length == 0">None</div>
+					<div class="appmnt-box bg-secondary" v-for="a in currentAppointments" :key="a.id">
+						<router-link :to="`/appointments#${a.id}`">{{ a.name }}</router-link> - Amount: {{ a.amount }}
+					</div>
+				</div>
+				<div class="col-5">
+					<h5>Next Appointments:</h5>
+					<div v-if="nextAppointments.length == 0">None</div>
+					<div class="appmnt-box bg-secondary" v-for="a in nextAppointments" :key="a.id">
+						<router-link :to="`/appointments#${a.id}`">{{ a.name }}</router-link> - Amount: {{ a.amount }}
+					</div>
+				</div>
 			</div>
 		</div>
 		<delete-item :categoryName="item.category" :typeName="item.type" :itemId="item.id" @onDelete="itemDeleted"/>
@@ -50,7 +68,7 @@
 </template>
 
 <script>
-	import ShowQrBarCode from "../helpers/ShowQrBarCode.vue"	
+	import ShowQrBarCode from "../helpers/ShowQrBarCode.vue"
 	import ErrorText from "../helpers/ErrorText.vue"
 	import LoadingIcon from "../helpers/LoadingIcon.vue"
 	import DeleteItem from './delete/DeleteItem.vue'
@@ -73,7 +91,9 @@
 				itemID: "",
 				deleteItemId: "",
 				errorText: "",
-				isLoading: false
+				isLoading: false,
+				currentAppointments: [],
+				nextAppointments: []
 			}
 		},
 		methods: {
@@ -86,6 +106,16 @@
 				this.$store.dispatch("getItemByID", this.itemID).then(answ => {
 					this.isLoading = false
 					this.item = answ.data[0].equipment[0]
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
+				})
+
+				this.$store.dispatch("getItemAppointmentsByID", this.itemID).then(answ => {
+					this.isLoading = false
+					this.currentAppointments = answ.data.filter(el => el.date < Date.now() && el.end_date > Date.now())
+					this.nextAppointments = answ.data.filter(el => el.date > Date.now())
+					console.log(answ.data)
 				}).catch(err => {
 					this.isLoading = false
 					this.errorText = err
@@ -113,5 +143,11 @@
 .menu-popover:hover {
 	border: none;
 	color: var(--bt-white)
+}
+
+.appmnt-box {
+	padding: 7px;
+	border-radius: 4px;
+	margin-bottom: 4px;
 }
 </style>
