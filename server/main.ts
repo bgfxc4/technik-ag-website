@@ -73,7 +73,7 @@ export async function check_request(type: bodyType, needs_auth: number, body: an
 			res.status(401).send("Login credentials are wrong or non-existent!")
 			return false
 		}
-		if ((user.permissions & needs_auth) == 0 && user.permissions != PERMS.Admin) {
+		if ((user.permissions & needs_auth) != needs_auth && user.permissions != PERMS.Admin) {
 			res.status(401).send("You do not have the required permissions!")
 			return false
 		}
