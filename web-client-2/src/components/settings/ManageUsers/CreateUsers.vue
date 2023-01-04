@@ -4,6 +4,10 @@
             <label for="create-user-name">Username:</label><br/><input id="create-user-name" v-model="userName" placeholder="Enter a username..."><br/>
             <label for="create-user-pass">Password:</label><br/><input id="create-user-pass" type="password" v-model="userPassword" placeholder="Enter a password..."><br/>
             <label for="create-user-pass2">Repeat Password:</label><br/><input id="create-user-pass2" type="password" v-model="userPassword2" placeholder="Repeat your password..."><br/>
+            <select v-model="userGroup" class="form-select my-3 bg-white" style="width: auto; margin-left: 50%; transform: translateX(-50%); text-align: center; color: black" aria-label="Select user group">
+                <option selected value="">Select the group for the user</option>
+                <option v-for="g in groups" :key="g.id" :value="g.id" style="color: black">{{g.name}}</option>
+            </select>
             <loading-icon v-if="isLoading" size="3x"/>
             <error-text v-if="errorText != ''" :msg="errorText"/><br>
             <b-button id="createUserModalButton" class="btn btn-secondary" v-b-modal.createUserModal>Cancel</b-button>
@@ -24,11 +28,15 @@
             LoadingIcon
 		},
         emits: ["loadUsers"],
-		data () {
+        props: {
+            groups: Array
+        },
+        data () {
 			return {
                 userName: "",
                 userPassword: "",
                 userPassword2: "",
+                userGroup: "",
 
                 errorText: "",
                 isLoading: false
@@ -47,7 +55,8 @@
                 }
                 var user = {
                     display_name: this.userName,
-                    login_hash: ("login_hash", sha512("technikag" + this.userName + ":" + this.userPassword))
+                    login_hash: ("login_hash", sha512("technikag" + this.userName + ":" + this.userPassword)),
+                    group_id: this.userGroup
                 }
                 this.$store.dispatch("createUser", user).then(_res => {
                     $('#createUserModalButton').click()
@@ -55,6 +64,7 @@
                     this.userName = ""
                     this.userPassword = ""
                     this.userPassword2 = ""
+                    this.userGroup = ""
                     this.$emit("loadUsers")
                 }).catch(err => {
                     this.errorText = err

@@ -45,7 +45,43 @@ const actions = {
             console.log(err)
             throw err
         })
-    }
+    },
+    async getGroups({rootState}) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.get('groups/list', {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
+    async createGroup({rootState}, group) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post('groups/new', group, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
+    async deleteGroup({rootState}, group) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post('groups/delete', group, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
+    async editGroup({rootState}, group) {
+        var headers = {'Authorization': rootState.auth.loginHash}
+        return await axios.post("groups/edit", group, {headers}).then(res => {
+            return res
+        }).catch(err => {
+            console.log(err)
+            throw err
+        })
+    },
 }
 
 export default {

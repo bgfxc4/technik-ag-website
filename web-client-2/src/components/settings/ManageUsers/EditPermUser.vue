@@ -4,7 +4,7 @@
             <div class="card" v-for="p in Object.keys(perms)" :key="p">
                 <div class="card-header" :id="`heading${p}`">
                     <h5 class="mb-0">
-                        <a class="btn btn-link" data-bs-toggle="collapse" :data-bs-target="`#collapse${p}`" aria-expanded="false" aria-controls="collapseOne">
+                        <a class="btn btn-link text-black" data-bs-toggle="collapse" :data-bs-target="`#collapse${p}`" aria-expanded="false" aria-controls="collapseOne">
                             {{p}}
                         </a>
                     </h5>
@@ -99,15 +99,26 @@
 
                 errorText: "",
                 isLoading: false,
-                user: {}
+                user: {},
+                group: {}
 			}
 		},
         methods: {
             editPermUserClicked (u) {
+                this.group = {}
                 this.user = u
                 for (var i of Object.keys(this.perms)) {
                     for (var j of Object.keys(this.perms[i])) {
                         this.perms[i][j].checked = (this.user.permissions & (1 << this.perms[i][j].shift)) != 0
+                    }
+                }
+            },
+            editPermGroupClicked (g) {
+                this.user = {}
+                this.group = g
+                for (var i of Object.keys(this.perms)) {
+                    for (var j of Object.keys(this.perms[i])) {
+                        this.perms[i][j].checked = (this.group.permissions & (1 << this.perms[i][j].shift)) != 0
                     }
                 }
             },
@@ -122,11 +133,11 @@
                 }
 
                 var user = {
-                    id: this.user.id,
+                    id: Object.keys(this.group).length == 0 ? this.user.id : this.group.id,
                     permissions
                 }
                 this.isLoading = true
-                this.$store.dispatch("editPermUser", user).then(_res => {
+                this.$store.dispatch((Object.keys(this.group).length == 0 ? "editPermUser" : "editGroup"), user).then(_res => {
                     this.isLoading = false
                     $('#userPermissionsModalButton').click()
                     this.$emit("loadUsers")

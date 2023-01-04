@@ -20,12 +20,14 @@ app.use(cors())
 console.log("start")
 
 export async function authorized(req_headers:any) {
+	let groups = await user_db.get_groups_from_db()
+
 	if (req_headers.authorization == undefined) return undefined
 	return await user_db.get_users_from_db(true).then((users: any) => {
 		for (var user of users) {
 			if (sha512(req_headers.authorization) == user.login_hash) {
 				return {
-					permissions: user.permissions,
+					permissions: user.permissions | groups.find((el:any) => el.id == user.group_id).permissions,
 					display_name: user.display_name
 				}
 			}
@@ -66,9 +68,9 @@ export function object(type: bodyType) {
 
 export async function check_request(type: bodyType, needs_auth: number, body: any, headers: any, res: any) {
 	if (needs_auth != PERMS.None) {
-		var user:any = await authorized(headers)
+		var user = await authorized(headers)
 		if (user == undefined) {
-			res.status(401).send("Login credentials are wrong or non-existent!")	
+			res.status(401).send("Login credentials are wrong or non-existent!")
 			return false
 		}
 		if ((user.permissions & needs_auth) == 0 && user.permissions != PERMS.Admin) {
