@@ -167,3 +167,37 @@ export async function update_appmnt_items_in_db(body: any):Promise<void> {
     });
     await Promise.all(all_proms)
 }
+
+export async function update_appmnt_in_db(body: any): Promise<void> {
+    let query = "UPDATE appointment_list SET"
+	let args = []
+	if (body.name) {
+		args.push(body.name)
+		query += ` name = $${args.length},`
+	}
+	if (body.date) {
+		args.push(body.date)
+		query += ` date = $${args.length},`
+	}
+	if (body.end_date) {
+		args.push(body.end_date)
+		query += ` end_date = $${args.length},`
+	}
+	if (body.description) {
+		args.push(body.description)
+		query += ` description = $${args.length},`
+	}
+	if (body.contact) {
+		args.push(body.contact)
+		query += ` contact = $${args.length},`
+	}
+	query = query.slice(0, -1) // remove trailing , at the end
+	args.push(body.id)
+	query += ` WHERE id = $${args.length}`
+
+	return main.db_pool.query(query, args).then(_ => {
+		return
+	}).catch(err => {
+		throw err
+	})
+}

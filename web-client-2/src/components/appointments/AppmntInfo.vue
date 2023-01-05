@@ -14,6 +14,7 @@
             </template>
             <template v-if="!items.length">none</template>
             <br>
+            <button class="btn btn-sm btn-info" v-b-modal.appmntEditModal>Edit Appmnt</button>
             <button class="btn btn-sm btn-info" v-b-modal.appmntEditItemsModal>Edit Booked Items</button><br><br>
 
             <loading-icon v-if="isLoading" size="3x"/>
@@ -32,12 +33,14 @@
         </div>
     </b-modal>
     <edit-booked-items @onChange="$emit('onChange')" :items="items" :appmntID="appointment?.id"/>
+    <edit-appmnt @onChange="$emit('onChange')" :appmntID="appointment?.id"/>
 </template>
 
 <script>
     import ErrorText from "../helpers/ErrorText.vue"
     import LoadingIcon from "../helpers/LoadingIcon.vue"
     import EditBookedItems from "./AppmntEditItems.vue"
+    import EditAppmnt from "./AppmntEdit.vue"
 
     export default {
         name: "AppmntInfo",
@@ -45,7 +48,8 @@
         components: {
             ErrorText,
             LoadingIcon,
-            EditBookedItems
+            EditBookedItems,
+            EditAppmnt
         },
         props: {
             appointment: Object

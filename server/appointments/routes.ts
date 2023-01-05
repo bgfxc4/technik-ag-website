@@ -155,3 +155,25 @@ main.app.post("/appointments/updateitems", async (req, res) => {
 		res.status(500).send(err)
 	})
 })
+
+main.app.post("/appointments/edit", async (req, res) => {
+	var type:main.bodyType = {
+		fields: {
+			"id": "string",
+			"name": "string",
+			"date": "number",
+			"end_date": "number",
+			"description": "string",
+			"contact": "string",
+		},
+		required: ["id"]
+	}
+	if (!(await main.check_request(type, PERMS.EditAppmnts, req.body, req.headers, res)))
+		return
+	db_helper.update_appmnt_in_db(req.body).then(() => {
+		res.send("ok")
+	}).catch(err => {
+		console.log(err)
+		res.status(500).send(err)
+	})
+})
