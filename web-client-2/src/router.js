@@ -20,6 +20,9 @@ import Scan from "./components/Scan.vue"
 
 import SettingsPanel from "./components/settings/SettingsPanel.vue"
 
+import Tools from "./components/tools/Tools.vue"
+import ToolsChecklists from "./components/tools/ToolsChecklists.vue"
+
 const routes = [
 	{
 		path: "/",
@@ -90,6 +93,16 @@ const routes = [
 		path: "/settings",
 		name: "SettingsPanel",
 		component: SettingsPanel
+	},
+	{
+		path: "/tools",
+		name: "Tools",
+		component: Tools
+	},
+	{
+		path: "/tools/checklists",
+		name: "ToolsChecklists",
+		component: ToolsChecklists
 	}
 ]
 

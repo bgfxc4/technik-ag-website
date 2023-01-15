@@ -20,6 +20,9 @@
 						<router-link to="/scan" class="nav-link" v-bind:class="{ active: ($route.path.startsWith('/scan'))}">Scan Code</router-link>
 					</li>
 					<li class="nav-item">
+						<router-link to="/tools" class="nav-link" v-bind:class="{ active: ($route.path.startsWith('/tools'))}">Tools</router-link>
+					</li>
+					<li class="nav-item">
 						<router-link to="/settings" class="nav-link" v-bind:class="{ active: ($route.path.startsWith('/settings'))}">Settings</router-link>
 					</li>
 				</ul>

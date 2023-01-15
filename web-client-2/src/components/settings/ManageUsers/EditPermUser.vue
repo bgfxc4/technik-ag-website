@@ -95,6 +95,18 @@
                             desc: "Edit Appointments"
                         }
                     },
+                    Tools: {
+                        RequestAppmnts: {
+                            checked: false,
+                            shift: 10,
+                            desc: "View Checklists"
+                        },
+                        ViewAppmnts: {
+                            checked: false,
+                            shift: 11,
+                            desc: "Edit Checklists"
+                        }
+                    },
                 },
 
                 errorText: "",

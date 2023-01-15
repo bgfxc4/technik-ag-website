@@ -14,4 +14,7 @@ export const PERMS = {
     RequestAppmnts: 1 << 7,
     ViewAppmnts: 1 << 8,
     EditAppmnts: 1 << 9,
+
+    ViewChecklists: 1 << 10,
+    EditChecklists: 1 << 11
 }

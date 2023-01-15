@@ -135,3 +135,22 @@ appointment_request_list
 
 
 CREATE TYPE CUSTOM_FIELD_TYPES as ENUM ('text', 'boolean', 'list')
+
+
+checklist_list
+	id	name
+		CREATE TABLE checklist_list(
+			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+			name VARCHAR(128) NOT NULL,
+			UNIQUE(name)
+		)
+
+checklist_items
+	id	list_id	name	checked
+		CREATE TABLE checklist_items(
+			id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+			list_id INT REFERENCES checklist_list(id) ON DELETE CASCADE,
+			name VARCHAR(128) NOT NULL,
+			checked BOOLEAN NOT NULL
+			UNIQUE(name)
+		)

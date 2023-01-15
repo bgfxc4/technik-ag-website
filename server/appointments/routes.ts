@@ -24,6 +24,8 @@ main.app.get("/appointments/list/approved", async (req, res) => {
 		return
 	db_helper.get_approved_appointments_from_db().then(data => {
 		res.send(JSON.stringify(data))
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -39,6 +41,8 @@ main.app.get("/appointments/list/requested", async (req, res) => {
 		db_helper.get_requested_appointments_from_db()
 	]).then(vals => {
 		res.send(JSON.stringify(vals.flat()))
+	}).catch(err => {
+		res.status(500).send(err)
 	})
 })
 
@@ -56,7 +60,6 @@ main.app.post("/appointments/delete/approved", async (req, res) => {
 				google_cal.delete_termin_event(req.body.id)]).then(() => {
 		res.send("ok")
 	}).catch(err => {
-		console.log(err)
 		res.status(500).send(err)
 	})
 })
