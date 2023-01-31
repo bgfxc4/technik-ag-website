@@ -4,7 +4,9 @@
             <loading-icon v-if="isLoading" size="3x"/>
 		<ul>
 			<li v-for="l in lists" :key="l.id" class="m-2">
-				<span @click="selectedList = l; selectedListSave = JSON.parse(JSON.stringify(l))" v-b-modal.checklistModal><span class="text-primary btn-link">{{ l.name }}</span> - {{ l.items.filter(el => el.checked).length }} / {{ l.items.length }}</span>
+				<span @click="selectedList = JSON.parse(JSON.stringify(l)); selectedListSave = JSON.parse(JSON.stringify(l))" v-b-modal.checklistModal>
+					<span class="text-primary btn-link">{{ l.name }}</span> - {{ l.items.filter(el => el.checked).length }} / {{ l.items.length }}
+				</span>
 				<button class="btn btn-danger btn-sm mx-3" @click="deleteListID = l.id" v-b-modal.deleteListModal><font-awesome-icon icon="trash-can"/></button>
 			</li>
 		</ul>
@@ -35,14 +37,25 @@
 			<template v-if="selectedList">
 				<div v-for="i in selectedList.items" :key="i.id">
 					<input class="form-check-input" type="checkbox" v-model="i.checked" :id="`item-${i.id}`">
-					<label class="form-check-label" :for="`item-${i.id}`">{{ i.name }} - {{ i.id }}</label><br>
+					<label class="form-check-label" :for="`item-${i.id}`">{{ i.name }} - {{ i.id }}</label>
+					<button class="btn btn-danger btn-sm mx-3" @click="selectedList.items.splice(selectedList.items.findIndex(el => el.id == i.id), 1)"><font-awesome-icon icon="trash-can"/></button><br>
 				</div>
 			</template>
 
             <loading-icon v-if="isLoading" size="3x"/>
             <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/><br>
+            <button class="btn btn-primary mx-2" v-b-modal.newItemModal>New Item</button>
             <button id="checklistModalButton" class="btn btn-secondary mx-2" v-b-modal.checklistModal>Close</button>
             <button class="btn btn-outline-primary mx-2" @click="sendItemChanges" v-show="showApply">Apply</button>
+        </div>
+    </b-modal>
+	<b-modal size="lg" id="newItemModal" class="text-secondary" centered hide-footer hide-header-close title="Create Item" header="test" header-class="justify-content-center">
+        <div class="modal-body text-center">
+			<label for="create-item-name">Name:</label><br/><input id="create-item-name" v-model="newItemName" placeholder="Enter a name for the item..."><br/>
+            <loading-icon v-if="isLoading" size="3x"/>
+            <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/><br>
+            <button id="newItemModalButton" class="btn btn-secondary mx-2" v-b-modal.checklistModal>Cancel</button>
+            <button class="btn btn-outline-primary" @click="createItem">Create Item</button>
         </div>
     </b-modal>
 </template>
@@ -64,6 +77,7 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 
 				newListName: "",
 				deleteListID: "",
+				newItemName: "",
 
 				selectedList: {},
 				selectedListSave: {}
@@ -84,6 +98,14 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 				this.errorText = ""
 				this.$store.dispatch("getChecklistList").then(res => {
 					this.lists = res.data
+					this.lists.forEach(el => {
+						el.items.sort((a, b) => a.id - b.id)	
+					})
+
+					if (this.selectedList?.id) {
+						this.selectedList = this.lists.find(el => el.id == this.selectedList.id)
+						this.selectedListSave = JSON.parse(JSON.stringify(this.selectedList))
+					}
 				}).catch(err => {
 					this.errorText = err
 				})
@@ -108,10 +130,24 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 					this.errorText = err
 				})
 			},
+			createItem () {
+				this.errorText = ""
+				this.$store.dispatch("checklistNewItems", {id: this.selectedList.id.toString(), items: [this.newItemName]}).then(res => {
+					$("#newItemModalButton").click()
+					this.loadLists()
+					this.newItemName = ""
+				}).catch(err => {
+					this.errorText = err
+				})
+			},
 			sendItemChanges () {
-				let checkedChanges = this.selectedList.items.filter((e, idx) => this.selectedListSave.items[idx].checked != e.checked)
+				let deleted = this.selectedListSave.items.filter(el => this.selectedList.items.find(e => e.id == el.id) == undefined).map(el => el.id)
+				let checkedChanges = this.selectedList.items.filter((e, idx) => this.selectedListSave.items[idx].checked != e.checked).filter(el => !deleted.includes(el.id))
 				if (checkedChanges.length != 0) {
-					this.$store.dispatch("checklistSetItemsChecked", {id: this.selectedList.id, items: checkedChanges.map(el => el.id), checked_list: checkedChanges.map(el => el.checked)}).then(res => {
+					Promise.all([
+						this.$store.dispatch("checklistSetItemsChecked", {id: this.selectedList.id, items: checkedChanges.map(el => el.id), checked_list: checkedChanges.map(el => el.checked)}),
+						this.$store.dispatch("checklistDeleteItems", {id: this.selectedList.id, items: deleted}),
+				]).then(_ => {
 						$("#checklistModalButton").click()
 						this.loadLists()
 						this.selectedList = null

@@ -72,8 +72,8 @@ main.app.post("/tools/checklists/newItems/", async (req, res) => {
 main.app.post("/tools/checklists/deleteItems/", async (req, res) => {
 	var type: main.bodyType = {
 		fields: {
-            "id": "string",
-            "items": main.array("string")
+            "id": "number",
+            "items": main.array("number")
         },
         required: ["id", "items"]
 	}
