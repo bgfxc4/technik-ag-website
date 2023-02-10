@@ -42,8 +42,6 @@ app.listen(config.main_server_port, () => {
 })
 
 export async function check_request<T>(type: AnyZodObject, needs_auth: number, body: unknown, headers: any, res: any): Promise<T | undefined> {
-	console.log("checking some stuff")
-	
 	if (needs_auth != PERMS.None) {
 		var user = await authorized(headers)
 		if (user == undefined) {
@@ -58,7 +56,7 @@ export async function check_request<T>(type: AnyZodObject, needs_auth: number, b
 	try {
 		var ret = type.parse(body)
 	} catch (e) {
-		res.send(JSON.stringify(e))
+		res.status(500).send(JSON.stringify(e))
 		return undefined
 	}
 

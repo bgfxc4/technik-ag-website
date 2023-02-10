@@ -156,7 +156,7 @@
                     shelf: this.storage[this.roomIndex].shelfs[this.shelfIndex].name,
                     compartment: this.storage[this.roomIndex].shelfs[this.shelfIndex].compartments[this.compIndex].name,
 
-                    amount: this.itemAmount,
+                    amount: +this.itemAmount,
                     custom_fields: this.customFields,
                     image: (!!this.$refs['image-upload'].previewImage) ? this.$refs['image-upload'].previewImage.split('base64,')[1] : undefined
                 }

@@ -132,7 +132,7 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 			},
 			createItem () {
 				this.errorText = ""
-				this.$store.dispatch("checklistNewItems", {id: this.selectedList.id.toString(), items: [this.newItemName]}).then(res => {
+				this.$store.dispatch("checklistNewItems", {id: this.selectedList.id, items: [this.newItemName]}).then(res => {
 					$("#newItemModalButton").click()
 					this.loadLists()
 					this.newItemName = ""
@@ -143,19 +143,17 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 			sendItemChanges () {
 				let deleted = this.selectedListSave.items.filter(el => this.selectedList.items.find(e => e.id == el.id) == undefined).map(el => el.id)
 				let checkedChanges = this.selectedList.items.filter((e, idx) => this.selectedListSave.items[idx].checked != e.checked).filter(el => !deleted.includes(el.id))
-				if (checkedChanges.length != 0) {
-					Promise.all([
-						this.$store.dispatch("checklistSetItemsChecked", {id: this.selectedList.id, items: checkedChanges.map(el => el.id), checked_list: checkedChanges.map(el => el.checked)}),
-						this.$store.dispatch("checklistDeleteItems", {id: this.selectedList.id, items: deleted}),
-				]).then(_ => {
-						$("#checklistModalButton").click()
-						this.loadLists()
-						this.selectedList = null
-						this.selectedListSave = null
-					}).catch(err => {
-						this.errorText = err
-					})
-				}
+				let proms = []
+				if (deleted.length != 0) proms.push(this.$store.dispatch("checklistDeleteItems", {id: this.selectedList.id, items: deleted}))
+				if (checkedChanges.length != 0) proms.push(this.$store.dispatch("checklistSetItemsChecked", {id: this.selectedList.id, items: checkedChanges.map(el => el.id), checked_list: checkedChanges.map(el => el.checked)}))
+				Promise.all(proms).then(_ => {
+					$("#checklistModalButton").click()
+					this.loadLists()
+					this.selectedList = null
+					this.selectedListSave = null
+				}).catch(err => {
+					this.errorText = err
+				})
 			}
 		},
 		mounted () {
