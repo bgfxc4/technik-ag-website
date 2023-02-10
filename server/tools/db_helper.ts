@@ -1,11 +1,12 @@
 import * as main from "../main"
+import { Checklist } from "./routes"
 
-export async function get_checklists_from_db(): Promise<any[]> {
+export async function get_checklists_from_db(): Promise<Checklist[]> {
     const query = `SELECT cl.name, cl.id, 
     COALESCE(json_agg((SELECT x FROM (SELECT ci.id, ci.name, ci.checked) AS x)) FILTER (WHERE ci.id IS NOT NULL), '[]') AS items
     FROM checklist_list AS cl
-    LEFT JOIN checklist_items AS ci ON cl.id = ci.list_Id
-    GROUP BY cl.id`
+ LEFT JOIN checklist_items AS ci ON cl.id = ci.list_Id
+ GROUP BY cl.id`
     return main.db_pool.query(query).then(res => res.rows).catch(err => {
         throw err
     })

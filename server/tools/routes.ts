@@ -1,14 +1,27 @@
 import * as db_helper from "./db_helper"
 import * as main from "../main"
+import { z } from "zod"
 import {PERMS} from "../permissions"
 
-main.app.get("/tools/checklists/list/", async (req, res) => {
-	var type: main.bodyType = {
-		fields: {},
-	}
+export interface ChecklistItem {
+	id: string,
+	name: string,
+	checked: boolean
+}
 
-	if (!(await main.check_request(type, PERMS.ViewChecklists, req.body, req.headers, res)))
+export interface Checklist {
+	id: string,
+	name: string,
+	items: ChecklistItem[]
+}
+
+main.app.get("/tools/checklists/list/", async (req, res) => {
+	let type = z.object({})
+
+	let checked_params = await main.check_request<z.infer<typeof type>>(type, PERMS.ViewChecklists, req.params, req.headers, res)
+	if (checked_params == undefined)
 		return
+
 	db_helper.get_checklists_from_db().then(data => {
 		res.send(JSON.stringify(data))
 	}).catch(err => {
@@ -17,17 +30,16 @@ main.app.get("/tools/checklists/list/", async (req, res) => {
 })
 
 main.app.post("/tools/checklists/new/", async (req, res) => {
-	var type: main.bodyType = {
-		fields: {
-            "name": "string",
-            "items": main.array("string")
-        },
-        required: ["name", "items"]
-	}
+	let type = z.object({
+		name: z.string(),
+		items: z.array(z.string())
+	})
 
-	if (!(await main.check_request(type, PERMS.EditChecklists, req.body, req.headers, res)))
+	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditChecklists, req.body, req.headers, res)
+	if (checked_body == undefined)
 		return
-	db_helper.add_checklist_to_db(req.body.name, req.body.items).then(data => {
+
+	db_helper.add_checklist_to_db(checked_body.name, checked_body.items).then(data => {
 		res.send(JSON.stringify(data))
 	}).catch(err => {
 		res.status(500).send(err)
@@ -35,16 +47,15 @@ main.app.post("/tools/checklists/new/", async (req, res) => {
 })
 
 main.app.post("/tools/checklists/delete/", async (req, res) => {
-	var type: main.bodyType = {
-		fields: {
-            "id": "number",
-        },
-        required: ["id"]
-	}
+	let type = z.object({
+		id: z.number().positive(),
+	})
 
-	if (!(await main.check_request(type, PERMS.EditChecklists, req.body, req.headers, res)))
+	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditChecklists, req.body, req.headers, res)
+	if (checked_body == undefined)
 		return
-	db_helper.delete_checklist(req.body.id).then(data => {
+
+	db_helper.delete_checklist(checked_body.id).then(data => {
 		res.send(JSON.stringify(data))
 	}).catch(err => {
 		res.status(500).send(err)
@@ -52,17 +63,16 @@ main.app.post("/tools/checklists/delete/", async (req, res) => {
 })
 
 main.app.post("/tools/checklists/newItems/", async (req, res) => {
-	var type: main.bodyType = {
-		fields: {
-            "id": "string",
-            "items": main.array("string")
-        },
-        required: ["id", "items"]
-	}
+	let type = z.object({
+		id: z.number().positive(),
+		items: z.array(z.string())
+	})
 
-	if (!(await main.check_request(type, PERMS.EditChecklists, req.body, req.headers, res)))
+	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditChecklists, req.body, req.headers, res)
+	if (checked_body == undefined)
 		return
-	db_helper.add_items_to_checklist(req.body.id, req.body.items).then(data => {
+
+	db_helper.add_items_to_checklist(checked_body.id, checked_body.items).then(data => {
 		res.send(JSON.stringify(data))
 	}).catch(err => {
 		res.status(500).send(err)
@@ -70,17 +80,16 @@ main.app.post("/tools/checklists/newItems/", async (req, res) => {
 })
 
 main.app.post("/tools/checklists/deleteItems/", async (req, res) => {
-	var type: main.bodyType = {
-		fields: {
-            "id": "number",
-            "items": main.array("number")
-        },
-        required: ["id", "items"]
-	}
+	let type = z.object({
+		id: z.number().positive(),
+		items: z.array(z.number().positive())
+	})
 
-	if (!(await main.check_request(type, PERMS.EditChecklists, req.body, req.headers, res)))
+	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditChecklists, req.body, req.headers, res)
+	if (checked_body == undefined)
 		return
-	db_helper.delete_items_from_checklist(req.body.id, req.body.items).then(data => {
+
+	db_helper.delete_items_from_checklist(checked_body.id, checked_body.items).then(data => {
 		res.send(JSON.stringify(data))
 	}).catch(err => {
 		res.status(500).send(err)
@@ -88,18 +97,17 @@ main.app.post("/tools/checklists/deleteItems/", async (req, res) => {
 })
 
 main.app.post("/tools/checklists/setItemsChecked/", async (req, res) => {
-	var type: main.bodyType = {
-		fields: {
-            "id": "number",
-            "items": main.array("number"),
-            "checked_list": main.array("boolean")
-        },
-        required: ["id", "items", "checked_list"]
-	}
+	let type = z.object({
+		id: z.number().positive(),
+		items: z.array(z.number().positive()),
+		checked_list: z.array(z.boolean())
+	})
 
-	if (!(await main.check_request(type, PERMS.EditChecklists, req.body, req.headers, res)))
+	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditChecklists, req.body, req.headers, res)
+	if (checked_body == undefined)
 		return
-	db_helper.set_items_checked(req.body.id, req.body.items, req.body.checked_list).then(data => {
+
+	db_helper.set_items_checked(checked_body.id, checked_body.items, checked_body.checked_list).then(data => {
 		res.send(JSON.stringify(data))
 	}).catch(err => {
 		res.status(500).send(err)
