@@ -5,8 +5,9 @@ const get_appointment_query = `SELECT id, name, contact, description, date, end_
             (
                 SELECT array_to_json(array_agg(row_to_json(i)))
                 FROM (
-                    SELECT amount, item_id as id
+                    SELECT appointment_item_bookings.amount, item_id as id, name
                     FROM appointment_item_bookings
+                    LEFT JOIN item_list ON item_list.id = item_id
                     WHERE appointment_item_bookings.appointment_id = appointment_list.id
                 ) i
             ) as items

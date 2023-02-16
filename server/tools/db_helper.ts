@@ -30,7 +30,6 @@ export async function add_items_to_checklist(list_id: number, names: string[]): 
     if (names.length == 0)
         return
     let values = names.map((el, idx) => `($1, $${idx+2}, FALSE),`).join(" ").slice(0, -1)
-    console.log(values)
     return main.db_pool.query(`INSERT INTO checklist_items (list_id, name, checked) VALUES ${values}`, [list_id, ...names]).then(_ => {return}).catch(err => {
         throw err
     })

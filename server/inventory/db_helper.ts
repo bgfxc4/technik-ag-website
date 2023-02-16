@@ -64,7 +64,6 @@ export async function add_category_to_db(name: string, custom_fields: CategoryCu
 
 	let all_promises: Promise<any>[] = []
 	for (var c of custom_fields) {
-		console.log(c)
 		all_promises.push(main.db_pool.query("INSERT INTO custom_field_list (category_id, name, type, options) VALUES ($1, $2, $3, $4)", 
 			[cat_id, c.name, c.type, c.options]
 		))
@@ -88,7 +87,6 @@ export async function add_type_to_db(name: string, category: string): Promise<nu
 	return main.db_pool.query("INSERT INTO type_list (id, category_id, name) VALUES ($1, $2, $3)", [type_id, cats.rows[0].id, name]).then(_ => {
 		return 0
 	}).catch(err => {
-		console.log(err, cats.rows[0].id)
 		throw err
 	})
 }

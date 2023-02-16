@@ -54,8 +54,22 @@
 			<label for="create-item-name">Name:</label><br/><input id="create-item-name" v-model="newItemName" placeholder="Enter a name for the item..."><br/>
             <loading-icon v-if="isLoading" size="3x"/>
             <error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/><br>
+
+            <div>
+                <h5>Create from:</h5>
+                <b-tabs class="" content-class="mt-3 align-items: center">
+                    <b-tab title="none">
+                    </b-tab>
+                    <b-tab @click="loadListAppmnts" title="Appointment checklist">
+                        <button class="btn btn-sm btn-primary" v-for="a in createListAppmnts" :key="a.id" @click="createChecklistItems(a.items?.map(el => el.name))">
+                            {{ a.name }}
+                        </button>
+                    </b-tab>
+                </b-tabs>
+            </div>
+
             <button id="newItemModalButton" class="btn btn-secondary mx-2" v-b-modal.checklistModal>Cancel</button>
-            <button class="btn btn-outline-primary" @click="createItem">Create Item</button>
+            <button class="btn btn-outline-primary" @click="createItemByName">Create Item</button>
         </div>
     </b-modal>
 </template>
@@ -79,6 +93,8 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 				deleteListID: "",
 				newItemName: "",
 
+                createListAppmnts: [],
+                
 				selectedList: {},
 				selectedListSave: {}
 			}
@@ -112,7 +128,7 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 			},
 			createList () {
 				this.errorText = ""
-				this.$store.dispatch("createChecklist", {name: this.newListName, items: []}).then(res => {
+				this.$store.dispatch("createChecklist", {name: this.newListName, items: []}).then(_ => {
 					$("#newListModalButton").click()
 					this.loadLists()
 					this.newListName = ""
@@ -122,7 +138,7 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 			},
 			deleteList () {
 				this.errorText = ""
-				this.$store.dispatch("deleteChecklist", {id: this.deleteListID}).then(res => {
+				this.$store.dispatch("deleteChecklist", {id: this.deleteListID}).then(_ => {
 					$("#deleteListModalButton").click()
 					this.loadLists()
 					this.deleteListID = ""
@@ -130,9 +146,9 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 					this.errorText = err
 				})
 			},
-			createItem () {
+			createItems (itemList) {
 				this.errorText = ""
-				this.$store.dispatch("checklistNewItems", {id: this.selectedList.id, items: [this.newItemName]}).then(res => {
+				this.$store.dispatch("checklistNewItems", {id: this.selectedList.id, items: itemList}).then(_ => {
 					$("#newItemModalButton").click()
 					this.loadLists()
 					this.newItemName = ""
@@ -140,6 +156,12 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 					this.errorText = err
 				})
 			},
+            createItemByName () {
+                this.createItems([this.newItemName])
+            },
+            createChecklistItems (itemNames) {
+			    this.createItems(itemNames)	
+            },
 			sendItemChanges () {
 				let deleted = this.selectedListSave.items.filter(el => this.selectedList.items.find(e => e.id == el.id) == undefined).map(el => el.id)
 				let checkedChanges = this.selectedList.items.filter((e, idx) => this.selectedListSave.items[idx].checked != e.checked).filter(el => !deleted.includes(el.id))
@@ -154,7 +176,12 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 				}).catch(err => {
 					this.errorText = err
 				})
-			}
+			},
+            loadListAppmnts () {
+                this.$store.dispatch("getAppointmentList").then(res => {
+                    this.createListAppmnts = res.data
+                })
+            }
 		},
 		mounted () {
 			this.loadLists()
