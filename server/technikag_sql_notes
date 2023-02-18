@@ -152,5 +152,5 @@ checklist_items
 			list_id INT REFERENCES checklist_list(id) ON DELETE CASCADE,
 			name VARCHAR(128) NOT NULL,
 			checked BOOLEAN NOT NULL
-			UNIQUE(name)
+			UNIQUE(name, list_id)
 		)

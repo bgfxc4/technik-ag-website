@@ -61,8 +61,16 @@
                     <b-tab title="none">
                     </b-tab>
                     <b-tab @click="loadListAppmnts" title="Appointment checklist">
-                        <button class="btn btn-sm btn-primary" v-for="a in createListAppmnts" :key="a.id" @click="createChecklistItems(a.items?.map(el => el.name))">
+                        <button class="btn btn-sm btn-primary mx-1" v-for="a in createListAppmnts" :key="a.id" @click="createChecklistItems(a.items?.map(el => el.name))">
                             {{ a.name }}
+                        </button>
+                    </b-tab>
+                    <b-tab @click="loadUsers" title="User checklist">
+                        <button class="btn btn-sm btn-primary mx-1" @click="createChecklistItems(userList.map(el => el.display_name))">
+                            <b>All users</b>
+                        </button>
+                        <button class="btn btn-sm btn-primary mx-1" v-for="g in groupList" :key="g.id" @click="createChecklistItems(userList.filter(el => el.group_id == g.id).map(el => el.display_name))">
+                            <b>Group:</b> {{ g.name }}
                         </button>
                     </b-tab>
                 </b-tabs>
@@ -94,6 +102,8 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
 				newItemName: "",
 
                 createListAppmnts: [],
+                userList: [],
+                groupList: [],
                 
 				selectedList: {},
 				selectedListSave: {}
@@ -180,6 +190,14 @@ import LoadingIcon from "../helpers/LoadingIcon.vue"
             loadListAppmnts () {
                 this.$store.dispatch("getAppointmentList").then(res => {
                     this.createListAppmnts = res.data
+                })
+            },
+            loadUsers () {
+                this.$store.dispatch("getUsers").then(res => {
+                    this.userList = res.data
+                })
+                this.$store.dispatch("getGroups").then(res => {
+                    this.groupList = res.data
                 })
             }
 		},
