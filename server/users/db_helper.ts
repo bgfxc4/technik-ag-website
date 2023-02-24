@@ -2,6 +2,7 @@ import * as main from "../main"
 import {sha512} from "js-sha512"
 import * as uuid from "uuid"
 import { Group, User } from "./routes"
+import * as t from "../types/users"
 
 export async function get_users_from_db(with_login_hash=false): Promise<User[]> {
 	const query = `SELECT group_id, display_name, permissions, id${with_login_hash ? ", login_hash" : ""} FROM user_list`
@@ -21,7 +22,7 @@ export async function get_users_from_db(with_login_hash=false): Promise<User[]> 
 	})
 }
 
-export async function add_user_to_db(display_name: string, login_hash: string, group_id: string): Promise<void> {
+export async function add_user_to_db(display_name: string, login_hash: string, group_id: t.ExistingGroupID): Promise<void> {
 	return main.db_pool.query("INSERT INTO user_list (id, display_name, login_hash, permissions, group_id) VALUES ($1, $2, $3, $4, $5)", ["U"+uuid.v4(), display_name, sha512(login_hash), 0, group_id]).then(_ => {
 		return
 	}).catch(err => {
@@ -45,7 +46,7 @@ export async function user_exists_in_db(login_hash: string, display_name: string
 	})
 }
 
-export async function remove_user_from_db(id: string): Promise<void> {
+export async function remove_user_from_db(id: t.ExistingUserID): Promise<void> {
 	return main.db_pool.query("DELETE FROM user_list WHERE id = $1", [id]).then(_ => {
 		return
 	}).catch(err => {
@@ -53,7 +54,7 @@ export async function remove_user_from_db(id: string): Promise<void> {
 	})
 }
 
-export async function remove_group_from_db(id: string): Promise<void> {
+export async function remove_group_from_db(id: t.ExistingGroupID): Promise<void> {
 	return main.db_pool.query("DELETE FROM group_list WHERE id = $1", [id]).then(_ => {
 		return
 	}).catch(err => {
@@ -61,7 +62,7 @@ export async function remove_group_from_db(id: string): Promise<void> {
 	})
 }
 
-export async function set_user_perm(id: string, permissions: number): Promise<void> {
+export async function set_user_perm(id: t.ExistingUserID, permissions: number): Promise<void> {
 	return main.db_pool.query("UPDATE user_list SET permissions = $1 WHERE id = $2", [permissions, id]).then(_ => {
 		return
 	}).catch(err => {
@@ -82,15 +83,7 @@ export async function get_groups_from_db(): Promise<Group[]> {
 	})
 }
 
-export async function group_exists_in_db(id: string): Promise<boolean> {
-	return main.db_pool.query("SELECT id FROM group_list WHERE id = $1", [id]).then(res => {
-		return res.rowCount != 0
-	}).catch(err => {
-		throw err
-	})
-}
-
-export async function edit_user(id: string, login_hash?: string, display_name?: string, group_id?: string): Promise<void> {
+export async function edit_user(id: t.ExistingUserID, login_hash?: string, display_name?: string, group_id?: string): Promise<void> {
 	let query = "UPDATE user_list SET"
 	let args = []
 	if (login_hash) {
@@ -116,7 +109,7 @@ export async function edit_user(id: string, login_hash?: string, display_name?: 
 	})
 }
 
-export async function edit_group(id: string, name?: string, permissions?: number): Promise<void> {
+export async function edit_group(id: t.ExistingGroupID, name?: string, permissions?: number): Promise<void> {
 	let query = "UPDATE group_list SET "
 	let args = []
 	if (name) {
@@ -137,7 +130,7 @@ export async function edit_group(id: string, name?: string, permissions?: number
 	})
 }
 
-export async function get_perms_of_user_and_group(id: String): Promise<number> {
+export async function get_perms_of_user_and_group(id: t.ExistingUserID): Promise<number> {
 	let user = await main.db_pool.query("SELECT permissions, group_id FROM user_list WHERE id = $1", [id]).then(el => el.rows[0])
 	let group = await main.db_pool.query("SELECT permissions FROM group_list WHERE id = $1", [user.group_id]).then(el => el.rows[0])
 	return user.permissions | group.permissions

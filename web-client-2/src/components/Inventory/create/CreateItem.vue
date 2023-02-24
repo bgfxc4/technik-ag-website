@@ -20,7 +20,7 @@
                         </div>
                         <br>
 
-                        <div v-if="!categoryName || !typeName" class="form-horizontal row row-cols-1 row-cols-lg-3">
+                        <div v-if="!categoryId || !typeId" class="form-horizontal row row-cols-1 row-cols-lg-3">
                             <div class="col">
                                 Category:
                                 <select class="form-select bg-light text-dark" aria-label="Select Storage Room" @change="loadCustomFields()" v-model="categoryIndex" v-if="categories.length">
@@ -30,7 +30,7 @@
                             <div>
                                 Type:
                                 <select class="form-select bg-light text-dark" aria-label="Select Storage Shelf" v-model="typeIndex" v-if="categories[categoryIndex]?.types.length">
-                                    <option v-for="(t, i) in categories[categoryIndex].types" :key="i" :value="i">{{t}}</option>
+                                    <option v-for="(t, i) in categories[categoryIndex].types" :key="i" :value="i">{{t.name}}</option>
                                 </select>
                             </div>
                         </div>
@@ -99,8 +99,8 @@
             LoadingIcon
         },
         props: {
-            categoryName: String,
-            typeName: String,
+            typeId: String,
+            categoryId: String,
             useID: String
         },
         data: function () {
@@ -147,25 +147,22 @@
             },
             createItem () {
                 var item = {
-                    category: this.categoryName,
-                    type: this.typeName,
+                    type: this.typeId,
                     name: this.itemName,
                     description: this.itemDescription,
 
-                    room: this.storage[this.roomIndex].name,
-                    shelf: this.storage[this.roomIndex].shelfs[this.shelfIndex].name,
-                    compartment: this.storage[this.roomIndex].shelfs[this.shelfIndex].compartments[this.compIndex].name,
+                    compartment: this.storage[this.roomIndex].shelfs[this.shelfIndex].compartments[this.compIndex].id,
 
                     amount: +this.itemAmount,
                     custom_fields: this.customFields,
                     image: (!!this.$refs['image-upload'].previewImage) ? this.$refs['image-upload'].previewImage.split('base64,')[1] : undefined
                 }
 
-                if (!item.category && !this.categoryName)
-                    item.category = this.categories[this.categoryIndex].name
+                if (!item.category)
+                    item.category = this.categories[this.categoryIndex].id
                     
-                if (!item.type && !this.typeName)
-                    item.type = this.categories[this.categoryIndex].types[this.typeIndex]
+                if (!item.type)
+                    item.type = this.categories[this.categoryIndex].types[this.typeIndex].id
 
                 if (this.useID)
                     item.id = this.useID
@@ -217,8 +214,8 @@
             },
             loadCustomFields () {                    
                 for (var cat of this.categories) {
-                    if (cat.name == this.categoryName || (this.categories.indexOf(cat) == this.categoryIndex && !this.categoryName)) {
-                        this.customFieldsLoaded = cat.custom_fields
+                    if (cat.id == this.categoryId || (this.categories.indexOf(cat) == this.categoryIndex && !this.categoryId)) {
+                        this.customFieldsLoaded = cat.custom_fields || []
                         for (var f of this.customFieldsLoaded) {
                             this.customFields[f.name] = ""
                         }

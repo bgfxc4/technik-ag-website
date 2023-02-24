@@ -22,7 +22,7 @@
             LoadingIcon
         },
         props: {
-            categoryName: String,
+            typeId: String,
             typeName: String
         },
         data: function () {
@@ -37,8 +37,7 @@
             },
             deleteType () {
                 var type = {
-                    name: this.typeName,
-                    category: this.categoryName
+                    id: this.typeId,
                 }
                 this.isLoading = true
                 this.errorText = ""

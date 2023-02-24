@@ -39,8 +39,8 @@ const actions = {
     },
     async getItemsByType({rootState}, params) {
         var headers = {'Authorization': rootState.auth.loginHash}
-        return await axios.get(`equipment/bytype/${params["catName"]}/${params["typeName"]}`, {headers}).then(res => {
-            return {res, typeName: params["typeName"]}
+        return await axios.get(`equipment/bytype/${params["typeId"]}`, {headers}).then(res => {
+            return {res, typeId: params["typeId"]}
         }).catch(err => {
             console.log(err)
             throw err

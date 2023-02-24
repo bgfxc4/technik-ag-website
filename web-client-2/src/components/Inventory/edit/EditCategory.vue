@@ -130,7 +130,7 @@
             },
             editCategory () {
                 var category = {
-                    old_name: this.category.name,
+                    id: this.category.id,
                     new_name: this.categoryName,
                     custom_fields: this.customFields,
                     image: (!!this.$refs['image-upload'].previewImage) ? this.$refs['image-upload'].previewImage.split('base64,')[1] : undefined
@@ -149,7 +149,7 @@
             fillInCategory () {
                 this.categoryName = this.category.name
                 this.customFields = this.category.custom_fields || []
-                this.$refs['image-upload']._url = this.$store.state.apiUrl + '/category/getimg/' + this.category.name
+                this.$refs['image-upload']._url = this.$store.state.apiUrl + '/category/getimg/' + this.category.id
             }
         }
     }

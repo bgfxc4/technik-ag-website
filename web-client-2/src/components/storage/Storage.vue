@@ -3,25 +3,25 @@
 		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row row-cols-1 row-cols-lg-3 g-4 m-3">
-			<div v-for="room in roomList" :key="room.name" class="col">
+			<div v-for="room in roomList" :key="room.id" class="col">
 				<div class="card mb-3 bg-secondary" style="height: 16vh">
 			  		<div class="row g-0" style="height: 100%">
 						<div class="card-body" style="max-height: 30vh">
-							<h5 @click="openRoom(room.name)" role="button" class="card-title">{{ room.name }}</h5>
+							<h5 @click="openRoom(room.id)" role="button" class="card-title">{{ room.name }}</h5>
 							<div style="max-height: 15vh; overflow: hidden;">
-								<router-link v-for="t in room.shelfs" :key="t" :to="`/storage/${room.name}/${t.name}`" 
-									class="fs-6 text-break d-block text-truncate">{{ t.name }}</router-link>
+								<router-link v-for="s in room.shelfs" :key="s.id" :to="`/storage/${room.id}/${s.id}`" 
+									class="fs-6 text-break d-block text-truncate">{{ s.name }}</router-link>
 							</div>
-							<button @click="openRoom(room.name)" class="btn btn-outline-primary mt-2">Open Room</button> <br>
+							<button @click="openRoom(room.id)" class="btn btn-outline-primary mt-2">Open Room</button> <br>
 
-							<a :id="'menu-popover-'+room.name" class="menu-popover" tabindex="0">
+							<a :id="'menu-popover-'+room.id" class="menu-popover" tabindex="0">
 								<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 							</a>
-							<b-popover :target="'menu-popover-'+room.name" triggers="focus">
-								<button v-b-modal.deleteRoomModal @click="deleteRoomName = room.name" class="btn btn-danger" style="max-height: 6vh">
+							<b-popover :target="'menu-popover-'+room.id" triggers="focus">
+								<button v-b-modal.deleteRoomModal @click="deleteRoomId = room.id" class="btn btn-danger" style="max-height: 6vh">
 									<font-awesome-icon icon="trash-can"/> Delete Room
 								</button>
-								<button @click="editRoomName = room.name" v-b-modal.editRoomModal class="btn btn-info" style="max-height: 6vh">
+								<button @click="editRoomId = room.id" v-b-modal.editRoomModal class="btn btn-info" style="max-height: 6vh">
 									<font-awesome-icon icon="pen"/> Edit Room
 								</button>
 							</b-popover>
@@ -32,8 +32,8 @@
 			<create-room @onCreate="loadRoomList" />
 		</div>
 
-		<delete-room :room="deleteRoomName" @onDelete="loadRoomList" />
-		<edit-room :room="editRoomName" @onEdit="loadRoomList" />
+		<delete-room :room="deleteRoomId" @onDelete="loadRoomList" />
+		<edit-room :room="editRoomId" @onEdit="loadRoomList" />
 	</div>
 </template>
 
@@ -58,13 +58,13 @@
 				roomList: [],
 				errorText: "",
 				isLoading: false,
-				deleteRoomName: undefined,
-				editRoomName: undefined
+				deleteRoomId: undefined,
+				editRoomId: undefined
 			}
 		},
 		methods: {
-			openRoom(name) {
-				this.$router.push(`/storage/${name}/`)
+			openRoom(id) {
+				this.$router.push(`/storage/${id}/`)
 			},
 			async loadRoomList () {
 				this.isLoading = true

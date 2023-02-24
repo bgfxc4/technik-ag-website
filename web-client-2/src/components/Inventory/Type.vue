@@ -3,8 +3,8 @@
 		<nav aria-label="breadcrumb" class="mx-4 my-2">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><router-link to='/inventory'>Inventory</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/`'>{{ $route.params.category }}</router-link></li>
-				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.type }}</li>
+				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.params.category}/`'>{{ catName }}</router-link></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ typeName }}</li>
 			</ol>
 		</nav>
 		<loading-icon v-if="isLoading" size="3x"/>
@@ -49,9 +49,9 @@
 					</div>
 				</div>
 			</div>
-			<create-item :categoryName="catName" :typeName="typeName" @onCreate="loadItems"/>
+			<create-item :categoryId="catId" :typeId="typeId" @onCreate="loadItems"/>
 		</div>
-		<delete-item :categoryName="catName" :typeName="typeName" :itemId="deleteItemId" @onDelete="loadItems"/>
+		<delete-item :itemId="deleteItemId" @onDelete="loadItems"/>
 		<edit-item :item="editItem" @onEdit="loadItems"/>
 	</div>
 </template>
@@ -71,6 +71,8 @@
 				itemList: [],
 				catName: "",
 				typeName: "",
+				catId: "",
+				typeId: "",
 				errorText: "",
 				isLoading: false,
 				deleteItemId: "",
@@ -86,13 +88,13 @@
 			ShowQrBarCode
 		},
 		methods: {
-			openItem(id, cat, type) {
-				this.$router.push(`/inventory/item/byId/${id}?category=${cat}&type=${type}`)
+			openItem(id) {
+				this.$router.push(`/inventory/item/byId/${id}?category=${this.catId}&type=${this.typeId}`)
 			},
 			loadItems () {
 				this.isLoading = true
 				this.errorText = ""
-				this.$store.dispatch("getItemsByType", {catName: this.catName, typeName: this.typeName}).then(answ => {
+				this.$store.dispatch("getItemsByType", {typeId: this.typeId}).then(answ => {
 					this.isLoading = false
 					console.log(answ)
 					this.itemList = answ.res.data
@@ -100,11 +102,24 @@
 					this.isLoading = false
 					this.errorText = err
 				})
-			}
+			},
+            loadType () {
+				this.$store.dispatch("getCategories").then(answ => {
+					this.isLoading = false
+				    let c = answ.data.find(cat => cat.id == this.catId)
+                    this.catName = c.name
+                    this.typeName = c.types.find(type => type.id == this.typeId).name
+
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
+				})
+            }
 		},
 		async created () {
-			this.catName = this.$route.params.category
-			this.typeName = this.$route.params.type
+			this.catId = this.$route.params.category
+			this.typeId = this.$route.params.type
+            this.loadType()
 			this.loadItems()
 		}
 	}

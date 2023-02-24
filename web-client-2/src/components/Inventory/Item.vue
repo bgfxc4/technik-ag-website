@@ -1,11 +1,11 @@
 <template>
 	<div id="item">
 		<nav aria-label="breadcrumb" class="mx-4 my-2">
-			<ol class="breadcrumb" v-if="catName && typeName">
+			<ol class="breadcrumb" v-if="catId && typeId">
 				<li class="breadcrumb-item"><router-link to='/inventory'>Inventory</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.query.category}/`'>{{ $route.query.category }}</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.query.category}/${$route.query.type}`'>{{ $route.query.type }}</router-link></li>
-				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.itemID }}</li>
+				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.query.category}/`'>{{ catName }}</router-link></li>
+				<li class="breadcrumb-item"><router-link :to='`/inventory/${$route.query.category}/${$route.query.type}`'>{{ typeName }}</router-link></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ item.name }}</li>
 			</ol>
 		</nav>
 		<loading-icon v-if="isLoading" size="3x"/>
@@ -62,7 +62,7 @@
 				</div>
 			</div>
 		</div>
-		<delete-item :categoryName="item.category" :typeName="item.type" :itemId="item.id" @onDelete="itemDeleted"/>
+		<delete-item :itemId="item.id" @onDelete="itemDeleted"/>
 		<edit-item :item="item" @onEdit="loadItem"/>
 	</div>
 </template>
@@ -88,6 +88,8 @@
 				item: {},
 				catName: "",
 				typeName: "",
+				catId: "",
+				typeId: "",
 				itemID: "",
 				deleteItemId: "",
 				errorText: "",
@@ -120,12 +122,24 @@
 					this.isLoading = false
 					this.errorText = err
 				})
-			}
+			},
+            loadType () {
+				this.$store.dispatch("getCategories").then(answ => {
+					this.isLoading = false
+				    let c = answ.data.find(cat => cat.id == this.catId)
+                    this.catName = c?.name
+                    this.typeName = c?.types.find(type => type.id == this.typeId)?.name
+				}).catch(err => {
+					this.isLoading = false
+					this.errorText = err
+				})
+            }
 		},
 		async created () {
-			this.catName = this.$route.query.category
-			this.typeName = this.$route.query.type
+			this.catId = this.$route.query.category
+			this.typeId = this.$route.query.type
 			this.itemID = this.$route.params.itemID
+            this.loadType()
 			this.loadItem()
 		}
 	}

@@ -44,9 +44,8 @@
             },
             editType () {
                 var type = {
-                    old_name: this.type.name,
+                    id: this.type.id,
                     new_name: this.typeName,
-                    category: this.catName
                 }
                 this.isLoading = true
                 this.errorText = ""

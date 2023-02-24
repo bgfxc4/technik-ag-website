@@ -3,19 +3,19 @@
 		<nav aria-label="breadcrumb" class="mx-4 my-2">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><router-link to='/storage'>Storage</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/storage/${$route.params.room}/`'>{{ $route.params.room }}</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/storage/${$route.params.room}/${$route.params.shelf}/`'>{{ $route.params.shelf }}</router-link></li>
-				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.compartment }}</li>
+				<li class="breadcrumb-item"><router-link :to='`/storage/${$route.params.room}/`'>{{ roomName }}</router-link></li>
+				<li class="breadcrumb-item"><router-link :to='`/storage/${$route.params.room}/${$route.params.shelf}/`'>{{ shelfName }}</router-link></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ compName }}</li>
 			</ol>
 		</nav>
 		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row row-cols-1 row-cols-lg-3 g-4 m-3">
-			<div v-for="item in itemList" :key="item.name" class="col">
+			<div v-for="item in itemList" :key="item.id" class="col">
 				<div class="card mb-3 bg-secondary" style="height: 32vh">
 			  		<div class="row g-0" style="height: 100%">
     					<div class="col-6 my-auto">
-							<img @click="openItem(item.id, item.category, item.type)" role="button" v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + item.id" class="card-img" 
+							<img @click="openItem(item.id)" role="button" v-bind:src="$store.state.apiUrl + '/equipment/getimg/' + item.id" class="card-img" 
 								style="max-width: 30vw; max-height: 30vh; height: auto; margin-left: 10px">
 						</div>
     					<div class="col-6 my-auto" style="max-height: 30vh">
@@ -47,6 +47,9 @@
 				roomName: "",
 				shelfName: "",
 				compName: "",
+				roomId: "",
+				shelfId: "",
+				compId: "",
 				errorText: "",
 				isLoading: false,
 			}
@@ -60,10 +63,15 @@
 				this.itemList = []
 				this.$store.dispatch("getStorage").then(answ => {
 					this.isLoading = false
-					console.log(answ.data.find(el => el?.name == this.roomName))
-					let shelfList = answ.data.find(el => el?.name == this.roomName).shelfs || []
-					let compList = shelfList.find(el => el?.name == this.shelfName).compartments || []
-					this.itemList = compList.find(el => el?.name == this.compName).items || []
+                    let room = answ.data.find(el => el?.id == this.roomId)
+					let shelfList = room.shelfs || []
+                    let shelf = shelfList.find(el => el?.id == this.shelfId)
+					let compList = shelf.compartments || []
+                    let comp = compList.find(el => el?.id == this.compId)
+					this.itemList = comp.items || []
+                    this.roomName = room?.name
+                    this.shelfName = shelf?.name
+                    this.compName = comp?.name
 				}).catch(err => {
 					this.isLoading = false
 					this.errorText = err
@@ -71,9 +79,9 @@
 			}
 		},
 		async created () {
-			this.roomName = this.$route.params.room
-			this.shelfName = this.$route.params.shelf
-			this.compName = this.$route.params.compartment
+			this.roomId = this.$route.params.room
+			this.shelfId = this.$route.params.shelf
+			this.compId = this.$route.params.compartment
 			this.loadItemList()
 		}
 	}

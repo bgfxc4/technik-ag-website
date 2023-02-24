@@ -54,7 +54,7 @@ export async function check_request<T>(type: AnyZodObject, needs_auth: number, b
 		}
 	}
 	try {
-		var ret = type.parse(body)
+		var ret = await type.parseAsync(body)
 	} catch (e) {
 		res.status(500).send(JSON.stringify(e))
 		return undefined

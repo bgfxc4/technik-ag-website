@@ -23,6 +23,7 @@
             LoadingIcon
         },
         props: {
+            categoryId: String,
             categoryName: String
         },
         computed: {
@@ -40,7 +41,7 @@
             },
             deleteCategory () {
                 var category = {
-                    name: this.categoryName,
+                    id: this.categoryId,
                 }
                 this.errorText = ""
                 this.isLoading = true

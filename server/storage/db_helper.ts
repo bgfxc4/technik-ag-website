@@ -1,5 +1,6 @@
 import * as main from "../main"
 import { Room } from "./routes"
+import * as t from "../types/storage"
 
 export async function get_storage_from_db(): Promise<Room[]> {
 	const query = `SELECT row_to_json(t)
@@ -45,87 +46,60 @@ export async function add_room_to_db(name: string): Promise<boolean> {
 	})
 }
 
-export async function delete_room_from_db(name: string): Promise<void> {
-	return main.db_pool.query("DELETE FROM room_list WHERE name = $1", [name]).then(_ => {
+export async function delete_room_from_db(id: t.ExistingRoomID): Promise<void> {
+	return main.db_pool.query("DELETE FROM room_list WHERE id = $1", [id]).then(_ => {
 		return
 	}).catch(err => {
 		throw err
 	})
 }
 
-export async function edit_room_in_db(old_name: string, new_name: string): Promise<void> {
-	return main.db_pool.query("UPDATE room_list SET name = $1 WHERE name = $2", [new_name, old_name]).then(_ => {
+export async function edit_room_in_db(id: t.ExistingRoomID, new_name: string): Promise<void> {
+	return main.db_pool.query("UPDATE room_list SET name = $1 WHERE id = $2", [new_name, id]).then(_ => {
 		return
 	}).catch(err => {
 		throw err
 	})
 }
 
-export async function add_shelf_to_db(room_name: string, name: string): Promise<number> {
-	let room = await main.db_pool.query("SELECT * FROM room_list WHERE name = $1", [room_name]).catch(err =>  {throw err})
-	if (room.rowCount == 0)
-		return 1
-	let shelfs = await main.db_pool.query("SELECT * FROM shelf_list WHERE room_id = $1 AND name = $2", [room.rows[0].id, name]).catch(err =>  {throw err})
-	if (shelfs.rowCount != 0)
-		return 2
-	await main.db_pool.query("INSERT INTO shelf_list (room_id, name) VALUES ($1, $2)", [room.rows[0].id, name]).catch(err =>  {throw err})
+export async function add_shelf_to_db(room_id: t.ExistingRoomID, name: string): Promise<number> {
+	await main.db_pool.query("INSERT INTO shelf_list (room_id, name) VALUES ($1, $2)", [room_id, name]).catch(err =>  {throw err})
 	return 0
 }
 
-export async function delete_shelf_from_db(room_name: string, name: string): Promise<void> {
-	let room = await main.db_pool.query("SELECT * FROM room_list WHERE name = $1", [room_name]).catch(err =>  {throw err})
-	return main.db_pool.query("DELETE FROM shelf_list WHERE room_id = $1 AND name = $2", [room.rows[0].id, name]).then(_ => {
+export async function delete_shelf_from_db(id: t.ExistingShelfID): Promise<void> {
+	return main.db_pool.query("DELETE FROM shelf_list WHERE id = $1", [id]).then(_ => {
 		return
 	}).catch(err => {
 		throw err
 	})
 }
 
-export async function edit_shelf_in_db(room_name: string, old_name: string, new_name: string): Promise<void> {
-	let room = await main.db_pool.query("SELECT * FROM room_list WHERE name = $1", [room_name]).catch(err =>  {throw err})
-	return main.db_pool.query("UPDATE shelf_list SET name = $1 WHERE name = $2 AND room_id = $3", [new_name, old_name, room.rows[0].id]).then(_ => {
+export async function edit_shelf_in_db(id: t.ExistingShelfID, new_name: string): Promise<void> {
+	return main.db_pool.query("UPDATE shelf_list SET name = $1 WHERE id = $2", [new_name, id]).then(_ => {
 		return
 	}).catch(err => {
 		throw err
 	})
 }
 
-export async function add_compartment_to_db(room_name: string, shelf_name: string, name: string): Promise<number> {
-	let room = await main.db_pool.query("SELECT * FROM room_list WHERE name = $1", [room_name]).catch(err =>  {throw err})
-	if (room.rowCount == 0)
-		return 1
-	let shelf = await main.db_pool.query("SELECT * FROM shelf_list WHERE name = $1 AND room_id = $2", [shelf_name, room.rows[0].id]).catch(err =>  {throw err})
-	if (shelf.rowCount == 0)
-		return 2
-	let comps = await main.db_pool.query("SELECT * FROM compartment_list WHERE shelf_id = $1 AND name = $2", [shelf.rows[0].id, name]).catch(err =>  {throw err})
-	if (comps.rowCount != 0)
-		return 3
-	await main.db_pool.query("INSERT INTO compartment_list (shelf_id, name) VALUES ($1, $2)", [shelf.rows[0].id, name]).catch(err =>  {throw err})
+export async function add_compartment_to_db(shelf_id: t.ExistingShelfID, name: string): Promise<number> {
+	await main.db_pool.query("INSERT INTO compartment_list (shelf_id, name) VALUES ($1, $2)", [shelf_id, name]).catch(err =>  {throw err})
 	return 0
 }
 
-export async function delete_compartment_from_db(room_name: string, shelf_name: string, name: string): Promise<void> {
-	let room = await main.db_pool.query("SELECT * FROM room_list WHERE name = $1", [room_name]).catch(err =>  {throw err})
-	let shelf = await main.db_pool.query("SELECT * FROM shelf_list WHERE name = $1 AND room_id = $2", [shelf_name, room.rows[0].id]).catch(err =>  {throw err})
-	return main.db_pool.query("DELETE FROM compartment_list WHERE shelf_id = $1 AND name = $2", [shelf.rows[0].id, name]).then(_ => {
+export async function delete_compartment_from_db(id: t.ExistingCompartmentID): Promise<void> {
+	return main.db_pool.query("DELETE FROM compartment_list WHERE id = $1", [id]).then(_ => {
 		return
 	}).catch(err => {
 		throw err
 	})
 }
 
-export async function edit_compartment_in_db(room_name: string, shelf_name: string, old_name: string, new_name: string): Promise<void> {
-	let room = await main.db_pool.query("SELECT * FROM room_list WHERE name = $1", [room_name]).catch(err =>  {throw err})
-	let shelf = await main.db_pool.query("SELECT * FROM shelf_list WHERE name = $1 AND room_id = $2", [shelf_name, room.rows[0].id]).catch(err =>  {throw err})
-	return main.db_pool.query("UPDATE compartment_list SET name = $1 WHERE shelf_id = $2 AND name = $3", [new_name, shelf.rows[0].id, old_name]).then(_ => {
+export async function edit_compartment_in_db(id: t.ExistingCompartmentID, new_name: string): Promise<void> {
+	return main.db_pool.query("UPDATE compartment_list SET name = $1 WHERE id = $2", [new_name, id]).then(_ => {
 		return
 	}).catch(err => {
 		throw err
 	})
-}
-
-export async function compartment_exists(r: string, s: string, c: string): Promise<boolean> {
-	let room = await main.db_pool.query("SELECT * FROM room_list WHERE name = $1", [r]).catch(err =>  {throw err})
-	let shelf = await main.db_pool.query("SELECT * FROM shelf_list WHERE name = $1 AND room_id = $2", [s, room.rows[0].id]).catch(err =>  {throw err})
-	return (await main.db_pool.query("SELECT * FROM compartment_list WHERE shelf_id = $1 AND name = $2", [shelf.rows[0].id, c]).catch(err => { throw err })).rowCount != 0
 }

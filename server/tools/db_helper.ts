@@ -1,5 +1,6 @@
 import * as main from "../main"
 import { Checklist } from "./routes"
+import * as t from "../types/tools"
 
 export async function get_checklists_from_db(): Promise<Checklist[]> {
     const query = `SELECT cl.name, cl.id, 
@@ -26,16 +27,16 @@ export async function add_checklist_to_db(name: string, items: string[]): Promis
     })
 }
 
-export async function add_items_to_checklist(list_id: number, names: string[]): Promise<void> {
+export async function add_items_to_checklist(list_id: t.ExistingChecklistID, names: string[]): Promise<void> {
     if (names.length == 0)
         return
-    let values = names.map((el, idx) => `($1, $${idx+2}, FALSE),`).join(" ").slice(0, -1)
+    let values = names.map((_, idx) => `($1, $${idx+2}, FALSE),`).join(" ").slice(0, -1)
     return main.db_pool.query(`INSERT INTO checklist_items (list_id, name, checked) VALUES ${values}`, [list_id, ...names]).then(_ => {return}).catch(err => {
         throw err
     })
 }
 
-export async function set_items_checked(list_id: number, item_ids: number[], checked_list: boolean[]): Promise<void> {
+export async function set_items_checked(list_id: t.ExistingChecklistID, item_ids: t.ExistingChecklistItemID[], checked_list: boolean[]): Promise<void> {
     let query = "UPDATE checklist_items SET checked = (CASE " 
         + item_ids.map((_, idx) => `WHEN id = $${idx+1} THEN ${checked_list[idx] ? "TRUE" : "FALSE"}`).join(" ") + ` END) WHERE list_id = $${item_ids.length+1} AND id = ANY($${item_ids.length+2}::int[])`
     
@@ -44,13 +45,13 @@ export async function set_items_checked(list_id: number, item_ids: number[], che
     })
 }
 
-export async function delete_checklist(list_id: number): Promise<void> {
+export async function delete_checklist(list_id: t.ExistingChecklistID): Promise<void> {
     return main.db_pool.query("DELETE FROM checklist_list WHERE id = $1", [list_id]).then(() => {return}).catch(err => {
         throw err
     })
 }
 
-export async function delete_items_from_checklist(list_id: number, item_ids: number[]): Promise<void> {
+export async function delete_items_from_checklist(list_id: t.ExistingChecklistID, item_ids: t.ExistingChecklistItemID[]): Promise<void> {
     return main.db_pool.query(`DELETE FROM checklist_items WHERE id IN (${item_ids.map((_, idx) => `$${idx+2}`).join(", ")}) AND list_id = $1`, [list_id, ...item_ids]).then(() => {return}).catch(err => {
         throw err
     })

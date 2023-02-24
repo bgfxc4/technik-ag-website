@@ -3,6 +3,8 @@ import * as main from "../main"
 import {PERMS} from "../permissions"
 import * as google_cal from "./google_calender_api"
 import { z } from "zod"
+import * as t from "../types/appointments"
+import * as it from "../types/inventory"
 
 export interface Appointment {
     id: string
@@ -46,7 +48,7 @@ main.app.get("/appointments/list/requested", async (req, res) => {
 
 main.app.post("/appointments/delete/approved", async (req, res) => {
 	let type = z.object({
-		id: z.string()
+		id: t.ZodExistingAppointmentID
 	})
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditAppmnts, req.body, req.headers, res)
 	if (checked_body == undefined)
@@ -61,7 +63,7 @@ main.app.post("/appointments/delete/approved", async (req, res) => {
 
 main.app.post("/appointments/delete/request", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
+		id: t.ZodExistingAppointmentRequestID,
 		from_google_calendar: z.boolean().optional()
 	})
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditAppmnts, req.body, req.headers, res)
@@ -105,7 +107,7 @@ main.app.post("/appointments/request", async (req, res) => {
 
 main.app.post("/appointments/approve", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
+		id: t.ZodExistingAppointmentRequestID,
 	})
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditAppmnts, req.body, req.headers, res)
 	if (checked_body == undefined)
@@ -122,8 +124,8 @@ main.app.post("/appointments/approve", async (req, res) => {
 
 main.app.post("/appointments/updateitems", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
-		items: z.array(z.object({ id: z.string(), amount: z.number().positive() }))
+		id: t.ZodExistingAppointmentID,
+		items: z.array(z.object({ id: it.ZodExistingItemID, amount: z.number().positive() }))
 	})
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditAppmnts, req.body, req.headers, res)
 	if (checked_body == undefined)
@@ -139,7 +141,7 @@ main.app.post("/appointments/updateitems", async (req, res) => {
 
 main.app.post("/appointments/edit", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
+		id: t.ZodExistingAppointmentID,
 		name: z.string().optional(),
 		description: z.string().optional(),
 		date: z.number().positive().optional(),

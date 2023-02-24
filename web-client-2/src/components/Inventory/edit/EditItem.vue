@@ -97,12 +97,9 @@
                     name: this.itemName,
                     description: this.itemDescription,
 
-                    room: this.storage[this.roomIndex].name,
-                    shelf: this.storage[this.roomIndex].shelfs[this.shelfIndex].name,
-                    compartment: this.storage[this.roomIndex].shelfs[this.shelfIndex].compartments[this.compIndex].name,
+                    compartment: this.storage[this.roomIndex].shelfs[this.shelfIndex].compartments[this.compIndex].id,
 
-                    category: this.item.category,
-                    type: this.item.type,
+                    type: this.item.type_id,
                     
                     amount: this.itemAmount,
                     custom_fields: this.customFields,

@@ -3,32 +3,32 @@
 		<nav aria-label="breadcrumb" class="mx-4 my-2">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><router-link to='/storage'>Storage</router-link></li>
-				<li class="breadcrumb-item"><router-link :to='`/storage/${$route.params.room}/`'>{{ $route.params.room }}</router-link></li>
-				<li class="breadcrumb-item active" aria-current="page">{{ $route.params.shelf }}</li>
+				<li class="breadcrumb-item"><router-link :to='`/storage/${$route.params.room}/`'>{{ roomName }}</router-link></li>
+				<li class="breadcrumb-item active" aria-current="page">{{ shelfName }}</li>
 			</ol>
 		</nav>
 		<loading-icon v-if="isLoading" size="3x"/>
 		<error-text v-if="!!errorText" v-bind:msg="errorText" class="mx-3 my-2"/>
 		<div class="row row-cols-1 row-cols-lg-3 g-4 m-3">
-			<div v-for="comp in compList" :key="comp.name" class="col">
+			<div v-for="comp in compList" :key="comp.id" class="col">
 				<div class="card mb-3 bg-secondary" style="height: 16vh">
 						<div class="row g-0" style="height: 100%">
 						<div class="card-body" style="max-height: 30vh">
-							<h5 @click="openComp(comp.name)" role="button" class="card-title">{{ comp.name }}</h5>
+							<h5 @click="openComp(comp.id)" role="button" class="card-title">{{ comp.name }}</h5>
 							<div style="max-height: 15vh; overflow: hidden;">
 								<router-link v-for="i in comp.items" :key="i.id" :to="`/inventory/item/byId/${i.id}`" 
 									class="fs-6 text-break d-block text-truncate">{{ i.name }}</router-link>
 							</div>
-							<button @click="openComp(comp.name)" class="btn btn-outline-primary mt-2">Open Compartment</button> <br>
+							<button @click="openComp(comp.id)" class="btn btn-outline-primary mt-2">Open Compartment</button> <br>
 
-							<a :id="'menu-popover-'+comp.name" class="menu-popover" tabindex="0">
+							<a :id="'menu-popover-'+comp.id" class="menu-popover" tabindex="0">
 								<font-awesome-icon icon="bars" class="fa-xl"></font-awesome-icon>
 							</a>
-							<b-popover :target="'menu-popover-'+comp.name" triggers="focus">
-								<button v-b-modal.deleteCompModal @click="deleteCompName = comp.name" class="btn btn-danger" style="max-height: 6vh">
+							<b-popover :target="'menu-popover-'+comp.id" triggers="focus">
+								<button v-b-modal.deleteCompModal @click="deleteCompId = comp.id" class="btn btn-danger" style="max-height: 6vh">
 									<font-awesome-icon icon="trash-can"/> Delete Compartment
 								</button>
-								<button @click="editCompName = comp.name" v-b-modal.editCompModal class="btn btn-info" style="max-height: 6vh">
+								<button @click="editCompId = comp.id" v-b-modal.editCompModal class="btn btn-info" style="max-height: 6vh">
 									<font-awesome-icon icon="pen"/> Edit Compartment
 								</button>
 							</b-popover>
@@ -39,8 +39,8 @@
 			<create-compartment :room="roomName" :shelf="shelfName" @onCreate="loadShelfList" />
 		</div>
 
-		<delete-compartment :room="roomName" :shelf="shelfName" :comp="deleteCompName" @onDelete="loadShelfList" />
-		<edit-comp :room="roomName" :shelf="shelfName" :comp="editCompName" @onEdit="loadShelfList" />
+		<delete-compartment :comp="deleteCompId" @onDelete="loadShelfList" />
+		<edit-comp :comp="editCompId" @onEdit="loadShelfList" />
 	</div>
 </template>
 
@@ -65,24 +65,29 @@
 				compList: [],
 				roomName: "",
 				shelfName: "",
+				roomId: "",
+				shelfId: "",
 				errorText: "",
 				isLoading: false,
-				deleteCompName: undefined,
-				editCompName: undefined
+				deleteCompId: undefined,
+				editCompId: undefined
 			}
 		},
 		methods: {
-			openComp(name) {
-				this.$router.push(`/storage/${this.roomName}/${this.shelfName}/${name}/`)
+			openComp(id) {
+				this.$router.push(`/storage/${this.roomId}/${this.shelfId}/${id}/`)
 			},
 			async loadShelfList () {
 				this.isLoading = true
 				this.compList = []
 				this.$store.dispatch("getStorage").then(answ => {
 					this.isLoading = false
-					console.log(answ.data.find(el => el?.name == this.roomName))
-					let shelfList = answ.data.find(el => el?.name == this.roomName).shelfs || []
-					this.compList = shelfList.find(el => el?.name == this.shelfName).compartments || []
+                    let room = answ.data.find(el => el?.id == this.roomId)
+                    this.roomName = room?.name
+					let shelfList = room.shelfs || []
+                    let shelf = shelfList.find(el => el?.id == this.shelfId)
+                    this.shelfName = shelf?.name
+					this.compList = shelf.compartments || []
 				}).catch(err => {
 					this.isLoading = false
 					this.errorText = err
@@ -90,8 +95,8 @@
 			}
 		},
 		async created () {
-			this.roomName = this.$route.params.room
-			this.shelfName = this.$route.params.shelf
+			this.roomId = this.$route.params.room
+			this.shelfId = this.$route.params.shelf
 			this.loadShelfList()
 		}
 	}

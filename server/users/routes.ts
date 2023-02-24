@@ -2,6 +2,7 @@ import * as db_helper from "./db_helper"
 import * as main from "../main"
 import { z } from "zod"
 import { PERMS } from "../permissions"
+import * as t from "../types/users"
 
 export interface User {
     display_name: string,
@@ -33,7 +34,7 @@ main.app.post("/users/new", async (req, res) => {
 	let type = z.object({
 		login_hash: z.string(),
 		display_name: z.string(),
-		group_id: z.string(),
+		group_id: t.ZodExistingGroupID,
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditUsrs, req.body, req.headers, res)
@@ -54,7 +55,7 @@ main.app.post("/users/new", async (req, res) => {
 
 main.app.post("/users/delete", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
+		id: t.ZodExistingUserID,
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditUsrs, req.body, req.headers, res)
@@ -75,7 +76,7 @@ main.app.post("/users/delete", async (req, res) => {
 
 main.app.post("/users/permedit", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
+		id: t.ZodExistingUserID,
 		permissions: z.number().positive()
 	})
 
@@ -97,7 +98,7 @@ main.app.post("/users/permedit", async (req, res) => {
 
 main.app.post("/users/edit", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
+		id: t.ZodExistingUserID,
 		login_hash: z.string().optional(),
 		display_name: z.string().optional(),
 		group_id: z.string().optional()
@@ -149,7 +150,7 @@ main.app.post("/groups/new", async (req, res) => {
 
 main.app.post("/groups/edit", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
+		id: t.ZodExistingGroupID,
 		name: z.string(),
 		permissions: z.number().positive()
 	})
@@ -157,11 +158,6 @@ main.app.post("/groups/edit", async (req, res) => {
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditUsrs, req.body, req.headers, res)
 	if (checked_body == undefined)
 		return
-
-    if (!(await db_helper.group_exists_in_db(checked_body.id))) {
-        res.status(400).send("A group with this id does not exist!")
-        return
-    }
 
     db_helper.edit_group(checked_body.id, checked_body.name, checked_body.permissions).then(() => {
         res.status(200).send("Ok")
@@ -172,17 +168,12 @@ main.app.post("/groups/edit", async (req, res) => {
 
 main.app.post("/groups/delete", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
+		id: t.ZodExistingGroupID,
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditUsrs, req.body, req.headers, res)
 	if (checked_body == undefined)
 		return
-
-    if (!(await db_helper.group_exists_in_db(checked_body.id))) {
-        res.status(400).send("A group with this id does not exist!")
-        return
-    }
 
     db_helper.remove_group_from_db(checked_body.id).then(() => {
         res.status(200).send("Ok")

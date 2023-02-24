@@ -1,6 +1,7 @@
 import * as db_helper from "./db_helper"
 import * as main from "../main"
 import { z } from "zod"
+import * as t from "../types/tools"
 import {PERMS} from "../permissions"
 
 export interface ChecklistItem {
@@ -48,7 +49,7 @@ main.app.post("/tools/checklists/new/", async (req, res) => {
 
 main.app.post("/tools/checklists/delete/", async (req, res) => {
 	let type = z.object({
-		id: z.number().positive(),
+		id: t.ZodExistingChecklistID,
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditChecklists, req.body, req.headers, res)
@@ -64,7 +65,7 @@ main.app.post("/tools/checklists/delete/", async (req, res) => {
 
 main.app.post("/tools/checklists/newItems/", async (req, res) => {
 	let type = z.object({
-		id: z.number().positive(),
+		id: t.ZodExistingChecklistID,
 		items: z.array(z.string())
 	})
 
@@ -81,8 +82,8 @@ main.app.post("/tools/checklists/newItems/", async (req, res) => {
 
 main.app.post("/tools/checklists/deleteItems/", async (req, res) => {
 	let type = z.object({
-		id: z.number().positive(),
-		items: z.array(z.number().positive())
+		id: t.ZodExistingChecklistID,
+		items: z.array(t.ZodExistingChecklistItemID)
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditChecklists, req.body, req.headers, res)
@@ -98,8 +99,8 @@ main.app.post("/tools/checklists/deleteItems/", async (req, res) => {
 
 main.app.post("/tools/checklists/setItemsChecked/", async (req, res) => {
 	let type = z.object({
-		id: z.number().positive(),
-		items: z.array(z.number().positive()),
+		id: t.ZodExistingChecklistID,
+		items: z.array(t.ZodExistingChecklistItemID),
 		checked_list: z.array(z.boolean())
 	})
 

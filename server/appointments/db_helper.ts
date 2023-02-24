@@ -1,5 +1,8 @@
 import * as main from "../main"
 import * as uuid from "uuid"
+import * as t from "../types/appointments"
+import * as it from "../types/inventory"
+import { Appointment } from "./routes"
 
 const get_appointment_query = `SELECT id, name, contact, description, date, end_date, needed_items,
             (
@@ -13,7 +16,7 @@ const get_appointment_query = `SELECT id, name, contact, description, date, end_
             ) as items
         FROM appointment_list`
 
-export async function get_approved_appointments_from_db(): Promise<object[]> {
+export async function get_approved_appointments_from_db(): Promise<Appointment[]> {
     return main.db_pool.query(get_appointment_query).then(res => {
         return res.rows.map(el => {el.date = Number(el.date); el.end_date = Number(el.end_date); return el})
     }).catch(err => {
@@ -21,7 +24,7 @@ export async function get_approved_appointments_from_db(): Promise<object[]> {
     })
 }
 
-export async function get_requested_appointments_from_db(): Promise<object[]> {
+export async function get_requested_appointments_from_db(): Promise<Appointment[]> {
     const query = `SELECT id, name, contact, description, date, end_date, needed_items
                 FROM appointment_request_list`
     return main.db_pool.query(query).then(res => {
@@ -31,7 +34,7 @@ export async function get_requested_appointments_from_db(): Promise<object[]> {
     })
 }
 
-export async function delete_appointment_from_db(id: string): Promise<void> {
+export async function delete_appointment_from_db(id: t.ExistingAppointmentID): Promise<void> {
     return main.db_pool.query("DELETE FROM appointment_list WHERE id = $1", [id]).then(_ => {
         return
     }).catch(err => {
@@ -39,7 +42,7 @@ export async function delete_appointment_from_db(id: string): Promise<void> {
     })
 }
 
-export async function delete_requested_appointment_from_db(id: string): Promise<void> {
+export async function delete_requested_appointment_from_db(id: t.ExistingAppointmentRequestID): Promise<void> {
     return main.db_pool.query("DELETE FROM appointment_request_list WHERE id = $1", [id]).then(_ => {
         return
     }).catch(err => {
@@ -57,7 +60,7 @@ export async function add_appointment_request_to_db(name: string, description: s
     })
 }
 
-export async function approve_appmnt_in_db(id: string): Promise<object> {
+export async function approve_appmnt_in_db(id: t.ExistingAppointmentRequestID): Promise<object> {
     await main.db_pool.query(`INSERT INTO appointment_list (id, name, description, date, end_date, contact, needed_items)
                             SELECT id, name, description, date, end_date, contact, needed_items
                             FROM appointment_request_list
@@ -75,27 +78,27 @@ export async function approve_appmnt_in_db(id: string): Promise<object> {
     })
 }
 
-export async function get_item_use_during_appointment(appmnt_id: string): Promise<{[key: string]: number}> {
+export async function get_item_use_during_appointment(appmnt_id: t.ExistingAppointmentID): Promise<{[key: it.ExistingItemID]: number}> {
     var appmnt = await main.db_pool.query(get_appointment_query+` WHERE appointment_list.id = $1`, [appmnt_id]).then(res => res.rows[0])
     if (!appmnt)
         throw new Error("The appointment with the ID you provided does not exist!")
     //var appmnts = await main.db.collection("appointments").find({date: {$lt: appmnt.end_date}, end_date: {$gt: appmnt.date}, id: {$ne: appmnt_id}}).toArray() // get all appmnts that are during the appmnt to check, but not itself
-    var appmnts = await main.db_pool.query(get_appointment_query+` WHERE appointment_list.date < $1 AND appointment_list.end_date > $2 AND appointment_list.id <> $3`,
+    let appmnts: {items: {amount: number, id: it.ExistingItemID}[], date: number, end_date: number}[] = await main.db_pool.query(get_appointment_query+` WHERE appointment_list.date < $1 AND appointment_list.end_date > $2 AND appointment_list.id <> $3`,
             [appmnt.end_date, appmnt.date, appmnt_id]).then(res => res.rows)
 
-    var orderd: {items: any[], time: number}[] = []
+    let orderd: {items: {amount: number, id: it.ExistingItemID}[], time: number}[] = []
     for (var a of appmnts) {
         orderd.push({items: a.items, time: a.date})
-        orderd.push({items: a.items.map((i:any) => {return {amount: i.amount * -1, id: i.id}}), time: a.end_date})
+        orderd.push({items: a.items.map(i => {return {amount: i.amount * -1, id: i.id}}), time: a.end_date})
     }
 
     orderd.sort((a, b) => a.time - b.time)
 
-    var max_amounts: {[key: string]: number} = {}
-    var amounts: {[key: string]: number} = {}
+    let max_amounts: {[key: it.ExistingItemID]: number} = {}
+    let amounts: {[key: it.ExistingItemID]: number} = {}
 
-    for (var o of orderd) { // run through all appmnts and "simulate" them to get max used amount at one time
-        for (var i of o.items) {
+    for (let o of orderd) { // run through all appmnts and "simulate" them to get max used amount at one time
+        for (let i of o.items) {
             if (!amounts[i.id]) {
                 amounts[i.id] = 0
                 max_amounts[i.id] = 0
@@ -111,7 +114,7 @@ export async function get_item_use_during_appointment(appmnt_id: string): Promis
     return max_amounts
 }
 
-export async function get_max_amount_of_item_for_appmnt(appmnt_id: string, item: {id: string, amount: number}, date: number, end_date: number): Promise<number> {
+export async function get_max_amount_of_item_for_appmnt(appmnt_id: t.ExistingAppointmentID, item: {id: it.ExistingItemID, amount: number}, date: number, end_date: number): Promise<number> {
     //var appmnts = await main.db.collection("appointments").find({items: {$elemMatch: {id: item.id}}, date: {$lt: end_date}, end_date: {$gt: date}, id: {$ne: appmnt_id}}).toArray() // get all appmnts that have the item booked that are during the appmnt to check, but not itself
     const query = get_appointment_query + 
         ` LEFT JOIN (SELECT appointment_id, item_id FROM appointment_item_bookings) bookings
@@ -145,7 +148,7 @@ export async function get_max_amount_of_item_for_appmnt(appmnt_id: string, item:
     return item.amount - max_amount
 }
 
-export async function update_appmnt_items_in_db(id: string, items: {id: string, amount: number}[]):Promise<void> {
+export async function update_appmnt_items_in_db(id: t.ExistingAppointmentID, items: {id: it.ExistingItemID, amount: number}[]):Promise<void> {
     //var appmnt = await main.db.collection("appointments").findOne({id: body.id}).catch(err => {throw err})
     let appmnt = await main.db_pool.query(get_appointment_query+` WHERE appointment_list.id = $1`, [id]).then(res => res.rows[0]).catch(err => {throw err})
     if (!appmnt)
@@ -162,14 +165,14 @@ export async function update_appmnt_items_in_db(id: string, items: {id: string, 
     }
     //await main.db.collection("appointments").updateOne({id: body.id}, {$set: {items: body.items}}).catch(err => {throw err})
     await main.db_pool.query("DELETE FROM appointment_item_bookings WHERE appointment_id = $1", [id]).catch(err => {throw err})
-    let all_proms: Promise<any>[] = []
+    let all_proms: Promise<void>[] = []
     items.forEach(el => {
-        all_proms.push(main.db_pool.query("INSERT INTO appointment_item_bookings (appointment_id, item_id, amount) VALUES ($1, $2, $3)", [id, el.id, el.amount]))
+        all_proms.push(main.db_pool.query("INSERT INTO appointment_item_bookings (appointment_id, item_id, amount) VALUES ($1, $2, $3)", [id, el.id, el.amount]).then(() => { return }))
     });
     await Promise.all(all_proms)
 }
 
-export async function update_appmnt_in_db(id: string, name?: string, date?: number, end_date?: number, description?: string, contact?: string): Promise<void> {
+export async function update_appmnt_in_db(id: t.ExistingAppointmentID, name?: string, date?: number, end_date?: number, description?: string, contact?: string): Promise<void> {
     let query = "UPDATE appointment_list SET"
 	let args = []
 	if (name) {

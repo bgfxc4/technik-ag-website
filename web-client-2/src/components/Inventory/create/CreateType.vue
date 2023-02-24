@@ -24,7 +24,7 @@
             LoadingIcon
         },
         props: {
-            categoryName: String
+            categoryId: String
         },
         data: function () {
             return  {
@@ -40,7 +40,7 @@
             createType () {
                 var type = {
                     name: this.typeName,
-                    category: this.categoryName
+                    category: this.categoryId
                 }
                 this.isLoading = true
                 this.errorText = ""

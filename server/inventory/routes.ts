@@ -1,9 +1,11 @@
 import * as db_helper from "./db_helper"
 import * as main from "../main"
-import * as storage_db_helper from "../storage/db_helper"
 import * as appmnt_db_helper from "../appointments/db_helper"
 import {PERMS} from "../permissions"
 import { z } from "zod"
+import * as t from "../types/inventory"
+import * as st from "../types/storage"
+import * as at from "../types/appointments"
 
 export interface Equipment {
 	id: string;
@@ -19,6 +21,10 @@ export interface Equipment {
 	custom_fields: any;
 }
 
+export interface ExistingEquipment extends Equipment {
+    id: t.ExistingItemID
+}
+
 export interface Category {
 	name: string;
 	image: string;
@@ -30,47 +36,24 @@ main.app.post("/equipment/new", async (req, res) => {
 	let type = z.object({
 		name: z.string(),
 		description: z.string(),
-		room: z.string(),
-		shelf: z.string(),
-		compartment: z.string(),
-		category: z.string(),
-		type: z.string(),
+		compartment: st.ZodExistingCompartmentID,
+		type: t.ZodExistingTypeID,
 		amount: z.number().positive(),
 		custom_fields: z.record(z.string(), z.union([z.string(), z.boolean()])),
 		image: z.string().optional(),
-		id: z.string().optional()
+		id: t.ZodNewItemID.optional()
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditInv, req.body, req.headers, res)
 	if (checked_body == undefined)
 		return
-	var shelf_exists = false
-	let r = await storage_db_helper.compartment_exists(checked_body.room, checked_body.shelf, checked_body.compartment)
-	shelf_exists = r
-	if (!r)
-		res.status(400).send("The room, shelf or compartment you specified does not exist!")
-	if (!shelf_exists)
-		return
-
-	db_helper.check_if_type_exists(checked_body.category, checked_body.type).then(code => {
-		if (checked_body == undefined) {
-			res.status(500).send("some error happened")
-			return
-		}
-		if (code == 1)
-			return res.status(400).send("The category you specified does not exist!")
-		if (code == 2)
-			return res.status(400).send("The type you specified does not exist in the category you specified!")
-		
-		db_helper.add_equipment_to_db(checked_body.id, checked_body.name, checked_body.description, checked_body.amount, checked_body.room, checked_body.shelf, 
-			checked_body.compartment, checked_body.category, checked_body.type, checked_body.custom_fields, checked_body.image).then(() => {
-			res.status(200).send("ok")
-		}).catch(err => {
-			res.status(500).send(err)
-		})
-	}).catch(err => {
-		res.status(500).send(err)
-	})
+    
+    db_helper.add_equipment_to_db(checked_body.id, checked_body.name, checked_body.description, checked_body.amount,
+        checked_body.compartment, checked_body.type, checked_body.custom_fields, checked_body.image).then(() => {
+        res.status(200).send("ok")
+    }).catch(err => {
+        res.status(500).send(err)
+    })
 })
 
 main.app.post("/category/new", async (req, res) => {
@@ -80,13 +63,14 @@ main.app.post("/category/new", async (req, res) => {
 		custom_fields: z.array(z.object({
 			name: z.string(),
 			type: z.string(),
-			options: z.array(z.string()).optional()
+			options: z.array(z.string()).nullable()
 		}))
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditInv, req.body, req.headers, res)
 	if (checked_body == undefined)
 		return
+
 	db_helper.add_category_to_db(checked_body.name, checked_body.custom_fields, checked_body.image).then(exists => {
 		if (!exists)
 			res.status(200).send("ok")
@@ -100,7 +84,7 @@ main.app.post("/category/new", async (req, res) => {
 main.app.post("/type/new", async (req, res) => {
 	let type = z.object({
 		name: z.string(),
-		category: z.string(),
+		category: t.ZodExistingCategoryID,
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditInv, req.body, req.headers, res)
@@ -123,83 +107,53 @@ main.app.post("/equipment/edit", async (req, res) => {
 	let type = z.object({
 		name: z.string(),
 		description: z.string(),
-		room: z.string(),
-		shelf: z.string(),
-		compartment: z.string(),
-		category: z.string(),
-		type: z.string(),
+		compartment: st.ZodExistingCompartmentID,
+		type: t.ZodExistingTypeID,
 		amount: z.number().positive(),
 		custom_fields: z.record(z.string(), z.union([z.string(), z.boolean()])),
 		image: z.string().optional(),
-		id: z.string()
+		id: t.ZodExistingItemID
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditInv, req.body, req.headers, res)
 	if (checked_body == undefined)
 		return
 
-	var storage_exists = false
-	let r = await storage_db_helper.compartment_exists(checked_body.room, checked_body.shelf, checked_body.compartment)
-
-	storage_exists = r
-	if (!r)
-		return res.status(400).send("The room, shelf or compartment you specified does not exist!")
-	if (!storage_exists)
-		return
-
-	db_helper.check_if_type_exists(checked_body.category, checked_body.type).then(code => {
-		if (checked_body == undefined)
-			return res.status(500).send("Some error on the server occured!")
-		if (code == 1)
-			return res.status(400).send("The category you specified does not exist!")
-		if (code == 2)
-			return res.status(400).send("The type you specified does not exist in the category you specified!")
-		db_helper.edit_equipment_in_db(checked_body.id, checked_body.name, checked_body.description, checked_body.amount, checked_body.custom_fields, checked_body.room, 
-			checked_body.shelf, checked_body.compartment, checked_body.category, checked_body.type, checked_body.image).then(() => {
-			res.status(200).send("ok")
-		}).catch(err => {
-			res.status(500).send(err)
-		})
-	}).catch(err => {
-		res.status(500).send(err)
-	})
+    db_helper.edit_equipment_in_db(checked_body.id, checked_body.name, checked_body.description, checked_body.amount, checked_body.custom_fields,
+        checked_body.compartment, checked_body.type, checked_body.image).then(() => {
+        res.status(200).send("ok")
+    }).catch(err => {
+        res.status(500).send(err)
+    })
 })
 
 main.app.post("/type/edit", async (req, res) => {
 	let type = z.object({
-		old_name: z.string(),
+        id: t.ZodExistingTypeID,
 		new_name: z.string(),
-		category: z.string(),
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditInv, req.body, req.headers, res)
 	if (checked_body == undefined)
 		return
 
-	db_helper.check_if_type_exists(checked_body.category, checked_body.old_name).then(exists => {
-		if (checked_body == undefined)
-			return res.status(500).send("There was an error on the server!")
-		if (exists != 0)
-			return res.status(400).send("A type with the old_name you specified does not exist in the category you specified!")
-		db_helper.edit_type_in_db(checked_body.old_name, checked_body.category, checked_body.new_name).then(() => {
-			res.status(200).send("ok")
-		}).catch(err => {
-			res.status(500).send(err)
-		})
-	}).catch(err => {
-		res.status(500).send(err)
-	})
+    db_helper.edit_type_in_db(checked_body.id, checked_body.new_name).then(() => {
+        res.status(200).send("ok")
+    }).catch(err => {
+        res.status(500).send(err)
+    })
+
 })
 
 main.app.post("/category/edit", async (req, res) => {
 	let type = z.object({
-		old_name: z.string(),
+		id: t.ZodExistingCategoryID,
 		new_name: z.string().optional(),
 		image: z.string().optional(),
 		custom_fields: z.array(z.object({
 			name: z.string(),
 			type: z.string(),
-			options: z.array(z.string()).optional()
+			options: z.array(z.string()).nullable()
 		})).optional()
 	})
 
@@ -207,24 +161,16 @@ main.app.post("/category/edit", async (req, res) => {
 	if (checked_body == undefined)
 		return
 
-	db_helper.check_if_category_exists(checked_body.old_name).then(exists => {
-		if (checked_body == undefined)
-			return res.status(500).send("There was an error on the server!")
-		if (!exists)
-			return res.status(400).send("A category with the old_name you specified does not exist!")
-		db_helper.edit_category_in_db(checked_body.old_name, checked_body.new_name, checked_body.custom_fields, checked_body.image).then(() => {
-			res.status(200).send("ok")
-		}).catch(err => {
-			res.status(500).send(err)
-		})
-	}).catch(err => {
-		res.status(500).send(err)
-	})
+    db_helper.edit_category_in_db(checked_body.id, checked_body.new_name, checked_body.custom_fields, checked_body.image).then(() => {
+        res.status(200).send("ok")
+    }).catch(err => {
+        res.status(500).send(err)
+    })
 })
 
 main.app.post("/equipment/delete", async (req, res) => {
 	let type = z.object({
-		id: z.string(),
+		id: t.ZodExistingItemID,
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditInv, req.body, req.headers, res)
@@ -240,54 +186,37 @@ main.app.post("/equipment/delete", async (req, res) => {
 
 main.app.post("/category/delete", async (req, res) => {
 	let type = z.object({
-		name: z.string(),
+		id: t.ZodExistingCategoryID,
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditInv, req.body, req.headers, res)
 	if (checked_body == undefined)
 		return
 
-	db_helper.check_if_category_exists(checked_body.name).then(exists => {
-		if (checked_body == undefined)
-			return res.status(500).send("There was an error on the server!")
-		if (!exists)
-			return res.status(400).send("The category you specified does not exist!")
-		db_helper.delete_category_from_db(checked_body.name).then(() => {
-			res.status(200).send("ok")
-		}).catch(err => {
-			res.status(500).send(err)
-		})
-	}).catch(err => {
-		res.status(500).send(err)
-	})
+    db_helper.delete_category_from_db(checked_body.id).then(() => {
+        res.status(200).send("ok")
+    }).catch(err => {
+        res.status(500).send(err)
+    })
 })
 
 main.app.post("/type/delete", async (req, res) => {
 	let type = z.object({
-		name: z.string(),
-		category: z.string()
+		id: t.ZodExistingTypeID,
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.EditInv, req.body, req.headers, res)
 	if (checked_body == undefined)
 		return
 
-	db_helper.check_if_type_exists(checked_body.category, checked_body.name).then(code => {
-		if (checked_body == undefined)
-			return res.status(500).send("There was an error on the server!")
-		if (code != 0)
-			return res.status(400).send("The type or category you specified does not exist!")
-		db_helper.delete_type_from_db(checked_body.name, checked_body.category).then(() => {
-			res.status(200).send("ok")
-		}).catch(err => {
-			res.status(500).send(err)
-		})
-	}).catch(err => {
-		res.status(500).send(err)
-	})
+    db_helper.delete_type_from_db(checked_body.id).then(() => {
+        res.status(200).send("ok")
+    }).catch(err => {
+        res.status(500).send(err)
+    })
 })
 
-async function get_appointment_list(during_appointment?: undefined|string): Promise<any[]> {
+async function get_appointment_list(during_appointment?: undefined|at.ExistingAppointmentID): Promise<any[]> {
 	var list: (Equipment & { available_amount?: number })[] = await db_helper.get_equipment_from_db()
 	var cats = await db_helper.get_categories_from_db()
 	var result: any[] = []
@@ -310,8 +239,8 @@ async function get_appointment_list(during_appointment?: undefined|string): Prom
 					if (result[i].types[j].name == equ.type) {
 
 						if (during_appointment) {
-							if (item_use_during_appmnt[(equ.id as string)])
-								equ.available_amount = equ.amount - item_use_during_appmnt[(equ.id as string)]
+							if (item_use_during_appmnt[equ.id as t.ExistingItemID])
+								equ.available_amount = equ.amount - item_use_during_appmnt[equ.id as t.ExistingItemID]
 							else {
 								equ.available_amount = equ.amount	
 							}
@@ -342,7 +271,7 @@ main.app.get("/equipment/list", async (req, res) => {
 
 main.app.post("/equipment/list/duringappointment", async (req, res) => {
 	let type = z.object({
-		appointment: z.string()
+		appointment: at.ZodExistingAppointmentID
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.ViewAppmnts | PERMS.ViewInv, req.body, req.headers, res)
@@ -354,8 +283,8 @@ main.app.post("/equipment/list/duringappointment", async (req, res) => {
 
 main.app.post("/equipment/get/duringappointment", async (req, res) => {
 	let type = z.object({
-		appointment: z.string(),
-		id: z.string()
+		appointment: at.ZodExistingAppointmentID,
+		id: t.ZodExistingItemID
 	})
 
 	let checked_body = await main.check_request<z.infer<typeof type>>(type, PERMS.ViewAppmnts | PERMS.ViewInv, req.body, req.headers, res)
@@ -366,7 +295,7 @@ main.app.post("/equipment/get/duringappointment", async (req, res) => {
 	if (!appmnt)
 		return res.status(400).send(`The appointment with the ID ${checked_body.appointment} was not found.`)
 
-	let item: Equipment & { available_amount?: number } = await db_helper.get_equipment_by_id_from_db(checked_body.id, true).then(res => res[0])
+	let item: ExistingEquipment & { available_amount?: number } = await db_helper.get_equipment_by_id_from_db(checked_body.id, true).then(res => res[0])
 	if (!item)
 		return res.status(400).send(`The item with the ID ${checked_body.id} was not found.`)
 	
@@ -375,19 +304,16 @@ main.app.post("/equipment/get/duringappointment", async (req, res) => {
 	res.send(JSON.stringify(item))
 })
 
-main.app.get("/category/getimg/:name", async (req, res) => {
+main.app.get("/category/getimg/:id", async (req, res) => {
 	let type = z.object({
-		name: z.string()
+		id: t.ZodExistingCategoryID
 	})
 
 	let checked_params = await main.check_request<z.infer<typeof type>>(type, PERMS.None, req.params, req.headers, res)
 	if (checked_params == undefined)
 		return
 
-	db_helper.get_category_by_name(checked_params.name).then(cat => {
-		if (cat == undefined)
-			return res.status(400).send("A category with the name you provided does not exist!")
-		
+	db_helper.get_category_by_id(checked_params.id).then(cat => {
 		var img = Buffer.from(cat.image, 'base64');
 
 		res.writeHead(200, {
@@ -403,7 +329,7 @@ main.app.get("/category/getimg/:name", async (req, res) => {
 
 main.app.get("/equipment/getimg/:id", async (req, res) => {
 	let type = z.object({
-		id: z.string()
+		id: t.ZodExistingItemID
 	})
 
 	let checked_params = await main.check_request<z.infer<typeof type>>(type, PERMS.None, req.params, req.headers, res)
@@ -411,8 +337,6 @@ main.app.get("/equipment/getimg/:id", async (req, res) => {
 		return
 
 	db_helper.get_equipment_by_id_from_db(checked_params.id, true).then(equ => {
-		if (equ == undefined || equ.length == 0 || equ[0] == undefined)
-			return res.status(400).send("An item with the id you provided does not exist!")
 		var img = Buffer.from(equ[0].image, 'base64');
 
 		res.writeHead(200, {
@@ -465,7 +389,7 @@ main.app.get("/categories/list", async (req, res) => {
 
 main.app.get("/equipment/byid/:id", async (req, res) => {
 	let type = z.object({
-		id: z.string()
+		id: t.ZodExistingItemID 
 	})
 
 	let checked_params = await main.check_request<z.infer<typeof type>>(type, PERMS.ViewInv, req.params, req.headers, res)
@@ -497,7 +421,7 @@ main.app.get("/equipment/byid/:id", async (req, res) => {
 
 main.app.get("/equipment/byid/:id/appointmentbookings", async (req, res) => {
 	let type = z.object({
-		id: z.string()
+		id: t.ZodExistingItemID 
 	})
 
 	let checked_params = await main.check_request<z.infer<typeof type>>(type, PERMS.ViewInv | PERMS.ViewAppmnts, req.params, req.headers, res)
@@ -511,17 +435,16 @@ main.app.get("/equipment/byid/:id/appointmentbookings", async (req, res) => {
 	})
 })
 
-main.app.get("/equipment/bytype/:category/:type", async (req, res) => {
+main.app.get("/equipment/bytype/:type_id", async (req, res) => {
 	let type = z.object({
-		type: z.string(),
-		category: z.string()
+		type_id: t.ZodExistingTypeID,
 	})
 
 	let checked_params = await main.check_request<z.infer<typeof type>>(type, PERMS.ViewInv, req.params, req.headers, res)
 	if (checked_params == undefined)
 		return
 
-	db_helper.get_equipment_by_type_from_db(checked_params.category, checked_params.type).then(equ => {
+	db_helper.get_equipment_by_type_from_db(checked_params.type_id).then(equ => {
 		res.send(JSON.stringify(equ))
 	}).catch(err => {
 		res.status(500).send(err)
